@@ -1,8 +1,8 @@
 from .base import *
 import os
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+DEBUG = False
+ALLOWED_HOSTS = ['tlmt.pythonanywhere.com']
 
 DATABASES = {
     'default': {
