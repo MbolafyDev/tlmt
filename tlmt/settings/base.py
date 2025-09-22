@@ -1,5 +1,4 @@
 from .env_base_dir import BASE_DIR
-from pathlib import Path
 import os
 
 # --- Clé & Auth ---

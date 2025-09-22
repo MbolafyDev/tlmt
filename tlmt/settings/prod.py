@@ -1,13 +1,12 @@
 from .base import *
-from .env_base_dir import BASE_DIR
 import os
 
-DEBUG = False
-ALLOWED_HOSTS = ['ton-domaine.com', 'ton-app.herokuapp.com']
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
         'NAME': os.getenv('DB_NAME', ''),
         'USER': os.getenv('DB_USER', ''),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
@@ -40,4 +39,4 @@ SECURE_HSTS_PRELOAD = False
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_TRUSTED_ORIGINS = ["https://ton-domaine.com"]
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host]
