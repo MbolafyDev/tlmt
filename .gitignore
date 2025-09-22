@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.log
+
+# Environnement virtuel
+venv/
+.env/
+*.env
+
+# Base SQLite locale
+db.sqlite3
+
+# Static et media collectés
+/staticfiles/
+/media/
+
+# VSCode / IDE
+.vscode/
+.idea/

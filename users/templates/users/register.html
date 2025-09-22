@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm p-4">
+        <h3 class="text-center mb-4">Créer un compte</h3>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ field.label }}</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  {% if "password" in field.name %}
+                    <i class="fa fa-lock text-secondary"></i>
+                  {% elif "email" in field.name %}
+                    <i class="fa fa-envelope text-secondary"></i>
+                  {% elif "username" in field.name %}
+                    <i class="fa fa-user text-secondary"></i>
+                  {% else %}
+                    <i class="fa fa-pencil-alt text-secondary"></i>
+                  {% endif %}
+                </span>
+                {{ field|add_class:"form-control form-control-lg rounded-pill shadow-sm" }}
+              </div>
+              {% if field.errors %}
+                <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+            <i class="fa fa-user-plus me-2"></i> S'inscrire
+          </button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          Déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

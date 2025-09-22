@@ -1,0 +1,56 @@
+.card-produit {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease; 
+  z-index: 0;
+}
+
+.card-produit:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Ombre plus prononcée */
+  transform: translateY(-5px); /* Optionnel : léger effet de levée */
+  z-index: 10;
+}
+
+.card-produit .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* pousse les boutons vers le bas */
+  flex-grow: 1;                    /* prend toute la hauteur disponible */
+}
+
+/* Image toujours carrée et responsive */
+.card-produit img {
+  width: 100%;          /* s'adapte à la largeur de la carte */
+  aspect-ratio: 1 / 1;  /* hauteur = largeur => carré parfait */
+  object-fit: cover;    /* remplit le carré sans déformation */
+  object-position: center;
+}
+
+/* Badge étiquette en haut à gauche */
+.card-produit .badge {
+  position: absolute;
+  top: 10px;      /* distance depuis le haut de la carte */
+  left: 10px;     /* distance depuis la gauche */
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 0.25rem 0.75rem 0.75rem 0.25rem; /* style étiquette */
+  z-index: 10;     /* au-dessus de l'image et du contenu */
+}
+
+/* Optionnel : léger effet d’ombre pour le badge */
+.card-produit .badge {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+
+/* Pour tablette et desktop */
+@media(min-width: 768px){
+  .card-produit img {
+    height: 200px;           /* hauteur fixe */
+    aspect-ratio: auto;      /* on n'impose plus le carré */
+    object-fit: cover;       /* remplit la carte pour les grands écrans */
+  }
+}

@@ -1,0 +1,37 @@
+.card-produit {
+  height: 100%; /* pour que toutes les cartes prennent toute la hauteur du parent */
+  display: flex;
+  flex-direction: column; /* pour que le body et le footer se positionnent verticalement */
+}
+
+.card-produit .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* espace entre le contenu et le bas de la carte */
+  flex-grow: 1; /* fait que le card-body prend tout l'espace disponible */
+}
+
+.card-text {
+  min-height: 40px; /* ajuste selon la taille de texte attendue */
+  overflow: hidden; /* évite que le texte dépasse */
+}
+
+
+.card-produit img {
+  width: 100%;
+  height: 150px; /* mobile */
+  object-fit: cover;
+  object-position: center;
+}
+
+@media(min-width: 768px){
+  .card-produit img {
+    height: 200px; /* tablette */
+  }
+}
+
+@media(min-width: 1200px){
+  .card-produit img {
+    height: 250px; /* desktop */
+  }
+}

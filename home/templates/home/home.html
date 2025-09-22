@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <h3 class="mb-3">Livrés chez vous en 48 heures</h3>
+  <div class="row g-4">
+
+    <!-- Produit exemple -->
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit">
+        <img src="{% static 'images/4.png' %}" class="card-img-top" alt="Produit 1">
+        ...
+      </div>
+    </div>
+
+    {# Remplace tes chemins relatifs par le tag static aussi : #}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit">
+        <img src="{% static 'images/_20250311_Applique murale_Zara Store.png' %}" class="card-img-top" alt="Produit 2">
+        ...
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit">
+        <img src="{% static 'images/20250429_Pack_HDMI_Pro.png' %}" class="card-img-top" alt="Produit 3">
+        ...
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit">
+        <img src="{% static 'images/20250603_Smartwatch T800 Ultra_Zara Store.png' %}" class="card-img-top" alt="Produit 4">
+        ...
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
