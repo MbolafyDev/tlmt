@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}À propos de l'application{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <h3 class="mb-4 text-center">À propos de TLMT Services</h3>
+  <p class="text-center mb-5">
+    TLMT Services est une application moderne qui vous permet de gérer vos commandes, suivre vos produits et accéder à nos services rapidement et efficacement.
+  </p>
+
+  <div class="row g-4">
+
+    <!-- Feature 1 -->
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit p-3">
+        <img src="{% static 'images/feature1.png' %}" class="card-img-top mb-3" alt="Rapide et fiable">
+        <h5 class="card-title">Rapide et fiable</h5>
+        <p class="card-text">Nos livraisons arrivent chez vous en moins de 48 heures, avec un suivi en temps réel.</p>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit p-3">
+        <img src="{% static 'images/feature2.png' %}" class="card-img-top mb-3" alt="Sécurisé">
+        <h5 class="card-title">Sécurisé</h5>
+        <p class="card-text">Toutes vos transactions sont sécurisées grâce à notre système de paiement certifié.</p>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit p-3">
+        <img src="{% static 'images/feature3.png' %}" class="card-img-top mb-3" alt="Interface intuitive">
+        <h5 class="card-title">Interface intuitive</h5>
+        <p class="card-text">Une navigation simple et fluide pour trouver et gérer vos produits facilement.</p>
+      </div>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm text-center card-produit p-3">
+        <img src="{% static 'images/feature4.png' %}" class="card-img-top mb-3" alt="Support 24/7">
+        <h5 class="card-title">Support 24/7</h5>
+        <p class="card-text">Une équipe disponible à tout moment pour répondre à vos questions et besoins.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

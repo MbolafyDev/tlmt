@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'home',
     'users',
     'widget_tweaks',
+    'apropos',
 ]
 
 # --- Middleware ---
