@@ -8,7 +8,7 @@
 
 .navbar-nav .nav-link {
     padding: 5px 8px;
-    font-size: 1.4rem; /* taille des icônes */
+    font-size: 1.4rem;
     position: relative;
 }
 
@@ -16,11 +16,11 @@
     padding: 0;
 }
 
-/* Champ recherche dropdown */
+/* Champ recherche dropdown (desktop) */
 #searchDropdown {
-    display: none; /* caché par défaut */
+    display: none;
     position: absolute;
-    top: 100%; /* sous l'icône */
+    top: 100%;
     right: 0;
     width: 125px;
     padding: 2px 5px;
@@ -36,24 +36,95 @@
     outline: none;
     padding: 2px 4px;
 }
+
+/* Sidebar mobile */
+#mobileSidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100%;
+    width: 250px;
+    background-color: #fff;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+    z-index: 1050;
+    transition: left 0.3s ease;
+    padding-top: 60px;
+}
+
+#mobileSidebar .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+#mobileSidebar ul li {
+    text-align: left;
+    padding: 12px 20px;
+}
+
+#mobileSidebar ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+#mobileSidebar ul li a i {
+    margin-right: 8px;
+}
+
+/* Overlay */
+#sidebarOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1040;
+    display: none;
+}
+
+/* Active state */
+#mobileSidebar.active {
+    left: 0;
+}
+
+#sidebarOverlay.active {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media(max-width: 991px){
+    #navbarIcons {
+        display: none !important;
+    }
+
+    #searchDropdown {
+        width: 100%;
+        left: 0;
+        right: 0;
+        top: auto;
+        margin-top: 5px;
+    }
+}
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
 
-    <!-- Logo principal -->
-    <a class="navbar-brand" href="#">
+    <!-- Logo -->
+    <a class="navbar-brand" href="{% url '/home' %}">
       <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40">
     </a>
 
-    <!-- Toggle mobile -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarIcons" aria-controls="navbarIcons"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <!-- Toggle mobile sidebar -->
+    <button class="btn d-lg-none" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Icônes menu -->
+    <!-- Navbar icons (desktop) -->
     <div class="collapse navbar-collapse justify-content-end" id="navbarIcons">
       <ul class="navbar-nav align-items-center">
 
@@ -125,6 +196,28 @@
   </div>
 </nav>
 
+<!-- Sidebar mobile -->
+<div id="mobileSidebar">
+  <!-- Bouton fermer -->
+  <span class="close-btn" id="closeSidebarBtn">&times;</span>
+  <ul class="mobile-menu list-unstyled">
+    <li><a href="#"><i class="fas fa-search"></i> Recherche</a></li>
+    <li><a href="#"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">0</span></a></li>
+    <li><a href="#"><i class="fas fa-puzzle-piece"></i> Services</a></li>
+    <li><a href="#"><i class="fas fa-envelope"></i> Contacter-nous</a></li>
+    <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+    {% else %}
+      <li><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Connexion</a></li>
+      <li><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Inscription</a></li>
+    {% endif %}
+  </ul>
+</div>
+
+<!-- Overlay -->
+<div id="sidebarOverlay"></div>
+
 <!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -133,9 +226,9 @@
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
-})
+});
 
-// Toggle input recherche
+// Toggle input recherche (desktop)
 var searchIcon = document.getElementById('searchIcon');
 var searchDropdown = document.getElementById('searchDropdown');
 
@@ -149,10 +242,31 @@ searchIcon.addEventListener('click', function(e){
     }
 });
 
-// Clic hors pour fermer
+// Clic hors pour fermer la recherche
 document.addEventListener('click', function(e){
     if(!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)){
         searchDropdown.style.display = 'none';
     }
+});
+
+// Sidebar mobile toggle
+const mobileBtn = document.getElementById('mobileMenuBtn');
+const mobileSidebar = document.getElementById('mobileSidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+mobileBtn.addEventListener('click', function(){
+    mobileSidebar.classList.add('active');
+    overlay.classList.add('active');
+});
+
+overlay.addEventListener('click', function(){
+    mobileSidebar.classList.remove('active');
+    overlay.classList.remove('active');
+});
+
+closeSidebarBtn.addEventListener('click', function(){
+    mobileSidebar.classList.remove('active');
+    overlay.classList.remove('active');
 });
 </script>

@@ -32,6 +32,13 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ['username', 'email', 'password1', 'password2']
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = 'client'  # rôle client par défaut
+        user.is_active = False  # compte inactif jusqu'à activation email
+        if commit:
+            user.save()
+        return user
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(

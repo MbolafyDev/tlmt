@@ -1,0 +1,13 @@
+{% autoescape off %}
+Bonjour {{ user.username }},
+
+Merci pour votre inscription sur {{ domain }}.
+Pour activer votre compte, veuillez cliquer sur ce lien :
+
+{{ activation_link }}
+
+Si vous n'avez pas créé ce compte, ignorez cet email.
+
+Merci,
+L'équipe {{ domain }}
+{% endautoescape %}
