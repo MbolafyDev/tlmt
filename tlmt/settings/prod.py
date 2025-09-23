@@ -1,8 +1,12 @@
 from .base import *
 import os
+from .env_base_dir import BASE_DIR
 
 DEBUG = False
-ALLOWED_HOSTS = ['https://tlmt.pythonanywhere.com/']
+ALLOWED_HOSTS = [ 
+    'tlmt.pythonanywhere.com',  
+    'www.tlmt.pythonanywhere.com',
+    ]
 
 DATABASES = {
     'default': {
@@ -39,4 +43,4 @@ SECURE_HSTS_PRELOAD = False
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host]
+CSRF_TRUSTED_ORIGINS = ["https://tlmt.pythonanywhere.com"]
