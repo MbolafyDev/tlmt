@@ -11,7 +11,6 @@ from .forms import DimensionnementForm, DemandeDimensionnementForm
 from .models import DemandeDimensionnement, Dimensionnement
 import math, os, json
 
-
 # ---------- Outils ----------
 def _to_float(s, default=0.0):
     try:
@@ -27,8 +26,8 @@ def _energie_from_post_lists(request):
 
     n = max(len(puissances), len(durees), len(quantites), len(noms))
     noms += [""] * (n - len(noms))
-    puissances += [""] * (n - len(puissances))
-    durees += [""] * (n - len(durees))
+    puissances += ["0"] * (n - len(puissances))
+    durees += ["0"] * (n - len(durees))
     quantites += ["1"] * (n - len(quantites))
 
     total = 0.0
@@ -79,22 +78,20 @@ def _tension_from_pc(pc):
     return 96
 
 def _propositions_panneaux(pc):
-    """Liste [{w, qty}] pour tailles 100W → 750W."""
     tailles = [100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 650, 700, 750]
     propositions = []
     for w in tailles:
-        qty = int(math.ceil((pc or 0) / w)) if w > 0 else 0
+        qty = int(math.ceil((pc or 0) / w)) if w > 0 else 1
         if qty < 1:
             qty = 1
         propositions.append({"w": w, "qty": qty})
     return propositions
 
 def _propositions_batteries(cap_ah):
-    """Liste [{ah, qty}] pour 100Ah → 500Ah (100,150,200,250,300,400,500)."""
     tailles = [100, 150, 200, 250, 300, 400, 500]
     propositions = []
     for ah in tailles:
-        qty = int(math.ceil((cap_ah or 0) / ah)) if ah > 0 else 0
+        qty = int(math.ceil((cap_ah or 0) / ah)) if ah > 0 else 1
         if qty < 1:
             qty = 1
         propositions.append({"ah": ah, "qty": qty})
@@ -105,8 +102,7 @@ def _render_pdf_weasyprint(request, html_string) -> bytes:
     html = HTML(string=html_string, base_url=base_url)
     return html.write_pdf()
 
-
-# ---------- Vue interne (optionnelle) ----------
+# ---------- Vue interne ----------
 def dimensionnement_view(request):
     result = None
     if request.method == "POST":
@@ -131,7 +127,6 @@ def dimensionnement_view(request):
 
     return render(request, "dimensionement/dimensionnement_form.html", {"form": form, "result": result})
 
-
 # ---------- Flux client ----------
 def demande_dimensionnement_view(request):
     if request.method == "POST":
@@ -139,7 +134,6 @@ def demande_dimensionnement_view(request):
         if form.is_valid():
             demande = form.save(commit=False)
 
-            # 1) Énergie journalière (Wh/j)
             ec_list, details = _energie_from_post_lists(request)
             if ec_list <= 0:
                 ec_text, details_text = _fallback_energie_from_text(demande.appareils)
@@ -148,34 +142,30 @@ def demande_dimensionnement_view(request):
             else:
                 demande.energie_journaliere = ec_list
 
-            # 2) Calculs internes
             k = demande.rendement_k or 0.65
             hC = demande.irradiation or 2.4
             pc = (demande.energie_journaliere or 0) / (k * hC) if (k and hC and demande.energie_journaliere) else 0.0
-            demande.puissance_crete = round(pc, 2)  # stocké mais non affiché
-
+            demande.puissance_crete = round(pc, 2)
             demande.tension_systeme = _tension_from_pc(pc)
 
             D = 0.8
-            if demande.energie_journaliere and demande.jours_autonomie and demande.tension_systeme and D:
-                cap_ah = (demande.energie_journaliere * demande.jours_autonomie) / (demande.tension_systeme * D)
-            else:
-                cap_ah = 0.0
-            demande.capacite_batterie = round(cap_ah, 2)  # stocké mais non affiché
+            cap_ah = (demande.energie_journaliere * demande.jours_autonomie) / (demande.tension_systeme * D) \
+                if demande.energie_journaliere and demande.jours_autonomie and demande.tension_systeme else 0.0
+            demande.capacite_batterie = round(cap_ah, 2)
 
             p_inst_total = sum(d["puissance"] * d["quantite"] for d in details) if details else 0.0
             demande.puissance_onduleur = round(p_inst_total * 1.5, 2)
 
-            # 3) Propositions PV & batteries -> sérialisées en JSON (TextField)
+            # Sérialisation JSON pour TextField
             p_list = _propositions_panneaux(pc)
             b_list = _propositions_batteries(cap_ah)
             demande.panneaux_propositions = json.dumps(p_list, ensure_ascii=False)
             demande.batteries_propositions = json.dumps(b_list, ensure_ascii=False)
 
-            # Save avant PDF pour avoir l'ID
+            # Save avant PDF
             demande.save()
 
-            # 4) Génération PDF (on passe aussi les listes prêtes à l'emploi)
+            # Génération PDF
             context = {
                 "demande": demande,
                 "details": details,
@@ -185,7 +175,6 @@ def demande_dimensionnement_view(request):
             html_string = render_to_string("dimensionement/dimensionnement_pdf.html", context)
             pdf_bytes = _render_pdf_weasyprint(request, html_string)
 
-            # 5) Enregistrer PDF
             safe_name = slugify(demande.nom) or "client"
             filename = f"dimensionnement_{demande.id}_{safe_name}.pdf"
             path = default_storage.save(f"dimensionements/{filename}", ContentFile(pdf_bytes))
@@ -198,10 +187,8 @@ def demande_dimensionnement_view(request):
 
     return render(request, "dimensionement/dimensionnement_form.html", {"form": form})
 
-
 def demande_success_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
-    # Dé-sérialiser pour affichage
     try:
         p_list = json.loads(demande.panneaux_propositions or "[]")
     except Exception:
@@ -217,22 +204,20 @@ def demande_success_view(request, pk: int):
         {"demande": demande, "propositions_pv": p_list, "propositions_batt": b_list},
     )
 
-
 def telecharger_pdf_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
     if not demande.pdf:
         return HttpResponse("PDF non disponible", status=404)
-    f = default_storage.open(demande.pdf.name, "rb")
-    resp = HttpResponse(f.read(), content_type="application/pdf")
-    resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(demande.pdf.name)}"'
-    return resp
-
+    with default_storage.open(demande.pdf.name, "rb") as f:
+        resp = HttpResponse(f.read(), content_type="application/pdf")
+        resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(demande.pdf.name)}"'
+        return resp
 
 def voir_pdf_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
     if not demande.pdf:
         return HttpResponse("PDF non disponible", status=404)
-    f = default_storage.open(demande.pdf.name, "rb")
-    resp = HttpResponse(f.read(), content_type="application/pdf")
-    resp["Content-Disposition"] = f'inline; filename="{os.path.basename(demande.pdf.name)}"'
-    return resp
+    with default_storage.open(demande.pdf.name, "rb") as f:
+        resp = HttpResponse(f.read(), content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="{os.path.basename(demande.pdf.name)}"'
+        return resp
