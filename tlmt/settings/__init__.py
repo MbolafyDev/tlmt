@@ -4,6 +4,9 @@ ENV est chargé depuis .env.dev / .env.prod dans env_base_dir.py
 """
 
 import os
+import pymysql
+
+pymysql.install_as_MySQLdb()
 
 # ⚠️ Charger d'abord les variables .env (side-effect) :
 from .env_base_dir import BASE_DIR  # noqa: F401

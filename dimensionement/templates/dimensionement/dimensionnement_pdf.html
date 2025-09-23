@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Rapport de dimensionnement PV</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
+    h1,h2,h3 { margin: 0 0 8px 0; }
+    .muted { color: #666; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #444; padding: 6px; text-align: center; }
+    th { background: #f2f2f2; }
+    .small { font-size: 12px; }
+    .left { text-align: left; }
+  </style>
+</head>
+<body>
+  <h2>Rapport de dimensionnement photovoltaïque</h2>
+  <div class="mb-3 small">
+    <b>Client :</b> {{ demande.nom }} — {{ demande.email }}{% if demande.telephone %} — {{ demande.telephone }}{% endif %}<br>
+    <span class="muted">Généré le {{ demande.created_at|date:"d/m/Y H:i" }}</span>
+  </div>
+
+  <h3 class="mb-2">Entrées</h3>
+  <table class="mb-4">
+    <tr>
+      <th>Jours d’autonomie</th>
+      <th>Irradiation (kWh/m².j)</th>
+      <th>Coefficient K</th>
+    </tr>
+    <tr>
+      <td>{{ demande.jours_autonomie }}</td>
+      <td>{{ demande.irradiation }}</td>
+      <td>{{ demande.rendement_k }}</td>
+    </tr>
+  </table>
+
+  {% if details %}
+  <h3 class="mb-2">Appareils saisis</h3>
+  <table class="mb-4">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th class="left">Nom</th>
+        <th>Puissance (W)</th>
+        <th>Durée (h/j)</th>
+        <th>Quantité</th>
+        <th>Énergie (Wh/j)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in details %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td class="left">{{ d.nom|default:"—" }}</td>
+        <td>{{ d.puissance }}</td>
+        <td>{{ d.duree }}</td>
+        <td>{{ d.quantite }}</td>
+        <td>{{ d.wh|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <h3 class="mb-2">Résultats & Choix d’équipements</h3>
+  <table class="mb-4">
+    <tr><th>Énergie journalière (Ec)</th><td>{{ demande.energie_journaliere|floatformat:2 }} Wh/j</td></tr>
+    <tr><th>Tension système</th><td>{{ demande.tension_systeme|floatformat:0 }} VDC</td></tr>
+    <tr><th>Puissance onduleur (≈ ΣP × 1.5)</th><td>{{ demande.puissance_onduleur|floatformat:2 }} VA</td></tr>
+  </table>
+
+  <h3 class="mb-2">Propositions de panneaux</h3>
+  <table class="mb-4">
+    <thead>
+      <tr><th>Taille panneau</th><th>Quantité</th></tr>
+    </thead>
+    <tbody>
+      {% for p in propositions_pv %}
+      <tr>
+        <td>{{ p.w }} W</td>
+        <td>{{ p.qty }} × ({{ p.w }}W)</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="mb-2">Propositions de batteries</h3>
+  <table class="mb-4">
+    <thead>
+      <tr><th>Capacité batterie</th><th>Quantité</th></tr>
+    </thead>
+    <tbody>
+      {% for b in propositions_batt %}
+      <tr>
+        <td>{{ b.ah }} Ah</td>
+        <td>{{ b.qty }} × ({{ b.ah }}Ah)</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="small muted">
+    Remarque : Les propositions sont arrondies au supérieur. Le choix réel dépend du stock,
+    des montages série/parallèle et des contraintes d’installation.
+  </p>
+</body>
+</html>

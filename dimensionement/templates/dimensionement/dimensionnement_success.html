@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Dimensionnement enregistré ✅</h2>
+
+  <div class="mb-3">
+    <p><b>Client :</b> {{ demande.nom }} — {{ demande.email }}{% if demande.telephone %} — {{ demande.telephone }}{% endif %}</p>
+    <p class="mb-1"><b>Énergie journalière :</b> {{ demande.energie_journaliere|floatformat:2 }} Wh/j</p>
+    <p class="mb-1"><b>Tension système :</b> {{ demande.tension_systeme|floatformat:0 }} VDC</p>
+    <p class="mb-1"><b>Puissance onduleur :</b> {{ demande.puissance_onduleur|floatformat:2 }} VA</p>
+  </div>
+
+  <div class="mb-3">
+    <h5>Propositions de panneaux</h5>
+    <ul>
+      {% for p in propositions_pv %}
+        <li>{{ p.w }}W → {{ p.qty }} × ({{ p.w }}W)</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mb-3">
+    <h5>Propositions de batteries</h5>
+    <ul>
+      {% for b in propositions_batt %}
+        <li>{{ b.ah }}Ah → {{ b.qty }} × ({{ b.ah }}Ah)</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="d-flex gap-2">
+    {% if demande.pdf %}
+      <a class="btn btn-primary" href="{% url 'telecharger_pdf' demande.id %}">⬇️ Télécharger le PDF</a>
+      <a class="btn btn-outline-secondary" href="{% url 'voir_pdf' demande.id %}" target="_blank">👁️ Voir en ligne</a>
+    {% else %}
+      <div class="alert alert-warning">Le PDF n’est pas disponible.</div>
+    {% endif %}
+    <a class="btn btn-link" href="{% url 'demande_dimensionnement' %}">← Nouvelle demande</a>
+  </div>
+</div>
+{% endblock %}

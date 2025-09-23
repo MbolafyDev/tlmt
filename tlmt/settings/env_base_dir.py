@@ -4,10 +4,17 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Charge .env.prod si présent, sinon .env.dev
-env_file = BASE_DIR / ".env.prod" if os.path.exists(BASE_DIR / ".env.prod") else BASE_DIR / ".env.dev"
+# Vérifie la variable ENV
+env_type = os.getenv("ENV", "development")  # par défaut: dev
+
+if env_type == "production":
+    env_file = BASE_DIR / ".env.prod"
+else:
+    env_file = BASE_DIR / ".env.dev"
+
+# Charger le bon fichier .env
 load_dotenv(dotenv_path=env_file)
 
-# Logs utiles (apparaissent dans la console/les logs)
-print("ENV chargé :", os.getenv("ENV"))
+# Logs utiles
+print(f"ENV détecté : {env_type}")
 print("DB_ENGINE :", os.getenv("DB_ENGINE"))
