@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def apropos_view(request):
+    return render(request, 'apropos/apropos.html')
