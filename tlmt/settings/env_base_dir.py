@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # --- Chargement automatique du bon .env ---
-env_file = BASE_DIR / ".env.dev"  # par défaut
+env_file = BASE_DIR / ".env.dev"  # par défaut local
 if os.getenv("ENV") == "production":
     env_file = BASE_DIR / ".env.prod"
 

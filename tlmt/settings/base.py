@@ -1,11 +1,10 @@
 from .env_base_dir import BASE_DIR
 import os
 
-# --- Clé & Auth ---
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
+DEBUG = os.getenv("DEBUG", "True") == "True"
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# --- Apps ---
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,7 +20,6 @@ INSTALLED_APPS = [
     'apropos',
 ]
 
-# --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -32,11 +30,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# --- URL / WSGI ---
 ROOT_URLCONF = 'tlmt.urls'
 WSGI_APPLICATION = 'tlmt.wsgi.application'
 
-# --- Templates ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -53,7 +49,6 @@ TEMPLATES = [
     },
 ]
 
-# --- Passwords ---
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -61,13 +56,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# --- i18n / tz ---
 LANGUAGE_CODE = 'fr'
 TIME_ZONE = 'Indian/Antananarivo'
 USE_I18N = True
 USE_TZ = True
 
-# --- Static & Media ---
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
