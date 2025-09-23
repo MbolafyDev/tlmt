@@ -1,6 +1,6 @@
 from .base import *
-import os
 from .env_base_dir import BASE_DIR
+import os
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
@@ -8,7 +8,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 DATABASES = {
     'default': {
         'ENGINE': os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
-        'NAME': BASE_DIR / os.getenv("DB_NAME", "db.sqlite3"),
+        'NAME': os.getenv("DB_NAME", BASE_DIR / "db.sqlite3"),
     }
 }
 
