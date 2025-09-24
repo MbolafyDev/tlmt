@@ -1,4 +1,10 @@
-<div class="py-2 border-bottom" style="background-color: #0dcaf0;">
+<!-- Bouton mobile pour ouvrir le menu -->
+<div class="d-md-none p-2 bg-info text-white text-center">
+  <button id="toggleCategoriesBtn" class="btn btn-light w-100">Catégories</button>
+</div>
+
+<!-- Menu catégories -->
+<div id="categoriesSidebar" class="py-2 border-bottom bg-info d-none d-md-block">
   <div class="container d-flex justify-content-center flex-wrap gap-2">
 
     <!-- Bouton Tous -->
@@ -16,7 +22,7 @@
 </div>
 
 <style>
-/* Optionnel : ajouter un léger effet hover et arrondi */
+/* Boutons */
 .btn-light:hover {
     background-color: #0bb5d8;
     color: white;
@@ -31,4 +37,65 @@
     border-radius: 5px;
     font-weight: 500;
 }
+
+/* Sidebar mobile */
+#categoriesSidebarMobile {
+    position: fixed;
+    top: 0;
+    left: -250px; /* caché par défaut */
+    width: 250px;
+    height: 100%;
+    background-color: #0dcaf0;
+    padding: 20px;
+    overflow-y: auto;
+    transition: left 0.3s;
+    z-index: 1050;
+}
+
+#categoriesSidebarMobile.active {
+    left: 0;
+}
+
+#categoriesSidebarMobile a {
+    display: block;
+    margin-bottom: 10px;
+    color: black;
+}
+
+#categoriesSidebarMobile a.btn-info {
+    color: white;
+}
+
+#closeSidebarBtn {
+    margin-bottom: 20px;
+}
 </style>
+
+<!-- Sidebar mobile HTML -->
+<div id="categoriesSidebarMobile" class="d-md-none">
+  <button id="closeSidebarBtn" class="btn btn-danger w-100 mb-3">Fermer</button>
+  
+  <a href="{% url '/home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
+
+  {% for categorie in categories_menu %}
+    <a href="{% url 'categorie_detail' slug=categorie.slug %}" 
+       class="btn {% if request.resolver_match.kwargs.slug == categorie.slug %}btn-info text-white{% else %}btn-light{% endif %}">
+      {{ categorie.nom }}
+    </a>
+  {% endfor %}
+</div>
+
+<script>
+// Toggle sidebar mobile
+const toggleBtn = document.getElementById('toggleCategoriesBtn');
+const sidebar = document.getElementById('categoriesSidebarMobile');
+const closeBtn = document.getElementById('closeSidebarBtn');
+
+toggleBtn.addEventListener('click', () => {
+    sidebar.classList.add('active');
+});
+
+closeBtn.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+});
+</script>

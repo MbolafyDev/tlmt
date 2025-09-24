@@ -1,0 +1,40 @@
+<!-- En bas de la section produits, après la div.row -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center mt-4">
+    {% if produits.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ produits.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-hidden="true">&laquo;</span>
+      </li>
+    {% endif %}
+
+    {% for num in produits.paginator.page_range %}
+      {% if produits.number == num %}
+        <li class="page-item active">
+          <span class="page-link">{{ num }}</span>
+        </li>
+      {% elif num > produits.number|add:'-3' and num < produits.number|add:'3' %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {% if produits.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ produits.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-hidden="true">&raquo;</span>
+      </li>
+    {% endif %}
+  </ul>
+</nav>

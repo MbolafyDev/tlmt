@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from article.models import Produit, Categorie
+from django.core.paginator import Paginator
 
 PANIER_EXEMPLE = [
     {
@@ -19,7 +20,13 @@ PANIER_EXEMPLE = [
 ]
 # Create your views here.
 def home(request):
-    produits = Produit.objects.prefetch_related("images").all()[:8]
+    produits_list = Produit.objects.prefetch_related("images").all()
+    
+    # Pagination: 10 produits par page
+    paginator = Paginator(produits_list, 10)
+    page_number = request.GET.get('page')  # Récupère le numéro de page depuis l'URL
+    produits = paginator.get_page(page_number)
+    
     return render(request, 'home/home.html', {"produits": produits})
 
 
