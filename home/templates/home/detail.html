@@ -8,10 +8,32 @@
 <div class="container my-5">
   <div class="row g-4">
 
-    <!-- Image principale -->
+    <!-- Images produit avec carousel -->
     <div class="col-md-6">
       <div class="border p-3 rounded shadow-sm">
-        <img src="{% static produit.image %}" class="img-fluid" alt="{{ produit.nom }}">
+        {% if produit.images.all %}
+        <div id="carouselDetail{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for image in produit.images.all %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ produit.nom }}">
+            </div>
+            {% endfor %}
+          </div>
+          {% if produit.images.count > 1 %}
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselDetail{{ produit.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselDetail{{ produit.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+          {% endif %}
+        </div>
+        {% else %}
+          <img src="{% static 'images/default.png' %}" class="img-fluid" alt="{{ produit.nom }}">
+        {% endif %}
       </div>
     </div>
 
@@ -39,21 +61,25 @@
       </h3>
 
       <!-- Caractéristiques -->
+      {% if produit.caracteristiques.all %}
       <ul class="mt-3">
-        {% for c in produit.caracteristiques %}
-        <li>{{ c }}</li>
+        {% for c in produit.caracteristiques.all %}
+        <li>{{ c.nom }}</li>
         {% endfor %}
       </ul>
+      {% endif %}
 
-      <!-- Sélecteurs -->
+      <!-- Couleurs -->
+      {% if produit.couleurs.all %}
       <div class="mt-3">
         <label for="color" class="form-label">Couleur :</label>
         <select id="color" class="form-select w-50">
-          {% for couleur in produit.couleurs %}
-          <option>{{ couleur }}</option>
+          {% for couleur in produit.couleurs.all %}
+          <option>{{ couleur.nom }}</option>
           {% endfor %}
         </select>
       </div>
+      {% endif %}
 
       <!-- Quantité + boutons -->
       <div class="d-flex align-items-center mt-4">
@@ -78,8 +104,7 @@
   <div class="mt-5">
     <h4>Description détaillée</h4>
     <p>
-      La <strong>{{ produit.nom }}</strong> est conçue pour les amateurs de sport et de technologie.
-      Grâce à son design moderne et ses fonctionnalités avancées, elle vous accompagne au quotidien : suivi d’activité, surveillance cardiaque, notifications, et plus encore.
+      {{ produit.description_detaillee|default:"Pas de description détaillée disponible." }}
     </p>
   </div>
 </div>
