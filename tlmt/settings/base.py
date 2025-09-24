@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'apropos',
     'dimensionement',
+    'contact',
 ]
 
 MIDDLEWARE = [

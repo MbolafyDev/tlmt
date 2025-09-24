@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Checkout - Zara Store{% endblock %}
+
+{% block content %}
+<!-- ================= PAGE CHECKOUT ================= -->
+<section class="container my-5">
+  <h2 class="mb-4">Votre Panier</h2>
+  <div class="row">
+    <!-- Colonne gauche: produits -->
+    <div class="col-lg-8 mb-4">
+      <div class="list-group">
+        {% for item in panier %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{% static item.image %}" alt="{{ item.nom }}" class="me-3" style="width:80px; aspect-ratio:1/1; object-fit:cover;">
+            <div>
+              <h6 class="mb-1">{{ item.nom }}</h6>
+              <small class="text-muted">Quantité: {{ item.quantite }}</small>
+            </div>
+          </div>
+          <div>
+            <span class="text-decoration-line-through text-muted">{{ item.prix_original }} Ar</span>
+            <span class="fw-bold text-danger ms-2">{{ item.prix }} Ar</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Total -->
+      <div class="mt-4 d-flex justify-content-end">
+        <h5>Total: <span class="text-danger">{{ total }} Ar</span></h5>
+      </div>
+    </div>
+
+    <!-- Colonne droite: formulaire paiement -->
+    <div class="col-lg-4">
+      <h4 class="mb-3">Paiement</h4>
+      <form method="POST" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="name" class="form-label">Nom complet</label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="John Doe">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Adresse</label>
+          <input type="text" class="form-control" id="address" name="address" placeholder="Adresse de livraison">
+        </div>
+        <div class="mb-3">
+          <label for="card" class="form-label">Carte bancaire</label>
+          <input type="text" class="form-control" id="card" name="card" placeholder="Numéro de carte">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Valider la commande</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

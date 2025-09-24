@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contactez-nous{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+    <h2>Contactez-nous</h2>
+    <p>Vous pouvez nous envoyer un message via le formulaire ci-dessous :</p>
+
+    {% if success %}
+      <div class="alert alert-success">Merci ! Votre message a été envoyé avec succès.</div>
+    {% endif %}
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.nom.label_tag }}
+            {{ form.nom }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+        </div>
+        <div class="mb-3">
+            {{ form.sujet.label_tag }}
+            {{ form.sujet }}
+        </div>
+        <div class="mb-3">
+            {{ form.message.label_tag }}
+            {{ form.message }}
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+    </form>
+</section>
+{% endblock %}

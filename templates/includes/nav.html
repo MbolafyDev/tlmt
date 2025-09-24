@@ -151,7 +151,7 @@
 
         <!-- Shopping Cart -->
         <li class="nav-item">
-          <a class="nav-link position-relative" href="#" data-bs-toggle="tooltip" title="Panier">
+          <a class="nav-link position-relative" href="{% url 'checkout' %}" data-bs-toggle="tooltip" title="Panier">
             <i class="fas fa-shopping-cart"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
           </a>
@@ -172,7 +172,7 @@
 
         <!-- Contacter-nous -->
         <li class="nav-item">
-          <a class="nav-link" href="#" data-bs-toggle="tooltip" title="Contacter-nous">
+          <a class="nav-link" href="{% url 'contact' %}" data-bs-toggle="tooltip" title="Contacter-nous">
             <i class="fas fa-envelope"></i>
           </a>
         </li>
@@ -214,7 +214,7 @@
   <span class="close-btn" id="closeSidebarBtn">&times;</span>
   <ul class="mobile-menu list-unstyled">
     <li><a href="#"><i class="fas fa-search"></i> Recherche</a></li>
-    <li><a href="#"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">0</span></a></li>
+    <li><a href="{% url 'checkout' %}"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">0</span></a></li>
     
     <!-- Services avec sous-menu -->
     <li>
@@ -227,7 +227,7 @@
       </ul>
     </li>
 
-    <li><a href="#"><i class="fas fa-envelope"></i> Contacter-nous</a></li>
+    <li><a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contacter-nous</a></li>
     <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
     {% if user.is_authenticated %}
       <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
