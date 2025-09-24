@@ -1,23 +1,30 @@
 import os
-import pymysql
-pymysql.install_as_MySQLdb()
+from pathlib import Path
+from dotenv import load_dotenv
 
-from .env_base_dir import BASE_DIR
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- Détection automatique de l'environnement ---
-# Priorité à la variable d'environnement ENV
-ENV = (os.getenv("ENV") or os.getenv("DJANGO_ENV") or "").lower()
+# First load a generic .env (for fallback)
+default_env_file = BASE_DIR.parent / ".env"
+load_dotenv(default_env_file)
 
-# Fallback : si aucune variable ENV, on détecte local vs prod selon l'existence du .env.prod
-if not ENV:
-    ENV = "production" if os.path.exists(os.path.join(BASE_DIR, ".env.prod")) else "development"
+# Now read ENV to decide which real .env file to load
+env = os.getenv("ENV", "local")  # default to 'local'
 
-# Charger les settings appropriés
-if ENV.startswith("prod") or ENV == "production":
+if env == "production":
+    env_file = BASE_DIR.parent / ".env.prod"
+elif env == "dev":
+    env_file = BASE_DIR.parent / ".env.dev"
+else:
+    env_file = default_env_file
+
+# Re-load selected .env file to overwrite
+load_dotenv(env_file, override=True)
+
+# Finally, load the actual Django settings
+if env == "production":
     from .prod import *
-    ACTIVE_SETTINGS = "prod"
 else:
     from .dev import *
-    ACTIVE_SETTINGS = "dev"
 
-print(f"[settings] ENV={ENV} -> settings.{ACTIVE_SETTINGS}")
+print(f"🔧 Using settings environment: {env}")
