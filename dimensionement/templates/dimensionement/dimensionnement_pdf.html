@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Rapport de dimensionnement PV</title>
+  {% load static %}
   <style>
     body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
     h1,h2,h3 { margin: 0 0 8px 0; }
@@ -15,10 +16,24 @@
     th { background: #f2f2f2; }
     .small { font-size: 12px; }
     .left { text-align: left; }
+    /* Conteneur titre + logo */
+    .header-logo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .header-logo img {
+      height: 50px; /* Ajuste la taille du logo */
+    }
   </style>
 </head>
 <body>
-  <h2>Rapport de dimensionnement photovoltaïque</h2>
+  <div class="header-logo">
+    <h2>Rapport de dimensionnement photovoltaïque</h2>
+    <img src="{% static 'images/logo.jpg' %}" alt="Logo">
+  </div>
+
   <div class="mb-3 small">
     <b>Client :</b> {{ demande.nom }} — {{ demande.email }}{% if demande.telephone %} — {{ demande.telephone }}{% endif %}<br>
     <span class="muted">Généré le {{ demande.created_at|date:"d/m/Y H:i" }}</span>
