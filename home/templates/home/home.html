@@ -3,45 +3,137 @@
 
 {% block title %}Home Page{% endblock %}
 
-<!-- ================= CAROUSEL ================= -->
-
-
 {% block content %}
+<!-- ================= CAROUSEL ================= -->
 {% include 'includes/carousel.html' %}
+
+<!-- Section Produits Livrés rapidement -->
 <section class="container my-5">
   <h3 class="mb-3">Livrés chez vous en 48 heures</h3>
   <div class="row g-4">
 
-    <!-- Produit exemple -->
+    <!-- Produit 1 -->
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="card shadow-sm text-center card-produit">
         <img src="{% static 'images/4.png' %}" class="card-img-top" alt="Produit 1">
-        ...
+        <div class="card-body d-flex flex-column justify-content-between">
+          <span class="badge bg-danger">-10 000 Ar</span>
+          <p class="card-text mt-2">Réchaud à Pétrole très performant et durable</p>
+          <p class="text-primary fw-bold mb-1">Réchaud à Pétrole 5L</p>
+          <div class="mb-2 text-warning">★★★★☆</div>
+          <p class="mb-2">
+            <span class="text-decoration-line-through text-muted">65 000 Ar</span>
+            <span class="fw-bold text-danger ms-2">55 000 Ar</span>
+          </p>
+          <div class="d-flex justify-content-center align-items-center mt-auto">
+            <div class="input-group input-group-sm" style="width: 100px;">
+              <button class="btn btn-outline-secondary" type="button">-</button>
+              <input type="text" class="form-control text-center" value="1">
+              <button class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+            <button class="btn btn-success btn-sm ms-2">
+              <i class="fas fa-cart-arrow-down"></i>
+            </button>
+            <a href="#" class="btn btn-info btn-sm ms-2">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
-    {# Remplace tes chemins relatifs par le tag static aussi : #}
+    <!-- Produit 2 -->
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="card shadow-sm text-center card-produit">
         <img src="{% static 'images/_20250311_Applique murale_Zara Store.png' %}" class="card-img-top" alt="Produit 2">
-        ...
+        <div class="card-body d-flex flex-column justify-content-between">
+          <span class="badge bg-danger">-10 000 Ar</span>
+          <p class="card-text mt-2">Applique murale design moderne</p>
+          <p class="text-primary fw-bold mb-1">Applique Zara Store</p>
+          <div class="mb-2 text-warning">★★★★☆</div>
+          <p class="mb-2">
+            <span class="text-decoration-line-through text-muted">75 000 Ar</span>
+            <span class="fw-bold text-danger ms-2">65 000 Ar</span>
+          </p>
+          <div class="d-flex justify-content-center align-items-center mt-auto">
+            <div class="input-group input-group-sm" style="width: 100px;">
+              <button class="btn btn-outline-secondary" type="button">-</button>
+              <input type="text" class="form-control text-center" value="1">
+              <button class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+            <button class="btn btn-success btn-sm ms-2">
+              <i class="fas fa-cart-arrow-down"></i>
+            </button>
+            <a href="#" class="btn btn-info btn-sm ms-2">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Produit 3 -->
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="card shadow-sm text-center card-produit">
         <img src="{% static 'images/20250429_Pack_HDMI_Pro.png' %}" class="card-img-top" alt="Produit 3">
-        ...
+        <div class="card-body d-flex flex-column justify-content-between">
+          <span class="badge bg-danger">-10 000 Ar</span>
+          <p class="card-text mt-2">Pack câbles HDMI haute performance</p>
+          <p class="text-primary fw-bold mb-1">HDMI Pro Pack</p>
+          <div class="mb-2 text-warning">★★★★☆</div>
+          <p class="mb-2">
+            <span class="text-decoration-line-through text-muted">45 000 Ar</span>
+            <span class="fw-bold text-danger ms-2">35 000 Ar</span>
+          </p>
+          <div class="d-flex justify-content-center align-items-center mt-auto">
+            <div class="input-group input-group-sm" style="width: 100px;">
+              <button class="btn btn-outline-secondary" type="button">-</button>
+              <input type="text" class="form-control text-center" value="1">
+              <button class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+            <button class="btn btn-success btn-sm ms-2">
+              <i class="fas fa-cart-arrow-down"></i>
+            </button>
+            <a href="#" class="btn btn-info btn-sm ms-2">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Produit 4 -->
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="card shadow-sm text-center card-produit">
         <img src="{% static 'images/20250603_Smartwatch T800 Ultra_Zara Store.png' %}" class="card-img-top" alt="Produit 4">
-        ...
+        <div class="card-body d-flex flex-column justify-content-between">
+          <span class="badge bg-danger">-10 000 Ar</span>
+          <p class="card-text mt-2">Smartwatch T800 Ultra</p>
+          <p class="text-primary fw-bold mb-1">Zara Tech</p>
+          <div class="mb-2 text-warning">★★★★☆</div>
+          <p class="mb-2">
+            <span class="text-decoration-line-through text-muted">150 000 Ar</span>
+            <span class="fw-bold text-danger ms-2">140 000 Ar</span>
+          </p>
+          <div class="d-flex justify-content-center align-items-center mt-auto">
+            <div class="input-group input-group-sm" style="width: 100px;">
+              <button class="btn btn-outline-secondary" type="button">-</button>
+              <input type="text" class="form-control text-center" value="1">
+              <button class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+            <button class="btn btn-success btn-sm ms-2">
+              <i class="fas fa-cart-arrow-down"></i>
+            </button>
+            <a href="#" class="btn btn-info btn-sm ms-2">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 </section>
+
+<!-- Pagination -->
 {% endblock %}
