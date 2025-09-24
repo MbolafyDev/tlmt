@@ -8,7 +8,7 @@
   <div class="container d-flex justify-content-center flex-wrap gap-2">
 
     <!-- Bouton Tous -->
-    <a href="{% url '/home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
+    <a href="{% url 'home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
 
     <!-- Boutons catégories dynamiques -->
     {% for categorie in categories_menu %}
@@ -75,7 +75,7 @@
 <div id="categoriesSidebarMobile" class="d-md-none">
   <button id="closeSidebarBtn" class="btn btn-danger w-100 mb-3">Fermer</button>
   
-  <a href="{% url '/home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
+  <a href="{% url 'home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
 
   {% for categorie in categories_menu %}
     <a href="{% url 'categorie_detail' slug=categorie.slug %}" 

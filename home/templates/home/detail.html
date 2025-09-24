@@ -8,7 +8,6 @@
 <div class="container my-5">
   <div class="row g-4">
 
-    <!-- Images produit avec carousel -->
     <div class="col-md-6">
       <div class="border p-3 rounded shadow-sm">
         {% if produit.images.all %}
@@ -37,30 +36,15 @@
       </div>
     </div>
 
-    <!-- Infos produit -->
     <div class="col-md-6">
       <h2 class="fw-bold">{{ produit.nom }}</h2>
       <p class="text-muted">{{ produit.description_courte }}</p>
 
-      <!-- Étoiles -->
-      <div class="mb-2 text-warning fs-5">
-        {% for i in "12345" %}
-          {% if forloop.counter <= produit.avis|divisibleby:10 %}
-            ★
-          {% else %}
-            ☆
-          {% endif %}
-        {% endfor %}
-        ({{ produit.avis }} avis)
-      </div>
-
-      <!-- Prix -->
       <h3>
         <span class="text-decoration-line-through text-muted fs-5">{{ produit.prix_original|intcomma }} Ar</span>
         <span class="fw-bold text-danger ms-3">{{ produit.prix|intcomma }} Ar</span>
       </h3>
 
-      <!-- Caractéristiques -->
       {% if produit.caracteristiques.all %}
       <ul class="mt-3">
         {% for c in produit.caracteristiques.all %}
@@ -69,7 +53,6 @@
       </ul>
       {% endif %}
 
-      <!-- Couleurs -->
       {% if produit.couleurs.all %}
       <div class="mt-3">
         <label for="color" class="form-label">Couleur :</label>
@@ -81,31 +64,58 @@
       </div>
       {% endif %}
 
-      <!-- Quantité + boutons -->
       <div class="d-flex align-items-center mt-4">
         <div class="input-group input-group-sm" style="width: 100px;">
-          <button class="btn btn-outline-secondary" type="button">-</button>
-          <input type="text" class="form-control text-center" value="1">
-          <button class="btn btn-outline-secondary" type="button">+</button>
+          <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
+          <input type="text" class="form-control text-center qty-input" value="1">
+          <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
         </div>
-        <button class="btn btn-success btn-lg ms-3">
+        <button class="btn btn-success btn-lg ms-3 btn-add-cart" data-id="{{ produit.id }}">
           <i class="fas fa-cart-arrow-down"></i> Ajouter au panier
         </button>
       </div>
 
-      <!-- Lien retour -->
       <div class="mt-3">
-        <a href="{% url '/home' %}" class="btn btn-link"><i class="fas fa-arrow-left"></i> Retour à la boutique</a>
+        <a href="{% url 'home' %}" class="btn btn-link"><i class="fas fa-arrow-left"></i> Retour à la boutique</a>
       </div>
     </div>
   </div>
 
-  <!-- Description détaillée -->
   <div class="mt-5">
     <h4>Description détaillée</h4>
-    <p>
-      {{ produit.description_detaillee|default:"Pas de description détaillée disponible." }}
-    </p>
+    <p>{{ produit.description_detaillee|default:"Pas de description détaillée disponible." }}</p>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.querySelector('.qty-input');
+  document.querySelector('.btn-increase').addEventListener('click', () => input.value = parseInt(input.value) + 1);
+  document.querySelector('.btn-decrease').addEventListener('click', () => input.value = Math.max(1, parseInt(input.value) - 1));
+
+  document.querySelector('.btn-add-cart').addEventListener('click', function() {
+    const produit_id = this.dataset.id;
+    const quantite = parseInt(input.value);
+
+    fetch("{% url 'ajouter_au_panier' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `produit_id=${produit_id}&quantite=${quantite}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success){
+        // Met à jour le badge du panier dynamiquement
+        const badge = document.querySelector('#cart-badge');
+        if(badge) badge.textContent = data.total_items;
+      } else {
+        console.error('Erreur ajout panier');
+      }
+    });
+  });
+});
+</script>
 {% endblock %}

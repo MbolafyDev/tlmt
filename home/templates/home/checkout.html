@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
+
 {% block title %}Checkout - Zara Store{% endblock %}
 
 {% block content %}
-<!-- ================= PAGE CHECKOUT ================= -->
 <section class="container my-5">
   <h2 class="mb-4">Votre Panier</h2>
+
   <div class="row">
     <!-- Colonne gauche: produits -->
     <div class="col-lg-8 mb-4">
+      {% if panier %}
       <div class="list-group">
-        {% for item in panier %}
+        {% for produit_id, item in panier.items %}
         <div class="list-group-item d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
             <img src="{% static item.image %}" alt="{{ item.nom }}" class="me-3" style="width:80px; aspect-ratio:1/1; object-fit:cover;">
@@ -19,9 +22,14 @@
               <small class="text-muted">Quantité: {{ item.quantite }}</small>
             </div>
           </div>
-          <div>
-            <span class="text-decoration-line-through text-muted">{{ item.prix_original }} Ar</span>
-            <span class="fw-bold text-danger ms-2">{{ item.prix }} Ar</span>
+          <div class="d-flex align-items-center">
+            <span class="text-decoration-line-through text-muted">{{ item.prix_original|intcomma }} Ar</span>
+            <span class="fw-bold text-danger ms-2">{{ item.prix|intcomma }} Ar</span>
+            <form method="POST" class="ms-2">
+              {% csrf_token %}
+              <input type="hidden" name="remove_id" value="{{ produit_id }}">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+            </form>
           </div>
         </div>
         {% endfor %}
@@ -29,8 +37,11 @@
 
       <!-- Total -->
       <div class="mt-4 d-flex justify-content-end">
-        <h5>Total: <span class="text-danger">{{ total }} Ar</span></h5>
+        <h5>Total: <span class="text-danger">{{ total|intcomma }} Ar</span></h5>
       </div>
+      {% else %}
+        <p class="text-center text-muted">Votre panier est vide.</p>
+      {% endif %}
     </div>
 
     <!-- Colonne droite: formulaire paiement -->
@@ -40,21 +51,25 @@
         {% csrf_token %}
         <div class="mb-3">
           <label for="name" class="form-label">Nom complet</label>
-          <input type="text" class="form-control" id="name" name="name" placeholder="John Doe">
+          <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required>
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
+          <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com" required>
         </div>
         <div class="mb-3">
           <label for="address" class="form-label">Adresse</label>
-          <input type="text" class="form-control" id="address" name="address" placeholder="Adresse de livraison">
+          <input type="text" class="form-control" id="address" name="address" placeholder="Adresse de livraison" required>
         </div>
         <div class="mb-3">
           <label for="card" class="form-label">Carte bancaire</label>
-          <input type="text" class="form-control" id="card" name="card" placeholder="Numéro de carte">
+          <input type="text" class="form-control" id="card" name="card" placeholder="Numéro de carte" required>
         </div>
+        {% if panier %}
         <button type="submit" class="btn btn-primary w-100">Valider la commande</button>
+        {% else %}
+        <button type="button" class="btn btn-secondary w-100" disabled>Panier vide</button>
+        {% endif %}
       </form>
     </div>
   </div>
