@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'apropos',
     'dimensionement',
     'contact',
+    'article',
 ]
 
 MIDDLEWARE = [

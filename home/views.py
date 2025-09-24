@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from article.models import Produit
 
 PANIER_EXEMPLE = [
     {
@@ -18,7 +19,9 @@ PANIER_EXEMPLE = [
 ]
 # Create your views here.
 def home(request):
-    return render(request, 'home/home.html')
+    produits = Produit.objects.prefetch_related("images").all()[:8]
+    return render(request, 'home/home.html', {"produits": produits})
+
 
 def produit_detail(request, produit_id):
     # Ici on suppose que vous avez un modèle Produit
