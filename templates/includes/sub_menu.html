@@ -1,10 +1,34 @@
 <div class="py-2 border-bottom" style="background-color: #0dcaf0;">
   <div class="container d-flex justify-content-center flex-wrap gap-2">
-    <a href="#" class="btn btn-light">NOS PRODUITS</a>
-    <a href="#" class="btn btn-light">GAMME APPLE</a>
-    <a href="#" class="btn btn-info text-white">LA RENTRÉE</a>
-    <a href="#" class="btn btn-light">CALCULATRICE</a>
-    <a href="#" class="btn btn-light">DISPO EN 48H</a>
-    <a href="#" class="btn btn-light">BLOG</a>
+
+    <!-- Bouton Tous -->
+    <a href="{% url '/home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
+
+    <!-- Boutons catégories dynamiques -->
+    {% for categorie in categories_menu %}
+      <a href="{% url 'categorie_detail' slug=categorie.slug %}" 
+         class="btn {% if request.resolver_match.kwargs.slug == categorie.slug %}btn-info text-white{% else %}btn-light{% endif %}">
+        {{ categorie.nom }}
+      </a>
+    {% endfor %}
+
   </div>
 </div>
+
+<style>
+/* Optionnel : ajouter un léger effet hover et arrondi */
+.btn-light:hover {
+    background-color: #0bb5d8;
+    color: white;
+    transition: 0.3s;
+}
+
+.btn-info {
+    border-radius: 5px;
+}
+
+.btn {
+    border-radius: 5px;
+    font-weight: 500;
+}
+</style>

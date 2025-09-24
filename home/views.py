@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from article.models import Produit
+from article.models import Produit, Categorie
 
 PANIER_EXEMPLE = [
     {
@@ -47,3 +47,11 @@ def checkout(request):
         'total': total
     }
     return render(request, 'home/checkout.html', context)
+
+def categorie_detail(request, slug):
+    categorie = get_object_or_404(Categorie, slug=slug)
+    produits = categorie.produits.all()
+    return render(request, 'home/home.html', {
+        'produits': produits,
+        'categorie': categorie
+    })
