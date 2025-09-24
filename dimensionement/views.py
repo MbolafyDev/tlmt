@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.contrib.auth.decorators import login_required
 
 from .forms import DimensionnementForm, DemandeDimensionnementForm
 from .models import DemandeDimensionnement, Dimensionnement
@@ -102,7 +103,8 @@ def _render_pdf_weasyprint(request, html_string) -> bytes:
     html = HTML(string=html_string, base_url=base_url)
     return html.write_pdf()
 
-# ---------- Vue interne ----------
+# ---------- Vues ----------
+@login_required
 def dimensionnement_view(request):
     result = None
     if request.method == "POST":
@@ -127,7 +129,7 @@ def dimensionnement_view(request):
 
     return render(request, "dimensionement/dimensionnement_form.html", {"form": form, "result": result})
 
-# ---------- Flux client ----------
+@login_required
 def demande_dimensionnement_view(request):
     if request.method == "POST":
         form = DemandeDimensionnementForm(request.POST)
@@ -156,13 +158,12 @@ def demande_dimensionnement_view(request):
             p_inst_total = sum(d["puissance"] * d["quantite"] for d in details) if details else 0.0
             demande.puissance_onduleur = round(p_inst_total * 1.5, 2)
 
-            # Sérialisation JSON pour TextField
+            # Sérialisation JSON
             p_list = _propositions_panneaux(pc)
             b_list = _propositions_batteries(cap_ah)
             demande.panneaux_propositions = json.dumps(p_list, ensure_ascii=False)
             demande.batteries_propositions = json.dumps(b_list, ensure_ascii=False)
 
-            # Save avant PDF
             demande.save()
 
             # Génération PDF
@@ -187,6 +188,7 @@ def demande_dimensionnement_view(request):
 
     return render(request, "dimensionement/dimensionnement_form.html", {"form": form})
 
+@login_required
 def demande_success_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
     try:
@@ -204,6 +206,7 @@ def demande_success_view(request, pk: int):
         {"demande": demande, "propositions_pv": p_list, "propositions_batt": b_list},
     )
 
+@login_required
 def telecharger_pdf_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
     if not demande.pdf:
@@ -213,6 +216,7 @@ def telecharger_pdf_view(request, pk: int):
         resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(demande.pdf.name)}"'
         return resp
 
+@login_required
 def voir_pdf_view(request, pk: int):
     demande = get_object_or_404(DemandeDimensionnement, pk=pk)
     if not demande.pdf:
