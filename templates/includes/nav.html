@@ -74,6 +74,17 @@
     margin-right: 8px;
 }
 
+/* Sous-menu mobile */
+#mobileSidebar .submenu {
+    list-style: none;
+    padding-left: 0;
+    display: none;
+}
+#mobileSidebar .submenu li a {
+    padding-left: 20px;
+    font-size: 1.2rem; /* réduit par rapport au menu principal */
+}
+
 /* Overlay */
 #sidebarOverlay {
     position: fixed;
@@ -204,7 +215,18 @@
   <ul class="mobile-menu list-unstyled">
     <li><a href="#"><i class="fas fa-search"></i> Recherche</a></li>
     <li><a href="#"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">0</span></a></li>
-    <li><a href="#"><i class="fas fa-puzzle-piece"></i> Services</a></li>
+    
+    <!-- Services avec sous-menu -->
+    <li>
+      <a href="#" class="submenu-toggle"><i class="fas fa-puzzle-piece"></i> Services <i class="fas fa-caret-down float-end"></i></a>
+      <ul class="submenu list-unstyled" >
+        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-tools"></i> Installation</a></li>
+        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
+        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-file-invoice"></i> Devis</a></li>
+        <li><a href="{% url 'demande_dimensionnement' %}" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-bolt"></i> Dimensionnement Paneau Solaire</a></li>
+      </ul>
+    </li>
+
     <li><a href="#"><i class="fas fa-envelope"></i> Contacter-nous</a></li>
     <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
     {% if user.is_authenticated %}
@@ -269,5 +291,19 @@ overlay.addEventListener('click', function(){
 closeSidebarBtn.addEventListener('click', function(){
     mobileSidebar.classList.remove('active');
     overlay.classList.remove('active');
+});
+
+// Toggle sous-menu mobile
+const submenuToggles = document.querySelectorAll('.submenu-toggle');
+submenuToggles.forEach(function(toggle){
+    toggle.addEventListener('click', function(e){
+        e.preventDefault();
+        const submenu = this.nextElementSibling;
+        if(submenu.style.display === 'block'){
+            submenu.style.display = 'none';
+        } else {
+            submenu.style.display = 'block';
+        }
+    });
 });
 </script>
