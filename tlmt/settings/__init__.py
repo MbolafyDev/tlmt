@@ -1,16 +1,18 @@
 import os
+import socket
 import pymysql
-
 pymysql.install_as_MySQLdb()
 
 from .env_base_dir import BASE_DIR
 
-ENV = (os.getenv("ENV") or os.getenv("DJANGO_ENV") or "").lower()
+# Détection automatique : local ou PythonAnywhere
+hostname = socket.gethostname()
+if "pythonanywhere" in hostname:
+    ENV = "production"
+else:
+    ENV = "development"
 
-if not ENV:
-    ENV = "production" if os.path.exists(os.path.join(BASE_DIR, ".env.prod")) else "development"
-
-if ENV.startswith("prod"):
+if ENV == "production":
     from .prod import *
     ACTIVE_SETTINGS = "prod"
 else:

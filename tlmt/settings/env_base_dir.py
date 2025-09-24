@@ -4,15 +4,14 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Choix de l'environnement
-env_type = os.getenv("ENV", "development")  # "production" ou "development"
+# Charger .env selon ENV (production ou développement)
+env_type = os.getenv("ENV", "development")
 
 if env_type == "production":
     env_file = BASE_DIR / ".env.prod"
 else:
     env_file = BASE_DIR / ".env.dev"
 
-# Charger le .env correspondant
 load_dotenv(dotenv_path=env_file)
 
 print(f"ENV détecté : {env_type}")

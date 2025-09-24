@@ -3,6 +3,7 @@ import os
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
 DEBUG = os.getenv("DEBUG", "True") == "True"
+
 AUTH_USER_MODEL = 'users.CustomUser'
 
 INSTALLED_APPS = [
