@@ -31,7 +31,10 @@
 
   <div class="d-flex gap-2">
     {% if demande.pdf %}
-      <a class="btn btn-primary" href="{% url 'telecharger_pdf' demande.id %}">⬇️ Télécharger le PDF</a>
+    <button class="btn btn-primary" onclick="telechargerPDF('{% url 'telecharger_pdf' demande.id %}', 'dimensionnement_{{ demande.id }}.pdf')">
+      ⬇️ Télécharger le PDF
+    </button>
+
       <a class="btn btn-outline-secondary" href="{% url 'voir_pdf' demande.id %}" target="_blank">👁️ Voir en ligne</a>
     {% else %}
       <div class="alert alert-warning">Le PDF n’est pas disponible.</div>
@@ -39,4 +42,16 @@
     <a class="btn btn-link" href="{% url 'demande_dimensionnement' %}">← Nouvelle demande</a>
   </div>
 </div>
+{% if demande.pdf %}
+  <script>
+    async function telechargerPDF(url, filename) {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+  </script>
+{% endif %}
 {% endblock %}
