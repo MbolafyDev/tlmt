@@ -47,6 +47,14 @@ def produit_detail(request, produit_id):
 
 
 def ajouter_au_panier(request):
+    # Vérifier si l'utilisateur est connecté
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            "success": False,
+            "redirect": True,
+            "login_url": "/users/login/"
+        })
+
     if request.method == "POST":
         produit_id = request.POST.get("produit_id")
         quantite = int(request.POST.get("quantite", 1))
@@ -82,6 +90,10 @@ def ajouter_au_panier(request):
 
 
 def checkout(request):
+    # 🚨 Vérification utilisateur connecté
+    if not request.user.is_authenticated:
+        return redirect("login")
+
     panier = request.session.get('panier', {})
     if isinstance(panier, list):
         panier = {}

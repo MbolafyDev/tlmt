@@ -100,6 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
           // Mise à jour dynamique du badge panier
           const badge = document.querySelector('#cart-badge');
           if(badge) badge.textContent = data.total_items;
+        } else if(data.redirect) {
+          // Redirection vers la page de connexion
+          window.location.href = data.login_url;
         } else {
           console.error('Erreur lors de l\'ajout au panier.');
         }
