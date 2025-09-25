@@ -223,5 +223,5 @@ def voir_pdf_view(request, pk: int):
         return HttpResponse("PDF non disponible", status=404)
     with default_storage.open(demande.pdf.name, "rb") as f:
         resp = HttpResponse(f.read(), content_type="application/pdf")
-        resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(demande.pdf.name)}"'
+        resp["Content-Disposition"] = f'inline; filename="{os.path.basename(demande.pdf.name)}"'
         return resp

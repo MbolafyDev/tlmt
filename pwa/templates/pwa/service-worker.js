@@ -2,11 +2,10 @@
 const APP_VERSION = "{{ APP_VERSION }}";
 const CACHE_NAME = `tlmt-precache-${APP_VERSION}`;
 
-// A adapter avec tes fichiers critiques (CSS/JS principaux + pages clés)
+// Fichiers critiques à mettre en cache
 const PRECACHE_URLS = [
   "/",                 // page d'accueil
   "/offline/",         // page de secours hors-ligne
-  // --- Tes assets principaux :
   "/static/css/main.css",
   "/static/js/main.js",
   "/static/pwa/icons/icon-192.png",
@@ -30,28 +29,23 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Politique :
-// - HTML/navigation : "Network-first" (si offline => offline page)
-// - Static (CSS/JS/images) : "Cache-first"
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Ne touche pas à l'admin
+  // Ne pas interférer avec l’admin
   if (url.pathname.startsWith("/admin/")) return;
 
-  // Navigation requests (documents HTML)
-  if (req.mode === "navigate") {
+  // PDFs → network-first pour ouverture inline
+  if (url.pathname.endsWith(".pdf")) {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          // Optionnel : mettre en cache la page HTML fraîche
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
           return res;
         })
         .catch(async () => {
-          // Si offline -> page en cache ou fallback offline
           const cached = await caches.match(req);
           return cached || caches.match("/offline/");
         })
@@ -59,7 +53,24 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Pour statiques : cache-first
+  // Navigation (HTML) → network-first
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(async () => {
+          const cached = await caches.match(req);
+          return cached || caches.match("/offline/");
+        })
+    );
+    return;
+  }
+
+  // Statiques → cache-first
   if (
     req.destination === "style" ||
     req.destination === "script" ||
@@ -81,5 +92,5 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Par défaut : passe-réseau (et ignore POST/PUT…)
+  // Par défaut → passe-réseau
 });
