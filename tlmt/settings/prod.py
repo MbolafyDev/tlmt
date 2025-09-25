@@ -7,6 +7,7 @@ DEBUG = False
 ALLOWED_HOSTS = ["tlmt.pythonanywhere.com"]
 
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # --- Base de données (MySQL PA) ---
 DATABASES = {

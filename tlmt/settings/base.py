@@ -36,8 +36,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 ROOT_URLCONF = "tlmt.urls"
 WSGI_APPLICATION = "tlmt.wsgi.application"
 
