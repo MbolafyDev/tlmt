@@ -1,9 +1,8 @@
-
 from pathlib import Path
 import os
 
 # Détection auto : si prod, prend 3 niveaux, sinon 2
-ENV = os.getenv("ENV", "local")
+ENV = os.getenv("ENV", "local").lower()
 if ENV == "production":
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
 else:

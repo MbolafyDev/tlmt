@@ -1,8 +1,7 @@
 import os
 
 # Récupère ENV depuis les variables d’environnement
-# (par défaut = "local")
-env = os.getenv("ENV", "local")
+env = os.getenv("ENV", "local").lower()
 
 print(f"🔧 Using settings environment: {env}")
 
