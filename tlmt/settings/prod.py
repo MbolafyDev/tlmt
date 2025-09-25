@@ -6,6 +6,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["tlmt.pythonanywhere.com"]
 
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 # --- Base de données (MySQL PA) ---
 DATABASES = {
     "default": {
