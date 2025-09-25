@@ -10,6 +10,7 @@ certifi==2022.6.15
 cffi==1.15.1
 charset-normalizer==2.1.1
 colorama==0.4.3
+cryptography==3.4.8
 cssselect2==0.7.0
 cycler==0.11.0
 demjson3==3.0.6
@@ -40,7 +41,7 @@ packaging==21.3
 pandas==1.4.3
 pillow==10.4.0
 pycparser==2.21
-pydyf==0.11.0
+pydyf==0.10.0
 pylint==2.6.0
 PyMySQL==1.1.2
 pyparsing==3.0.9
@@ -67,6 +68,7 @@ tzdata==2025.2
 urllib3==1.26.12
 weasyprint==61.2
 webencodings==0.5.1
+whitenoise==6.7.0
 wrapt==1.12.1
 wsproto==1.2.0
 xlrd==2.0.1

@@ -18,21 +18,31 @@
 
   <!-- pwa -->
    <link rel="manifest" href="{% url 'manifest' %}">
-  <meta name="theme-color" content="#0d6efd">
-  <link rel="apple-touch-icon" href="{% static 'pwa/icons/icon-192x192.png' %}">
+    <meta name="theme-color" content="#0d6efd">
+
+    <!-- iOS (ajouts utiles) -->
+    <link rel="apple-touch-icon" href="{% static 'pwa/icons/icon-192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register("{% static 'pwa/js/sw.js' %}")
-        .then(function(registration) {
-            console.log('ServiceWorker registered: ', registration);
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
+        .then(reg => {
+          // Optionnel : notifier l’utilisateur d’une mise à jour
+          reg.addEventListener("updatefound", () => {
+            const newSW = reg.installing;
+            newSW?.addEventListener("statechange", () => {
+              if (newSW.state === "installed" && navigator.serviceWorker.controller) {
+                console.log("Mise à jour disponible (nouvelle version de l’app).");
+              }
+            });
+          });
         })
-        .catch(function(error) {
-            console.log('ServiceWorker registration failed: ', error);
-        });
+        .catch(err => console.error("SW register error:", err));
     });
-}
+  }
 </script>
 
 <body>
