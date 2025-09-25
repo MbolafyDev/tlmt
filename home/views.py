@@ -100,7 +100,6 @@ def checkout(request):
         # Traitement de commande (simulé)
         request.session['panier'] = {}
         request.session.modified = True
-        # Remplacez 'commande_confirmee' par la vue que vous souhaitez réellement
         return redirect('home')  
 
     return render(request, 'home/checkout.html', {
