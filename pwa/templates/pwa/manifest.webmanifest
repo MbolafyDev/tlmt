@@ -1,3 +1,4 @@
+{% load static %}
 {
   "name": "TLMT Services",
   "short_name": "TLMT Services",
