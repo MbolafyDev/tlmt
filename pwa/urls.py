@@ -1,3 +1,4 @@
+# pwa/urls.py
 from django.urls import path
 from .views import ManifestView, service_worker, offline
 
