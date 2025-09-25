@@ -15,7 +15,26 @@
   <link rel="stylesheet" href="{% static 'css/carousel.css' %}">
   <link rel="stylesheet" href="{% static 'css/card-produit.css' %}">
   <link rel="stylesheet" href="{% static 'css/img.css' %}">
+
+  <!-- pwa -->
+   <link rel="manifest" href="{% url 'manifest' %}">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="apple-touch-icon" href="{% static 'pwa/icons/icon-192x192.png' %}">
 </head>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register("{% static 'pwa/js/sw.js' %}")
+        .then(function(registration) {
+            console.log('ServiceWorker registered: ', registration);
+        })
+        .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
+        });
+    });
+}
+</script>
+
 <body>
 
 <!-- ================= NAVBAR ================= -->

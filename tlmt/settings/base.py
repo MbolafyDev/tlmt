@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "dimensionement",
     "contact",
     "article",
+    'pwa',
 ]
 
 MIDDLEWARE = [
