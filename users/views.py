@@ -63,14 +63,14 @@ def login_view(request):
                 messages.error(request, "Vous devez activer votre compte via email avant de vous connecter.")
                 return redirect('login')
             auth_login(request, user)
-            return redirect("/home")
+            return redirect("home")
     else:
         form = CustomAuthenticationForm()
     return render(request, "users/login.html", {"form": form})
 
 def logout_view(request):
     auth_logout(request)
-    return redirect("/home")
+    return redirect("home")
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'users/password_reset.html'
