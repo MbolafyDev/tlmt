@@ -1,10 +1,10 @@
 <!-- Bouton mobile pour ouvrir le menu -->
-<div class="d-md-none p-2 bg-info text-white text-center">
+<div class="d-md-none p-2 bg-darknight text-white text-center">
   <button id="toggleCategoriesBtn" class="btn btn-light w-100">Catégories</button>
 </div>
 
-<!-- Menu catégories -->
-<div id="categoriesSidebar" class="py-2 border-bottom bg-info d-none d-md-block">
+<!-- Menu catégories desktop -->
+<div id="categoriesSidebar" class="py-2 border-bottom bg-darknight d-none d-md-block">
   <div class="container d-flex justify-content-center flex-wrap gap-2">
 
     <!-- Bouton Tous -->
@@ -42,13 +42,13 @@
 #categoriesSidebarMobile {
     position: fixed;
     top: 0;
-    left: -250px; /* caché par défaut */
+    left: -260px; /* caché par défaut */
     width: 250px;
     height: 100%;
-    background-color: #0dcaf0;
+    background-color: #0b1d3f; /* bleu nuit mobile */
     padding: 20px;
     overflow-y: auto;
-    transition: left 0.3s;
+    transition: left 0.3s ease;
     z-index: 1050;
 }
 
@@ -59,21 +59,28 @@
 #categoriesSidebarMobile a {
     display: block;
     margin-bottom: 10px;
+    color: white;
+    text-decoration: none;
+}
+
+#categoriesSidebarMobile a.btn-light {
     color: black;
 }
 
-#categoriesSidebarMobile a.btn-info {
-    color: white;
+#closeSidebarBtn2 {
+    margin-bottom: 20px;
+    cursor: pointer;
 }
 
-#closeSidebarBtn {
-    margin-bottom: 20px;
+/* Couleur bleu nuit pour menu desktop */
+.bg-darknight {
+    background-color: #0b1d3f !important;
 }
 </style>
 
 <!-- Sidebar mobile HTML -->
-<div id="categoriesSidebarMobile" class="d-md-none">
-  <button id="closeSidebarBtn" class="btn btn-danger w-100 mb-3">Fermer</button>
+<div id="categoriesSidebarMobile">
+  <button id="closeSidebarBtn2" class="btn btn-danger w-100 mb-3">Fermer</button>
   
   <a href="{% url 'home' %}" class="btn {% if not request.resolver_match.kwargs.slug %}btn-info text-white{% else %}btn-light{% endif %}">Tous</a>
 
@@ -86,16 +93,28 @@
 </div>
 
 <script>
-// Toggle sidebar mobile
-const toggleBtn = document.getElementById('toggleCategoriesBtn');
-const sidebar = document.getElementById('categoriesSidebarMobile');
-const closeBtn = document.getElementById('closeSidebarBtn');
+// Vérifier que le DOM est prêt
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('toggleCategoriesBtn');
+    const sidebar = document.getElementById('categoriesSidebarMobile');
+    const closeBtn = document.getElementById('closeSidebarBtn2');
 
-toggleBtn.addEventListener('click', () => {
-    sidebar.classList.add('active');
-});
+    // Ouvrir le menu mobile
+    toggleBtn.addEventListener('click', function () {
+        sidebar.classList.add('active');
+    });
 
-closeBtn.addEventListener('click', () => {
-    sidebar.classList.remove('active');
+    // Fermer le menu mobile
+    closeBtn.addEventListener('click', function () {
+        sidebar.classList.remove('active');
+    });
+
+    // Optionnel : fermer le menu si on clique sur un lien
+    const links = sidebar.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+        });
+    });
 });
 </script>
