@@ -191,6 +191,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+              <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-tools"></i> Paramètres du compte</a></li>
             </ul>
           </li>
         {% else %}
@@ -228,6 +229,7 @@
     <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
     {% if user.is_authenticated %}
       <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-tools"></i> Paramètres du compte</a></li>
     {% else %}
       <li><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Connexion</a></li>
       <li><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Inscription</a></li>

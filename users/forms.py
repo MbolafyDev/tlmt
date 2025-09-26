@@ -53,3 +53,35 @@ class CustomAuthenticationForm(AuthenticationForm):
             "placeholder": "Mot de passe"
         })
     )
+
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['nom_complet', 'username', 'email', 'contact', 'adresse', 'image']
+        widgets = {
+            'nom_complet': forms.TextInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm",
+                "placeholder": "Nom complet"
+            }),
+            'username': forms.TextInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm",
+                "placeholder": "Nom d'utilisateur"
+            }),
+            'email': forms.EmailInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm",
+                "placeholder": "Email"
+            }),
+            'contact': forms.TextInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm",
+                "placeholder": "Numéro de contact"
+            }),
+            'adresse': forms.TextInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm",
+                "placeholder": "Adresse"
+            }),
+            'image': forms.ClearableFileInput(attrs={
+                "class": "form-control form-control-lg rounded-pill shadow-sm"
+            }),
+        }
+
