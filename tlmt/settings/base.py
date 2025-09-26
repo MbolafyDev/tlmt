@@ -1,3 +1,4 @@
+# settings/base.py
 from .env_base_dir import BASE_DIR
 import os
 
@@ -23,7 +24,7 @@ INSTALLED_APPS = [
     "dimensionement",
     "contact",
     "article",
-    'pwa',
+    "pwa",
 ]
 
 MIDDLEWARE = [
@@ -78,3 +79,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 APP_VERSION = "2025-09-25.1"
+
+# ====== Ajouts utiles pour l'email ======
+SITE_NAME = os.getenv("SITE_NAME", "Bike in Mada")
+
+# Valeurs par défaut (overridées en dev/prod)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", f"[{SITE_NAME}] ")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))  # évite les blocages SMTP

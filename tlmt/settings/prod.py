@@ -7,7 +7,6 @@ DEBUG = False
 ALLOWED_HOSTS = ["tlmt.pythonanywhere.com"]
 
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # --- Base de données (MySQL PA) ---
@@ -27,14 +26,22 @@ DATABASES = {
     }
 }
 
-# --- Email ---
+# --- Email (Gmail / Google Workspace) ---
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"  # reste False si TLS:587
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# From réel = ton compte SMTP (améliore la délivrabilité)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Préfixe objet et timeout repris de base.py (override possible par .env)
+EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", EMAIL_SUBJECT_PREFIX)
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", str(EMAIL_TIMEOUT)))
 
 # --- Sécurité HTTPS ---
 SECURE_SSL_REDIRECT = True
