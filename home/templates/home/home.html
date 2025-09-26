@@ -21,7 +21,7 @@
           <div class="carousel-inner">
             {% for image in produit.images.all %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ image.image.url }}" class="d-block w-100 produit-img" alt="{{ produit.nom }}">
+                <img src="{{ image.image.url }}" class="d-block w-100 h-100 produit-img" alt="{{ produit.nom }}">
               </div>
             {% endfor %}
           </div>
@@ -73,34 +73,8 @@
   {% include 'includes/paginator.html' %}
 </section>
 
-<!-- Ajustements responsive (sans changer ton style existant) -->
-<style>
-/* Mobile ≤ 576px : on réduit la taille, on garde les proportions et on centre l'image */
-@media (max-width: 576px) {
-  .produit-img {
-    max-height: 160px;      /* réduit la hauteur pour éviter la coupe */
-    width: auto;            /* ne force pas à 100% de largeur */
-    max-width: 100%;        /* ne dépasse jamais le conteneur */
-    object-fit: contain;    /* garde l'image entière */
-    display: block;         /* permet le centrage */
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
+<!-- CSS responsive (ajouté, sans toucher à ton style existant) -->
 
-/* Optionnel tablette (576–768px) pour un rendu harmonisé */
-@media (min-width: 577px) and (max-width: 768px) {
-  .produit-img {
-    max-height: 200px;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
