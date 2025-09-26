@@ -27,7 +27,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: white;
-    z-index: 1000;
+    z-index: 1000; /* le menu Bootstrap passera au-dessus */
 }
 
 #searchDropdown input {
@@ -35,6 +35,11 @@
     border: none;
     outline: none;
     padding: 2px 4px;
+}
+
+/* >>> Assure que les menus dropdown passent au-dessus du search <<< */
+.dropdown-menu {
+    z-index: 2000; /* au-dessus de #searchDropdown (1000) */
 }
 
 /* Sidebar mobile */
@@ -82,7 +87,7 @@
 }
 #mobileSidebar .submenu li a {
     padding-left: 20px;
-    font-size: 1.2rem; /* réduit par rapport au menu principal */
+    font-size: 1.2rem;
 }
 
 /* Overlay */
@@ -98,20 +103,12 @@
 }
 
 /* Active state */
-#mobileSidebar.active {
-    left: 0;
-}
-
-#sidebarOverlay.active {
-    display: block;
-}
+#mobileSidebar.active { left: 0; }
+#sidebarOverlay.active { display: block; }
 
 /* Responsive adjustments */
 @media(max-width: 991px){
-    #navbarIcons {
-        display: none !important;
-    }
-
+    #navbarIcons { display: none !important; }
     #searchDropdown {
         width: 100%;
         left: 0;
@@ -159,7 +156,8 @@
 
         <!-- Services Dropdown -->
         <li class="nav-item dropdown">
-          <a class="nav-link" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Services">
+          <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false" title="Services">
             <i class="fas fa-puzzle-piece"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
@@ -184,10 +182,11 @@
           </a>
         </li>
 
-        <!-- Utilisateur connecté / non -->
+        <!-- Utilisateur -->
         {% if user.is_authenticated %}
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Utilisateur">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false" title="Utilisateur">
               <i class="fas fa-user"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -210,16 +209,14 @@
 
 <!-- Sidebar mobile -->
 <div id="mobileSidebar">
-  <!-- Bouton fermer -->
   <span class="close-btn" id="closeSidebarBtn">&times;</span>
   <ul class="mobile-menu list-unstyled">
     <li><a href="#"><i class="fas fa-search"></i> Recherche</a></li>
     <li><a href="{% url 'checkout' %}"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">{{ total_items }}</span></a></li>
-    
-    <!-- Services avec sous-menu -->
+
     <li>
       <a href="#" class="submenu-toggle"><i class="fas fa-puzzle-piece"></i> Services <i class="fas fa-caret-down float-end"></i></a>
-      <ul class="submenu list-unstyled" >
+      <ul class="submenu list-unstyled">
         <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-tools"></i> Installation</a></li>
         <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
         <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-file-invoice"></i> Devis</a></li>
@@ -238,72 +235,96 @@
   </ul>
 </div>
 
-<!-- Overlay -->
 <div id="sidebarOverlay"></div>
 
-<!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{# Ne PAS recharger Bootstrap ici : déjà inclus dans base.html #}
 
 <script>
-// Tooltips
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl)
-});
-
-// Toggle input recherche (desktop)
-var searchIcon = document.getElementById('searchIcon');
-var searchDropdown = document.getElementById('searchDropdown');
-
-searchIcon.addEventListener('click', function(e){
-    e.preventDefault();
-    if(searchDropdown.style.display === 'block'){
-        searchDropdown.style.display = 'none';
+(function () {
+  function onReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
     } else {
-        searchDropdown.style.display = 'block';
-        searchDropdown.querySelector('input').focus();
+      fn();
     }
-});
+  }
 
-// Clic hors pour fermer la recherche
-document.addEventListener('click', function(e){
-    if(!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)){
-        searchDropdown.style.display = 'none';
+  onReady(function () {
+    // Vérifie que Bootstrap est bien chargé (depuis base.html)
+    if (!window.bootstrap) {
+      console.warn('Bootstrap JS non détecté. Vérifie le <script> dans base.html.');
+      return;
     }
-});
 
-// Sidebar mobile toggle
-const mobileBtn = document.getElementById('mobileMenuBtn');
-const mobileSidebar = document.getElementById('mobileSidebar');
-const overlay = document.getElementById('sidebarOverlay');
-const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-
-mobileBtn.addEventListener('click', function(){
-    mobileSidebar.classList.add('active');
-    overlay.classList.add('active');
-});
-
-overlay.addEventListener('click', function(){
-    mobileSidebar.classList.remove('active');
-    overlay.classList.remove('active');
-});
-
-closeSidebarBtn.addEventListener('click', function(){
-    mobileSidebar.classList.remove('active');
-    overlay.classList.remove('active');
-});
-
-// Toggle sous-menu mobile
-const submenuToggles = document.querySelectorAll('.submenu-toggle');
-submenuToggles.forEach(function(toggle){
-    toggle.addEventListener('click', function(e){
-        e.preventDefault();
-        const submenu = this.nextElementSibling;
-        if(submenu.style.display === 'block'){
-            submenu.style.display = 'none';
-        } else {
-            submenu.style.display = 'block';
-        }
+    // Tooltips
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+      bootstrap.Tooltip.getOrCreateInstance(el);
     });
-});
+
+    // Dropdowns (initialisation explicite, robuste)
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function (el) {
+      bootstrap.Dropdown.getOrCreateInstance(el);
+    });
+
+    // Toggle input recherche (desktop)
+    var searchIcon = document.getElementById('searchIcon');
+    var searchDropdown = document.getElementById('searchDropdown');
+
+    if (searchIcon && searchDropdown) {
+      searchIcon.addEventListener('click', function(e){
+          e.preventDefault();
+          var isOpen = searchDropdown.style.display === 'block';
+          searchDropdown.style.display = isOpen ? 'none' : 'block';
+          if (!isOpen) {
+            var input = searchDropdown.querySelector('input');
+            input && input.focus();
+          }
+      });
+
+      // Clic hors pour fermer la recherche (sans gêner les dropdowns)
+      document.addEventListener('click', function(e){
+          if (e.target.closest('.dropdown-menu') || e.target.closest('[data-bs-toggle="dropdown"]')) {
+              return; // Laisse Bootstrap gérer ses menus
+          }
+          if (!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)) {
+              searchDropdown.style.display = 'none';
+          }
+      });
+    }
+
+    // Sidebar mobile
+    var mobileBtn = document.getElementById('mobileMenuBtn');
+    var mobileSidebar = document.getElementById('mobileSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    var closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    if (mobileBtn && mobileSidebar && overlay && closeSidebarBtn) {
+      mobileBtn.addEventListener('click', function(){
+          mobileSidebar.classList.add('active');
+          overlay.classList.add('active');
+      });
+
+      overlay.addEventListener('click', function(){
+          mobileSidebar.classList.remove('active');
+          overlay.classList.remove('active');
+      });
+
+      closeSidebarBtn.addEventListener('click', function(){
+          mobileSidebar.classList.remove('active');
+          overlay.classList.remove('active');
+      });
+    }
+
+    // Toggle sous-menu mobile
+    document.querySelectorAll('.submenu-toggle').forEach(function(toggle){
+      toggle.addEventListener('click', function(e){
+          e.preventDefault();
+          var submenu = this.nextElementSibling;
+          if (submenu) {
+            submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
+          }
+      });
+    });
+  });
+})();
 </script>
