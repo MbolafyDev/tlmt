@@ -21,7 +21,7 @@
           <div class="carousel-inner">
             {% for image in produit.images.all %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ produit.nom }}">
+                <img src="{{ image.image.url }}" class="d-block w-100 produit-img" alt="{{ produit.nom }}">
               </div>
             {% endfor %}
           </div>
@@ -37,7 +37,7 @@
           {% endif %}
         </div>
         {% else %}
-          <img src="{% static 'images/default.png' %}" class="card-img-top" alt="{{ produit.nom }}">
+          <img src="{% static 'images/default.png' %}" class="card-img-top produit-img" alt="{{ produit.nom }}">
         {% endif %}
 
         <div class="card-body d-flex flex-column justify-content-between">
@@ -72,6 +72,16 @@
   </div>
   {% include 'includes/paginator.html' %}
 </section>
+
+<!-- Ajustement responsive -->
+<style>
+@media (max-width: 576px) {
+  .produit-img {
+    max-height: 180px;   /* réduit la hauteur */
+    object-fit: contain; /* garde l'image entière sans la couper */
+  }
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
