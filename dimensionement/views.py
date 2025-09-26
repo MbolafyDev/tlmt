@@ -7,6 +7,7 @@ from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
 
 from .forms import DimensionnementForm, DemandeDimensionnementForm
 from .models import DemandeDimensionnement, Dimensionnement
@@ -166,12 +167,15 @@ def demande_dimensionnement_view(request):
 
             demande.save()
 
+            logo_path = finders.find('images/logo.jpg')
+
             # Génération PDF
             context = {
                 "demande": demande,
                 "details": details,
                 "propositions_pv": p_list,
                 "propositions_batt": b_list,
+                "logo_path": logo_path, 
             }
             html_string = render_to_string("dimensionement/dimensionnement_pdf.html", context)
             pdf_bytes = _render_pdf_weasyprint(request, html_string)
