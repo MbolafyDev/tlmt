@@ -38,8 +38,8 @@ def produit_list(request):
         .prefetch_related("images")
         .order_by("-id")
     )
-    paginator = Paginator(qs, 1)
-    page = request.GET.get("page", 12)
+    paginator = Paginator(qs, 12)
+    page = request.GET.get("page", 1)
     try:
         produits = paginator.page(page)   # ← objet Page attendu par ton paginator.html
     except PageNotAnInteger:
