@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "contact",
     "article",
     "pwa",
+    "configuration",
+    "common",
 ]
 
 MIDDLEWARE = [

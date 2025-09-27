@@ -27,4 +27,5 @@ urlpatterns = [
     path("dimensionement/", include("dimensionement.urls")),
     path("contact/", include("contact.urls")),
     path('pwa/', include('pwa.urls')),
+    path("configuration/", include("configuration.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

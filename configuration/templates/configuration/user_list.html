@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Gestion des utilisateurs</h2>
+
+  {# Affichage des messages Django #}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Nom d’utilisateur</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Validé ?</th>
+        <th>Actif ?</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td>{{ user.validated_by_admin|yesno:"Oui,Non" }}</td>
+        <td>{{ user.is_active|yesno:"Oui,Non" }}</td>
+        <td>
+          <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center">Aucun utilisateur</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
