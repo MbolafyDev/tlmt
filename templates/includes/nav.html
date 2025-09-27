@@ -1,121 +1,75 @@
 {% load static %}
 
 <style>
-/* Navbar icônes */
-.navbar-nav .nav-item {
-    margin-right: 8px;
-}
-
-.navbar-nav .nav-link {
-    padding: 5px 8px;
-    font-size: 1.4rem;
-    position: relative;
-}
-
-.navbar-brand {
-    padding: 0;
-}
+/* ---------- Desktop navbar ---------- */
+.navbar-nav .nav-item { margin-right: 8px; }
+.navbar-nav .nav-link { padding: 5px 8px; font-size: 1.4rem; position: relative; }
+.navbar-brand { padding: 0; }
 
 /* Champ recherche dropdown (desktop) */
-#searchDropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 125px;
-    padding: 2px 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    z-index: 1000; /* le menu Bootstrap passera au-dessus */
+#searchDropdown{
+  display:none; position:absolute; top:100%; right:0; width:125px;
+  padding:2px 5px; border:1px solid #ccc; border-radius:4px; background:#fff; z-index:1000;
+}
+#searchDropdown input{ width:100%; border:none; outline:none; padding:2px 4px; }
+
+/* Menus dropdown au-dessus du search */
+.dropdown-menu{ z-index:2000; }
+
+/* Dropdown Paramètres + petit */
+.dropdown-menu-sm{ font-size:.9rem; }
+.dropdown-menu-sm .dropdown-item{ padding:.35rem .75rem; }
+
+/* ---------- Mobile sidebar ---------- */
+:root { --sidebar-w: 280px; }
+
+#mobileSidebar{
+  position:fixed; top:0; left:-100vw; height:100%; width:min(90vw, var(--sidebar-w));
+  background:#fff; box-shadow:2px 0 5px rgba(0,0,0,.3); z-index:1050;
+  transition:left .3s ease; padding-top:60px; box-sizing:border-box;
+}
+#mobileSidebar *{ box-sizing:border-box; max-width:100%; }
+#mobileSidebar .close-btn{
+  position:absolute; top:10px; right:12px; font-size:1.5rem; cursor:pointer;
 }
 
-#searchDropdown input {
-    width: 100%;
-    border: none;
-    outline: none;
-    padding: 2px 4px;
+/* Liste principale */
+#mobileSidebar ul.mobile-menu{ margin:0; padding:0; list-style:none; }
+#mobileSidebar ul.mobile-menu > li{ padding:10px 14px; }
+#mobileSidebar ul.mobile-menu > li > a{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.75rem; text-decoration:none; color:#333; font-size:1rem;
+  white-space:normal; overflow:hidden; text-overflow:ellipsis; word-break:break-word;
+}
+#mobileSidebar ul.mobile-menu > li > a .left{
+  display:flex; align-items:center; gap:.6rem; min-width:0;
+}
+#mobileSidebar ul.mobile-menu > li > a .label{
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:normal;
 }
 
-/* >>> Assure que les menus dropdown passent au-dessus du search <<< */
-.dropdown-menu {
-    z-index: 2000; /* au-dessus de #searchDropdown (1000) */
-}
-
-/* Sidebar mobile */
-#mobileSidebar {
-    position: fixed;
-    top: 0;
-    left: -250px;
-    height: 100%;
-    width: 250px;
-    background-color: #fff;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-    z-index: 1050;
-    transition: left 0.3s ease;
-    padding-top: 60px;
-}
-
-#mobileSidebar .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-#mobileSidebar ul li {
-    text-align: left;
-    padding: 12px 20px;
-}
-
-#mobileSidebar ul li a {
-    text-decoration: none;
-    color: #333;
-    display: block;
-}
-
-#mobileSidebar ul li a i {
-    margin-right: 8px;
-}
-
-/* Sous-menu mobile */
-#mobileSidebar .submenu {
-    list-style: none;
-    padding-left: 0;
-    display: none;
-}
-#mobileSidebar .submenu li a {
-    padding-left: 20px;
-    font-size: 1.2rem;
+/* Sous-menus */
+#mobileSidebar .submenu{ list-style:none; padding:0; margin:8px 0 0 0; display:none; }
+#mobileSidebar .submenu li{ padding:8px 14px 8px 34px; }
+#mobileSidebar .submenu li a{
+  display:flex; align-items:center; gap:.6rem;
+  text-decoration:none; color:#333; font-size:.95rem; line-height:1.25;
+  white-space:normal; overflow-wrap:anywhere;
 }
 
 /* Overlay */
-#sidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1040;
-    display: none;
+#sidebarOverlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1040; display:none;
 }
 
-/* Active state */
-#mobileSidebar.active { left: 0; }
-#sidebarOverlay.active { display: block; }
+/* Active */
+#mobileSidebar.active{ left:0; }
+#sidebarOverlay.active{ display:block; }
 
-/* Responsive adjustments */
+/* Responsive */
 @media(max-width: 991px){
-    #navbarIcons { display: none !important; }
-    #searchDropdown {
-        width: 100%;
-        left: 0;
-        right: 0;
-        top: auto;
-        margin-top: 5px;
-    }
+  #navbarIcons{ display:none !important; }
+  #searchDropdown{ width:100%; left:0; right:0; top:auto; margin-top:5px; }
 }
 </style>
 
@@ -146,7 +100,7 @@
           </div>
         </li>
 
-        <!-- Shopping Cart -->
+        <!-- Panier -->
         <li class="nav-item">
           <a class="nav-link position-relative" href="{% url 'checkout' %}" data-bs-toggle="tooltip" title="Panier">
             <i class="fas fa-shopping-cart"></i>
@@ -154,21 +108,21 @@
           </a>
         </li>
 
-        <!-- Services Dropdown -->
+        <!-- Services -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button"
              data-bs-toggle="dropdown" aria-expanded="false" title="Services">
             <i class="fas fa-puzzle-piece"></i>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
             <li><a class="dropdown-item" href="#"><i class="fas fa-tools"></i> Installation</a></li>
             <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
             <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice"></i> Devis</a></li>
-            <li><a class="dropdown-item" href="{% url 'demande_dimensionnement' %}"><i class="fas fa-bolt"></i> Dimensionnement Paneau Solaire</a></li>
+            <li><a class="dropdown-item" href="{% url 'demande_dimensionnement' %}"><i class="fas fa-bolt"></i> Dimensionnement Panneau Solaire</a></li>
           </ul>
         </li>
 
-        <!-- Contacter-nous -->
+        <!-- Contact -->
         <li class="nav-item">
           <a class="nav-link" href="{% url 'contact' %}" data-bs-toggle="tooltip" title="Contacter-nous">
             <i class="fas fa-envelope"></i>
@@ -182,6 +136,23 @@
           </a>
         </li>
 
+        {# ========= PARAMÈTRES AVANT UTILISATEUR (DESKTOP) ========= #}
+        {% if user.is_authenticated %}
+          {% if user.is_superuser or user.role == "admin" %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false" title="Paramètres">
+                <i class="fas fa-cog"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-sm" aria-labelledby="settingsDropdown">
+                <li class="dropdown-header">Paramètres</li>
+                <li><a class="dropdown-item" href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Listes des utilisateurs</a></li>
+                <li><a class="dropdown-item" href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Listes des Produits</a></li>
+              </ul>
+            </li>
+          {% endif %}
+        {% endif %}
+
         <!-- Utilisateur -->
         {% if user.is_authenticated %}
           <li class="nav-item dropdown">
@@ -192,10 +163,6 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
               <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-tools"></i> Paramètres du compte</a></li>
-              {% if user.is_superuser or user.role == "admin" %}
-                <li><a class="dropdown-item" href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Listes des utilisateurs</a></li>
-                <li><a class="dropdown-item" href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Listes des Produits</a></li>
-              {% endif %}
             </ul>
           </li>
         {% else %}
@@ -216,123 +183,118 @@
 <div id="mobileSidebar">
   <span class="close-btn" id="closeSidebarBtn">&times;</span>
   <ul class="mobile-menu list-unstyled">
-    <li><a href="#"><i class="fas fa-search"></i> Recherche</a></li>
-    <li><a href="{% url 'checkout' %}"><i class="fas fa-shopping-cart"></i> Panier <span class="badge bg-danger">{{ total_items }}</span></a></li>
 
     <li>
-      <a href="#" class="submenu-toggle"><i class="fas fa-puzzle-piece"></i> Services <i class="fas fa-caret-down float-end"></i></a>
-      <ul class="submenu list-unstyled">
-        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-tools"></i> Installation</a></li>
-        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
-        <li><a href="#" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-file-invoice"></i> Devis</a></li>
-        <li><a href="{% url 'demande_dimensionnement' %}" style="font-size: 12px; padding: 0; margin: 0;"><i class="fas fa-bolt"></i> Dimensionnement Paneau Solaire</a></li>
+      <a href="#" class="menu-link">
+        <span class="left"><i class="fas fa-search"></i> <span class="label">Recherche</span></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="{% url 'checkout' %}" class="menu-link">
+        <span class="left"><i class="fas fa-shopping-cart"></i> <span class="label">Panier</span></span>
+        <span class="badge bg-danger">{{ total_items }}</span>
+      </a>
+    </li>
+
+    <!-- Services (mobile) -->
+    <li>
+      <a href="#" class="menu-link submenu-toggle">
+        <span class="left"><i class="fas fa-puzzle-piece"></i> <span class="label">Services</span></span>
+        <i class="fas fa-caret-down"></i>
+      </a>
+      <ul class="submenu">
+        <li><a href="#"><i class="fas fa-tools"></i> Installation</a></li>
+        <li><a href="#"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
+        <li><a href="#"><i class="fas fa-file-invoice"></i> Devis</a></li>
+        <li><a href="{% url 'demande_dimensionnement' %}"><i class="fas fa-bolt"></i> Dimensionnement</a></li>
       </ul>
     </li>
 
-    <li><a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contacter-nous</a></li>
-    <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
+    <!-- Paramètres AVANT Utilisateur (mobile) -->
     {% if user.is_authenticated %}
-      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-      <li><a href="{% url 'profile' %}"><i class="fas fa-tools"></i> Paramètres du compte</a></li>
       {% if user.is_superuser or user.role == "admin" %}
-        <li><a href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Liste des utilisateur</a></li>
-        <li><a href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Liste des Produits</a></li>
+        <li>
+          <a href="#" class="menu-link submenu-toggle">
+            <span class="left"><i class="fas fa-cog"></i> <span class="label">Paramètres</span></span>
+            <i class="fas fa-caret-down"></i>
+          </a>
+          <ul class="submenu">
+            <li><a href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Listes des utilisateurs</a></li>
+            <li><a href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Listes des Produits</a></li>
+          </ul>
+        </li>
       {% endif %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <li>
+        <a href="{% url 'logout' %}" class="menu-link">
+          <span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'profile' %}" class="menu-link">
+          <span class="left"><i class="fas fa-tools"></i> <span class="label">Paramètres du compte</span></span>
+        </a>
+      </li>
     {% else %}
-      <li><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Connexion</a></li>
-      <li><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Inscription</a></li>
+      <li><a href="{% url 'login' %}" class="menu-link"><span class="left"><i class="fas fa-sign-in-alt"></i> <span class="label">Connexion</span></span></a></li>
+      <li><a href="{% url 'register' %}" class="menu-link"><span class="left"><i class="fas fa-user-plus"></i> <span class="label">Inscription</span></span></a></li>
     {% endif %}
   </ul>
 </div>
 
 <div id="sidebarOverlay"></div>
 
-{# Ne PAS recharger Bootstrap ici : déjà inclus dans base.html #}
-
 <script>
-(function () {
-  function onReady(fn) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn, { once: true });
-    } else {
-      fn();
-    }
+(function(){
+  function onReady(fn){
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fn,{once:true});}else{fn();}
   }
 
-  onReady(function () {
-    // Vérifie que Bootstrap est bien chargé (depuis base.html)
-    if (!window.bootstrap) {
-      console.warn('Bootstrap JS non détecté. Vérifie le <script> dans base.html.');
-      return;
-    }
+  onReady(function(){
+    if(!window.bootstrap){ console.warn('Bootstrap JS non détecté.'); }
 
-    // Tooltips
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
-      bootstrap.Tooltip.getOrCreateInstance(el);
-    });
+    // Tooltips & Dropdowns (desktop)
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap && bootstrap.Tooltip.getOrCreateInstance(el); });
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el){ bootstrap && bootstrap.Dropdown.getOrCreateInstance(el); });
 
-    // Dropdowns (initialisation explicite, robuste)
-    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function (el) {
-      bootstrap.Dropdown.getOrCreateInstance(el);
-    });
-
-    // Toggle input recherche (desktop)
-    var searchIcon = document.getElementById('searchIcon');
-    var searchDropdown = document.getElementById('searchDropdown');
-
-    if (searchIcon && searchDropdown) {
-      searchIcon.addEventListener('click', function(e){
-          e.preventDefault();
-          var isOpen = searchDropdown.style.display === 'block';
-          searchDropdown.style.display = isOpen ? 'none' : 'block';
-          if (!isOpen) {
-            var input = searchDropdown.querySelector('input');
-            input && input.focus();
-          }
+    // Recherche (desktop)
+    const searchIcon=document.getElementById('searchIcon');
+    const searchDropdown=document.getElementById('searchDropdown');
+    if(searchIcon && searchDropdown){
+      searchIcon.addEventListener('click',function(e){
+        e.preventDefault();
+        const open=searchDropdown.style.display==='block';
+        searchDropdown.style.display=open?'none':'block';
+        if(!open){ const input=searchDropdown.querySelector('input'); input && input.focus(); }
       });
-
-      // Clic hors pour fermer la recherche (sans gêner les dropdowns)
-      document.addEventListener('click', function(e){
-          if (e.target.closest('.dropdown-menu') || e.target.closest('[data-bs-toggle="dropdown"]')) {
-              return; // Laisse Bootstrap gérer ses menus
-          }
-          if (!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)) {
-              searchDropdown.style.display = 'none';
-          }
+      document.addEventListener('click',function(e){
+        if(e.target.closest('.dropdown-menu')||e.target.closest('[data-bs-toggle="dropdown"]')) return;
+        if(!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)){
+          searchDropdown.style.display='none';
+        }
       });
     }
 
     // Sidebar mobile
-    var mobileBtn = document.getElementById('mobileMenuBtn');
-    var mobileSidebar = document.getElementById('mobileSidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var closeSidebarBtn = document.getElementById('closeSidebarBtn');
-
-    if (mobileBtn && mobileSidebar && overlay && closeSidebarBtn) {
-      mobileBtn.addEventListener('click', function(){
-          mobileSidebar.classList.add('active');
-          overlay.classList.add('active');
-      });
-
-      overlay.addEventListener('click', function(){
-          mobileSidebar.classList.remove('active');
-          overlay.classList.remove('active');
-      });
-
-      closeSidebarBtn.addEventListener('click', function(){
-          mobileSidebar.classList.remove('active');
-          overlay.classList.remove('active');
-      });
+    const mobileBtn=document.getElementById('mobileMenuBtn');
+    const mobileSidebar=document.getElementById('mobileSidebar');
+    const overlay=document.getElementById('sidebarOverlay');
+    const closeBtn=document.getElementById('closeSidebarBtn');
+    if(mobileBtn && mobileSidebar && overlay && closeBtn){
+      mobileBtn.addEventListener('click',()=>{ mobileSidebar.classList.add('active'); overlay.classList.add('active'); });
+      overlay.addEventListener('click',()=>{ mobileSidebar.classList.remove('active'); overlay.classList.remove('active'); });
+      closeBtn.addEventListener('click',()=>{ mobileSidebar.classList.remove('active'); overlay.classList.remove('active'); });
     }
 
-    // Toggle sous-menu mobile
-    document.querySelectorAll('.submenu-toggle').forEach(function(toggle){
-      toggle.addEventListener('click', function(e){
-          e.preventDefault();
-          var submenu = this.nextElementSibling;
-          if (submenu) {
-            submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
-          }
+    // Sous-menus mobile
+    document.querySelectorAll('.submenu-toggle').forEach(function(t){
+      t.addEventListener('click',function(e){
+        e.preventDefault();
+        const s=this.parentElement.querySelector('.submenu');
+        if(s){ s.style.display = (s.style.display==='block') ? 'none' : 'block'; }
       });
     });
   });
