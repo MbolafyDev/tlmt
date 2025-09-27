@@ -3,7 +3,7 @@ from django.contrib import messages
 from users.models import CustomUser
 from .forms import UserValidationForm, ProduitForm, ProduitImageForm
 from common.decorators import admin_required
-from article.models import Produit, ProduitImage
+from article.models import Produit, ProduitImage, Categorie, Caracteristique
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ---------------- Users ----------------
@@ -28,27 +28,18 @@ def edit_user(request, user_id):
 # ---------------- Articles ----------------
 @admin_required
 def produit_list(request):
-    """
-    Liste paginée des produits (12 par page).
-    IMPORTANT : on passe 'produits' = objet Page, pour matcher ton paginator.html.
-    """
-    qs = (
-        Produit.objects
-        .all()
-        .prefetch_related("images")
-        .order_by("-id")
-    )
+    qs = Produit.objects.all().prefetch_related("images").order_by("-id")
     paginator = Paginator(qs, 12)
     page = request.GET.get("page", 1)
     try:
-        produits = paginator.page(page)   # ← objet Page attendu par ton paginator.html
+        produits = paginator.page(page)
     except PageNotAnInteger:
         produits = paginator.page(1)
     except EmptyPage:
         produits = paginator.page(paginator.num_pages)
 
     return render(request, "configuration/produit_list.html", {
-        "produits": produits,            # ← objet Page
+        "produits": produits,
         "is_paginated": paginator.num_pages > 1,
     })
 
@@ -92,48 +83,94 @@ def produit_delete(request, produit_id):
 
 @admin_required
 def produit_detail(request, produit_id):
-    produit = get_object_or_404(
-        Produit.objects.prefetch_related("images"),
-        id=produit_id
-    )
-
-    # On réutilise ton formulaire pour lister TOUTES les infos visibles en "edit"
+    produit = get_object_or_404(Produit.objects.prefetch_related("images"), id=produit_id)
     form = ProduitForm(instance=produit)
-
-    # On construit une liste (label, value) propre, human-readable
     details = []
     for name, field in form.fields.items():
         label = field.label or name.replace('_', ' ').title()
-
-        # Valeur lisible: prioriser le get_FOO_display() si choices
         display_getter = f"get_{name}_display"
         if hasattr(produit, display_getter):
             value = getattr(produit, display_getter)()
         else:
             attr = getattr(produit, name, None)
-            if hasattr(attr, "all"):  # ManyToMany
+            if hasattr(attr, "all"):
                 value = ", ".join(str(x) for x in attr.all())
             else:
                 value = attr
-
-        # Mise en forme de base pour None / vide
         if value is None or value == "":
             value = "—"
-
         details.append((label, value))
+    return render(request, "configuration/includes/produit_detail_modal.html", {
+        "produit": produit,
+        "details": details,
+    })
 
-    # Tu peux ajouter des champs "meta" non inclus dans le formulaire si ton modèle en a :
-    for meta_field in ("created_at", "updated_at", "date_creation", "date_modification"):
-        if hasattr(produit, meta_field):
-            val = getattr(produit, meta_field)
-            if val:
-                details.append((meta_field.replace('_', ' ').title(), val))
+# ---------------- Categorie ----------------
+@admin_required
+def categorie_list(request):
+    categories = Categorie.objects.all()
+    return render(request, "configuration/categorie_list.html", {"categories": categories})
 
-    return render(
-        request,
-        "configuration/includes/produit_detail_modal.html",
-        {
-            "produit": produit,
-            "details": details,  # ← on passe la liste des paires (label, value)
-        }
-    )
+@admin_required
+def categorie_add(request):
+    if request.method == "POST":
+        nom = request.POST.get("nom")
+        if nom:
+            Categorie.objects.create(nom=nom)
+            messages.success(request, f"Catégorie '{nom}' ajoutée avec succès.")
+            return redirect("categorie_list")
+    return render(request, "configuration/categorie_form.html", {"title": "Ajouter une catégorie"})
+
+@admin_required
+def categorie_edit(request, categorie_id):
+    categorie = get_object_or_404(Categorie, id=categorie_id)
+    if request.method == "POST":
+        nom = request.POST.get("nom")
+        if nom:
+            categorie.nom = nom
+            categorie.save()
+            messages.success(request, f"Catégorie '{nom}' mise à jour avec succès.")
+            return redirect("categorie_list")
+    return render(request, "configuration/categorie_form.html", {"categorie": categorie, "title": f"Modifier la catégorie : {categorie.nom}"})
+
+@admin_required
+def categorie_delete(request, categorie_id):
+    categorie = get_object_or_404(Categorie, id=categorie_id)
+    categorie.delete()
+    messages.success(request, f"Catégorie '{categorie.nom}' supprimée avec succès.")
+    return redirect("categorie_list")
+
+# ---------------- Caracteristique ----------------
+@admin_required
+def caracteristique_list(request):
+    caracteristiques = Caracteristique.objects.all()
+    return render(request, "configuration/caracteristique_list.html", {"caracteristiques": caracteristiques})
+
+@admin_required
+def caracteristique_add(request):
+    if request.method == "POST":
+        nom = request.POST.get("nom")
+        if nom:
+            Caracteristique.objects.create(nom=nom)
+            messages.success(request, f"Caractéristique '{nom}' ajoutée avec succès.")
+            return redirect("caracteristique_list")
+    return render(request, "configuration/caracteristique_form.html", {"title": "Ajouter une caractéristique"})
+
+@admin_required
+def caracteristique_edit(request, caracteristique_id):
+    caracteristique = get_object_or_404(Caracteristique, id=caracteristique_id)
+    if request.method == "POST":
+        nom = request.POST.get("nom")
+        if nom:
+            caracteristique.nom = nom
+            caracteristique.save()
+            messages.success(request, f"Caractéristique '{nom}' mise à jour avec succès.")
+            return redirect("caracteristique_list")
+    return render(request, "configuration/caracteristique_form.html", {"caracteristique": caracteristique, "title": f"Modifier la caractéristique : {caracteristique.nom}"})
+
+@admin_required
+def caracteristique_delete(request, caracteristique_id):
+    caracteristique = get_object_or_404(Caracteristique, id=caracteristique_id)
+    caracteristique.delete()
+    messages.success(request, f"Caractéristique '{caracteristique.nom}' supprimée avec succès.")
+    return redirect("caracteristique_list")

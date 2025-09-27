@@ -23,7 +23,7 @@
   /* Forme mobile : largeur bornée pour ne pas pousser le bouton menu */
   form.navbar-search.d-lg-none{
     flex:0 1 auto;
-    width:clamp(140px, 58vw, 320px);   /* ← ajuste ici si tu veux plus court/long */
+    width:clamp(140px, 58vw, 320px);
   }
   #mobileMenuBtn{
     flex:0 0 auto;
@@ -93,9 +93,8 @@
       <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40" style="border-radius: 50%;">
     </a>
 
-    <!-- Barre de recherche : MOBILE (à côté du logo) -->
+    <!-- Barre de recherche : MOBILE -->
     <form class="navbar-search ms-2 flex-grow-1 d-flex d-lg-none" method="get" action="{% url 'produit_list' %}">
-      {# Remplace 'produit_list' par ta vue de recherche si besoin #}
       <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
       <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
         <i class="fas fa-search"></i>
@@ -107,7 +106,7 @@
       <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Barre de recherche : DESKTOP (à côté du logo) -->
+    <!-- Barre de recherche : DESKTOP -->
     <form class="navbar-search ms-2 d-none d-lg-flex" method="get" action="{% url 'produit_list' %}">
       <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
       <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
@@ -155,7 +154,7 @@
           </a>
         </li>
 
-        {# ========= PARAMÈTRES AVANT UTILISATEUR (DESKTOP) ========= #}
+        <!-- Paramètres (Desktop) -->
         {% if user.is_authenticated %}
           {% if user.is_superuser or user.role == "admin" %}
             <li class="nav-item dropdown">
@@ -167,6 +166,8 @@
                 <li class="dropdown-header">Paramètres</li>
                 <li><a class="dropdown-item" href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Listes des utilisateurs</a></li>
                 <li><a class="dropdown-item" href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Listes des Produits</a></li>
+                <li><a class="dropdown-item" href="{% url 'categorie_list' %}"><i class="fas fa-tags"></i> Catégories</a></li>
+                <li><a class="dropdown-item" href="{% url 'caracteristique_list' %}"><i class="fas fa-list"></i> Caractéristiques</a></li>
               </ul>
             </li>
           {% endif %}
@@ -203,8 +204,6 @@
   <span class="close-btn" id="closeSidebarBtn" aria-label="Fermer">&times;</span>
 
   <ul class="mobile-menu">
-
-    <!-- Panier -->
     <li>
       <a href="{% url 'checkout' %}" class="menu-link">
         <span class="left"><i class="fas fa-shopping-cart"></i> <span class="label">Panier</span></span>
@@ -212,7 +211,7 @@
       </a>
     </li>
 
-    <!-- Services (mobile) -->
+    <!-- Services -->
     <li>
       <a href="#" class="menu-link submenu-toggle">
         <span class="left"><i class="fas fa-puzzle-piece"></i> <span class="label">Services</span></span>
@@ -226,7 +225,7 @@
       </ul>
     </li>
 
-    <!-- Paramètres AVANT Utilisateur (mobile) -->
+    <!-- Paramètres (mobile) -->
     {% if user.is_authenticated %}
       {% if user.is_superuser or user.role == "admin" %}
         <li>
@@ -237,22 +236,16 @@
           <ul class="submenu">
             <li><a href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> Listes des utilisateurs</a></li>
             <li><a href="{% url 'produit_list' %}"><i class="fas fa-box"></i> Listes des Produits</a></li>
+            <li><a href="{% url 'categorie_list' %}"><i class="fas fa-tags"></i> Catégories</a></li>
+            <li><a href="{% url 'caracteristique_list' %}"><i class="fas fa-list"></i> Caractéristiques</a></li>
           </ul>
         </li>
       {% endif %}
     {% endif %}
 
     {% if user.is_authenticated %}
-      <li>
-        <a href="{% url 'logout' %}" class="menu-link">
-          <span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'profile' %}" class="menu-link">
-          <span class="left"><i class="fas fa-tools"></i> <span class="label">Paramètres du compte</span></span>
-        </a>
-      </li>
+      <li><a href="{% url 'logout' %}" class="menu-link"><span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span></a></li>
+      <li><a href="{% url 'profile' %}" class="menu-link"><span class="left"><i class="fas fa-tools"></i> <span class="label">Paramètres du compte</span></span></a></li>
     {% else %}
       <li><a href="{% url 'login' %}" class="menu-link"><span class="left"><i class="fas fa-sign-in-alt"></i> <span class="label">Connexion</span></span></a></li>
       <li><a href="{% url 'register' %}" class="menu-link"><span class="left"><i class="fas fa-user-plus"></i> <span class="label">Inscription</span></span></a></li>
@@ -270,7 +263,6 @@
 
   onReady(function(){
     if(window.bootstrap){
-      // Tooltips & Dropdowns (desktop)
       document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap.Tooltip.getOrCreateInstance(el); });
       document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el){ bootstrap.Dropdown.getOrCreateInstance(el); });
     }
