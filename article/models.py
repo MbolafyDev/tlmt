@@ -1,6 +1,24 @@
-import json
 from django.db import models
 from django.utils.text import slugify
+
+
+def _unique_slug_for(model_cls, base_text, *, pk_to_exclude=None, fallback="item"):
+    """
+    Génère un slug unique pour model_cls à partir de base_text.
+    Ajoute -2, -3, ... en cas de collision. Exclut pk_to_exclude (pour l'update).
+    """
+    base = slugify(base_text or "") or fallback
+    candidate = base
+    i = 2
+
+    qs = model_cls.objects.all()
+    if pk_to_exclude is not None:
+        qs = qs.exclude(pk=pk_to_exclude)
+
+    while qs.filter(slug=candidate).exists():
+        candidate = f"{base}-{i}"
+        i += 1
+    return candidate
 
 
 class Categorie(models.Model):
@@ -15,8 +33,16 @@ class Categorie(models.Model):
         return self.nom
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.nom)
+        """
+        Crée un slug unique si absent, ou si le nom a changé.
+        """
+        old_nom = None
+        if self.pk:
+            old_nom = type(self).objects.filter(pk=self.pk).values_list("nom", flat=True).first()
+
+        if not self.slug or (old_nom is not None and old_nom != self.nom):
+            self.slug = _unique_slug_for(type(self), self.nom, pk_to_exclude=self.pk, fallback="categorie")
+
         super().save(*args, **kwargs)
 
 
@@ -58,7 +84,7 @@ class Produit(models.Model):
 
     avis = models.PositiveIntegerField(default=0)
 
-    # Nouveau : relations
+    # Relations
     caracteristiques = models.ManyToManyField(Caracteristique, blank=True, related_name="produits")
     couleurs = models.ManyToManyField(Couleur, blank=True, related_name="produits")
 
@@ -71,16 +97,24 @@ class Produit(models.Model):
     def __str__(self):
         return self.nom
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.nom)
-        super().save(*args, **kwargs)
-
     @property
     def reduction(self):
-        if self.prix_original > 0:
+        if self.prix_original and self.prix_original > 0:
             return int(100 - (self.prix * 100 / self.prix_original))
         return 0
+
+    def save(self, *args, **kwargs):
+        """
+        Crée un slug unique si absent, ou si le nom a changé.
+        """
+        old_nom = None
+        if self.pk:
+            old_nom = type(self).objects.filter(pk=self.pk).values_list("nom", flat=True).first()
+
+        if not self.slug or (old_nom is not None and old_nom != self.nom):
+            self.slug = _unique_slug_for(type(self), self.nom, pk_to_exclude=self.pk, fallback="produit")
+
+        super().save(*args, **kwargs)
 
 
 class ProduitImage(models.Model):

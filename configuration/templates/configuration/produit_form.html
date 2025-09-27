@@ -2,17 +2,105 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
-  <h2>{{ title }}</h2>
+  <h2 class="mb-3">{{ title }}</h2>
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
-    {{ form.as_p }}
 
-    <label for="images" class="form-label">Ajouter des images</label>
-    <input type="file" name="images" id="images" multiple class="form-control mb-3">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
 
-    <button type="submit" class="btn btn-success">Enregistrer</button>
-    <a href="{% url 'produit_list' %}" class="btn btn-secondary">Annuler</a>
+    <div class="row g-3">
+      <!-- Colonne principale -->
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="row g-3">
+              <!-- Catégorie -->
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="{{ form.categorie.id_for_label }}">Catégorie</label>
+                {{ form.categorie }}
+                {% if form.categorie.errors %}<div class="text-danger small">{{ form.categorie.errors }}</div>{% endif %}
+              </div>
+
+              <!-- Nom -->
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="{{ form.nom.id_for_label }}">Nom du produit</label>
+                {{ form.nom }}
+                {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+              </div>
+
+              <!-- Prix d’origine -->
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="{{ form.prix_original.id_for_label }}">Prix d’origine</label>
+                {{ form.prix_original }}
+                {% if form.prix_original.errors %}<div class="text-danger small">{{ form.prix_original.errors }}</div>{% endif %}
+              </div>
+
+              <!-- Prix -->
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="{{ form.prix.id_for_label }}">Prix actuel</label>
+                {{ form.prix }}
+                {% if form.prix.errors %}<div class="text-danger small">{{ form.prix.errors }}</div>{% endif %}
+              </div>
+
+              <!-- Description courte -->
+              <div class="col-12">
+                <label class="form-label" for="{{ form.description_courte.id_for_label }}">Description courte</label>
+                {{ form.description_courte }}
+                {% if form.description_courte.errors %}<div class="text-danger small">{{ form.description_courte.errors }}</div>{% endif %}
+              </div>
+
+              <!-- Description détaillée -->
+              <div class="col-12">
+                <label class="form-label" for="{{ form.description_detaillee.id_for_label }}">Description détaillée</label>
+                {{ form.description_detaillee }}
+                {% if form.description_detaillee.errors %}<div class="text-danger small">{{ form.description_detaillee.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne latérale -->
+      <div class="col-12 col-lg-4">
+        <!-- Caractéristiques (M2M) -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <label class="form-label" for="{{ form.caracteristiques.id_for_label }}">Caractéristiques</label>
+            <small class="text-muted d-block mb-2">Maintenez Ctrl/Cmd pour sélectionner plusieurs.</small>
+            {{ form.caracteristiques }}
+            {% if form.caracteristiques.errors %}<div class="text-danger small">{{ form.caracteristiques.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        {# Si tu veux gérer les couleurs, ajoute le champ dans ProduitForm et décommente :
+        <div class="card mb-3">
+          <div class="card-body">
+            <label class="form-label" for="{{ form.couleurs.id_for_label }}">Couleurs</label>
+            <small class="text-muted d-block mb-2">Maintenez Ctrl/Cmd pour sélectionner plusieurs.</small>
+            {{ form.couleurs }}
+            {% if form.couleurs.errors %}<div class="text-danger small">{{ form.couleurs.errors }}</div>{% endif %}
+          </div>
+        </div>
+        #}
+
+        <!-- Upload images -->
+        <div class="card">
+          <div class="card-body">
+            <label for="images" class="form-label">Ajouter des images</label>
+            <input type="file" name="images" id="images" multiple class="form-control mb-2">
+            <small class="text-muted d-block">Vous pouvez sélectionner plusieurs fichiers (JPG, PNG…)</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-success">Enregistrer</button>
+      <a href="{% url 'produit_list' %}" class="btn btn-secondary">Annuler</a>
+    </div>
   </form>
 </div>
 {% endblock %}
