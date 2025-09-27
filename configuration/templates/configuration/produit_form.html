@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <h2>{{ title }}</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <label for="images" class="form-label">Ajouter des images</label>
+    <input type="file" name="images" id="images" multiple class="form-control mb-3">
+
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a href="{% url 'produit_list' %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</div>
+{% endblock %}

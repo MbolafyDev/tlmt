@@ -1,0 +1,83 @@
+{# configuration/includes/produit_detail_modal.html #}
+<div class="modal-header">
+  <h5 class="modal-title">{{ produit.nom }}</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body">
+  <div class="row g-4">
+    <!-- Colonne image / carrousel -->
+    <div class="col-12 col-md-5 text-center">
+      {% if produit.images.all %}
+        <div id="modalCarousel{{ produit.id }}" class="carousel slide modal-img-carousel mx-auto" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for img in produit.images.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ img.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ produit.nom }}">
+              </div>
+            {% endfor %}
+          </div>
+          {% if produit.images.count > 1 %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel{{ produit.id }}" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel{{ produit.id }}" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Suivant</span>
+            </button>
+          {% endif %}
+        </div>
+      {% else %}
+        <img src="https://via.placeholder.com/300x300?text=Pas+d'image" class="img-fluid rounded shadow-sm" alt="No image">
+      {% endif %}
+    </div>
+
+    <!-- Colonne détails (toutes les infos du ProduitForm) -->
+    <div class="col-12 col-md-7">
+      <div class="details-grid">
+        {% for label, value in details %}
+          <div class="detail-item">
+            <div class="detail-label">{{ label }}</div>
+            <div class="detail-value">{{ value }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+  <a href="{% url 'produit_edit' produit.id %}" class="btn btn-primary">
+    <i class="fa fa-pen me-1"></i> Modifier
+  </a>
+</div>
+
+<style>
+  .modal-img-carousel { max-width: 340px; }
+
+  /* Grille propre pour les paires label/valeur */
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr;      /* mobile */
+    gap: .5rem .75rem;
+  }
+  @media (min-width: 768px) {
+    .details-grid {
+      grid-template-columns: 1fr 2fr; /* desktop: label | valeur */
+      align-items: start;
+    }
+  }
+  .detail-item { display: contents; } /* permet label/valeur d'occuper les colonnes */
+  .detail-label {
+    font-weight: 600;
+    color: #495057;
+    padding: .25rem 0;
+  }
+  .detail-value {
+    padding: .25rem 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+</style>
