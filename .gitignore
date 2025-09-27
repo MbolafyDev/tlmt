@@ -24,3 +24,12 @@ db.sqlite3
 .idea/
 
 media/
+
+# Ignorer tout dans static/images/
+static/images/*
+
+# Mais ne pas ignorer ces fichiers (les inclure dans Git)
+!static/images/slide-1.png
+!static/images/slide-2.png
+!static/images/slide-3.png
+!static/images/default.png

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
   <h2>Gestion des utilisateurs</h2>
 
   {# Affichage des messages Django #}
@@ -14,35 +15,81 @@
     {% endfor %}
   {% endif %}
 
-  <table class="table table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>Nom d’utilisateur</th>
-        <th>Email</th>
-        <th>Rôle</th>
-        <th>Validé ?</th>
-        <th>Actif ?</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
+  {# TABLEAU pour desktop (lg+) #}
+  <div class="d-none d-lg-block">
+    <table class="table table-bordered table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Photo</th>
+          <th>Nom d’utilisateur</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Validé ?</th>
+          <th>Actif ?</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>
+            {% if user.image %}
+              <img src="{{ user.image.url }}" alt="{{ user.username }}" class="rounded-circle" width="40" height="40">
+            {% else %}
+              <img src="{% static 'images/default.png' %}" alt="Profil par défaut" class="rounded-circle" width="40" height="40">
+            {% endif %}
+          </td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.validated_by_admin|yesno:"Oui,Non" }}</td>
+          <td>{{ user.is_active|yesno:"Oui,Non" }}</td>
+          <td>
+            <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center">Aucun utilisateur</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# CARDS pour mobile (lg-) #}
+  <div class="d-lg-none">
+    <div class="row">
       {% for user in users %}
-      <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.role }}</td>
-        <td>{{ user.validated_by_admin|yesno:"Oui,Non" }}</td>
-        <td>{{ user.is_active|yesno:"Oui,Non" }}</td>
-        <td>
-          <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
-        </td>
-      </tr>
+      <div class="col-12 mb-3">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+              {% if user.image %}
+                <img src="{{ user.image.url }}" alt="{{ user.username }}" class="rounded-circle" width="50" height="50">
+              {% else %}
+                <img src="{% static 'images/default.png' %}" alt="Profil par défaut" class="rounded-circle" width="50" height="50">
+              {% endif %}
+            </div>
+            <div class="flex-grow-1">
+              <h5 class="card-title mb-1">{{ user.username }}</h5>
+              <p class="mb-0"><strong>Email:</strong> {{ user.email }}</p>
+              <p class="mb-0"><strong>Rôle:</strong> {{ user.role }}</p>
+              <p class="mb-0"><strong>Validé ?</strong> {{ user.validated_by_admin|yesno:"Oui,Non" }}</p>
+              <p class="mb-0"><strong>Actif ?</strong> {{ user.is_active|yesno:"Oui,Non" }}</p>
+            </div>
+            <div>
+              <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
+            </div>
+          </div>
+        </div>
+      </div>
       {% empty %}
-      <tr>
-        <td colspan="6" class="text-center">Aucun utilisateur</td>
-      </tr>
+      <div class="col-12">
+        <p class="text-center">Aucun utilisateur</p>
+      </div>
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
