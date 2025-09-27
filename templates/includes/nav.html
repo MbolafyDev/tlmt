@@ -6,17 +6,21 @@
 .navbar-nav .nav-link { padding: 5px 8px; font-size: 1.4rem; position: relative; }
 .navbar-brand { padding: 0; }
 
-/* Champ recherche dropdown (desktop) */
-#searchDropdown{
-  display:none; position:absolute; top:100%; right:0; width:125px;
-  padding:2px 5px; border:1px solid #ccc; border-radius:4px; background:#fff; z-index:1000;
+/* Barre de recherche (même composant utilisé desktop & mobile-top) */
+.navbar-search{
+  display:flex; align-items:center; gap:.5rem; min-width:0;
 }
-#searchDropdown input{ width:100%; border:none; outline:none; padding:2px 4px; }
+.navbar-search .form-control{
+  height: 36px; min-width:0; flex:1 1 auto;
+}
+.navbar-search .btn{
+  height: 36px; display:flex; align-items:center;
+}
 
-/* Menus dropdown au-dessus du search */
+/* Menus dropdown au-dessus de tout */
 .dropdown-menu{ z-index:2000; }
 
-/* Dropdown Paramètres + petit */
+/* Dropdown Paramètres plus petit */
 .dropdown-menu-sm{ font-size:.9rem; }
 .dropdown-menu-sm .dropdown-item{ padding:.35rem .75rem; }
 
@@ -36,15 +40,15 @@
 /* Liste principale */
 #mobileSidebar ul.mobile-menu{ margin:0; padding:0; list-style:none; }
 #mobileSidebar ul.mobile-menu > li{ padding:10px 14px; }
-#mobileSidebar ul.mobile-menu > li > a{
+#mobileSidebar ul.mobile-menu > li > a.menu-link{
   display:flex; align-items:center; justify-content:space-between;
   gap:.75rem; text-decoration:none; color:#333; font-size:1rem;
   white-space:normal; overflow:hidden; text-overflow:ellipsis; word-break:break-word;
 }
-#mobileSidebar ul.mobile-menu > li > a .left{
+#mobileSidebar ul.mobile-menu > li > a.menu-link .left{
   display:flex; align-items:center; gap:.6rem; min-width:0;
 }
-#mobileSidebar ul.mobile-menu > li > a .label{
+#mobileSidebar ul.mobile-menu > li > a.menu-link .label{
   min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:normal;
 }
 
@@ -67,38 +71,44 @@
 #sidebarOverlay.active{ display:block; }
 
 /* Responsive */
-@media(max-width: 991px){
-  #navbarIcons{ display:none !important; }
-  #searchDropdown{ width:100%; left:0; right:0; top:auto; margin-top:5px; }
+@media (max-width: 991px){
+  /* la version desktop de la recherche se masque auto via classes; rien à surcharger ici */
 }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
+  <div class="container-fluid align-items-center">
 
     <!-- Logo -->
-    <a class="navbar-brand" href="{% url 'home' %}">
-      <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+      <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40" style="border-radius: 50%;">
     </a>
 
-    <!-- Toggle mobile sidebar -->
-    <button class="btn d-lg-none" id="mobileMenuBtn">
+    <!-- Barre de recherche : MOBILE (à côté du logo) -->
+    <form class="navbar-search ms-2 flex-grow-1 d-flex d-lg-none" method="get" action="{% url 'produit_list' %}">
+      {# Remplace 'produit_list' par ta vue de recherche si besoin #}
+      <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
+      <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+
+    <!-- Bouton sidebar mobile -->
+    <button class="btn d-lg-none ms-2" id="mobileMenuBtn" aria-label="Ouvrir le menu">
       <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Navbar icons (desktop) -->
-    <div class="collapse navbar-collapse justify-content-end" id="navbarIcons">
-      <ul class="navbar-nav align-items-center">
+    <!-- Barre de recherche : DESKTOP (à côté du logo) -->
+    <form class="navbar-search ms-2 d-none d-lg-flex" method="get" action="{% url 'produit_list' %}">
+      <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
+      <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
 
-        <!-- Recherche -->
-        <li class="nav-item position-relative">
-          <a class="nav-link" href="#" id="searchIcon" data-bs-toggle="tooltip" title="Recherche">
-            <i class="fas fa-search"></i>
-          </a>
-          <div id="searchDropdown">
-            <input type="text" placeholder="Rechercher...">
-          </div>
-        </li>
+    <!-- Zone icônes + menus (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarIcons">
+      <ul class="navbar-nav ms-auto align-items-center">
 
         <!-- Panier -->
         <li class="nav-item">
@@ -114,7 +124,7 @@
              data-bs-toggle="dropdown" aria-expanded="false" title="Services">
             <i class="fas fa-puzzle-piece"></i>
           </a>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
             <li><a class="dropdown-item" href="#"><i class="fas fa-tools"></i> Installation</a></li>
             <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
             <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice"></i> Devis</a></li>
@@ -181,15 +191,11 @@
 
 <!-- Sidebar mobile -->
 <div id="mobileSidebar">
-  <span class="close-btn" id="closeSidebarBtn">&times;</span>
-  <ul class="mobile-menu list-unstyled">
+  <span class="close-btn" id="closeSidebarBtn" aria-label="Fermer">&times;</span>
 
-    <li>
-      <a href="#" class="menu-link">
-        <span class="left"><i class="fas fa-search"></i> <span class="label">Recherche</span></span>
-      </a>
-    </li>
+  <ul class="mobile-menu">
 
+    <!-- Panier -->
     <li>
       <a href="{% url 'checkout' %}" class="menu-link">
         <span class="left"><i class="fas fa-shopping-cart"></i> <span class="label">Panier</span></span>
@@ -254,28 +260,10 @@
   }
 
   onReady(function(){
-    if(!window.bootstrap){ console.warn('Bootstrap JS non détecté.'); }
-
-    // Tooltips & Dropdowns (desktop)
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap && bootstrap.Tooltip.getOrCreateInstance(el); });
-    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el){ bootstrap && bootstrap.Dropdown.getOrCreateInstance(el); });
-
-    // Recherche (desktop)
-    const searchIcon=document.getElementById('searchIcon');
-    const searchDropdown=document.getElementById('searchDropdown');
-    if(searchIcon && searchDropdown){
-      searchIcon.addEventListener('click',function(e){
-        e.preventDefault();
-        const open=searchDropdown.style.display==='block';
-        searchDropdown.style.display=open?'none':'block';
-        if(!open){ const input=searchDropdown.querySelector('input'); input && input.focus(); }
-      });
-      document.addEventListener('click',function(e){
-        if(e.target.closest('.dropdown-menu')||e.target.closest('[data-bs-toggle="dropdown"]')) return;
-        if(!searchDropdown.contains(e.target) && !searchIcon.contains(e.target)){
-          searchDropdown.style.display='none';
-        }
-      });
+    if(window.bootstrap){
+      // Tooltips & Dropdowns (desktop)
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap.Tooltip.getOrCreateInstance(el); });
+      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el){ bootstrap.Dropdown.getOrCreateInstance(el); });
     }
 
     // Sidebar mobile
