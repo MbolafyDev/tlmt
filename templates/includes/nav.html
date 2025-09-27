@@ -6,15 +6,29 @@
 .navbar-nav .nav-link { padding: 5px 8px; font-size: 1.4rem; position: relative; }
 .navbar-brand { padding: 0; }
 
-/* Barre de recherche (même composant utilisé desktop & mobile-top) */
+/* Barre de recherche (même composant desktop & mobile-top) */
 .navbar-search{
   display:flex; align-items:center; gap:.5rem; min-width:0;
 }
-.navbar-search .form-control{
-  height: 36px; min-width:0; flex:1 1 auto;
-}
-.navbar-search .btn{
-  height: 36px; display:flex; align-items:center;
+.navbar-search .form-control{ height:36px; min-width:0; flex:1 1 auto; }
+.navbar-search .btn{ height:36px; display:flex; align-items:center; }
+
+/* Empêche les sauts de ligne dans la barre supérieure */
+.navbar .container-fluid{ flex-wrap: nowrap; }
+
+/* Ajustements MOBILE pour garder le bouton menu sur la même ligne */
+@media (max-width: 991px){
+  .navbar .container-fluid{ gap:6px; }
+  .navbar-brand{ flex:0 0 auto; }
+  /* Forme mobile : largeur bornée pour ne pas pousser le bouton menu */
+  form.navbar-search.d-lg-none{
+    flex:0 1 auto;
+    width:clamp(140px, 58vw, 320px);   /* ← ajuste ici si tu veux plus court/long */
+  }
+  #mobileMenuBtn{
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
 }
 
 /* Menus dropdown au-dessus de tout */
@@ -69,11 +83,6 @@
 /* Active */
 #mobileSidebar.active{ left:0; }
 #sidebarOverlay.active{ display:block; }
-
-/* Responsive */
-@media (max-width: 991px){
-  /* la version desktop de la recherche se masque auto via classes; rien à surcharger ici */
-}
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -81,7 +90,7 @@
 
     <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-      <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40" style="border-radius: 50%;">
+      <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40">
     </a>
 
     <!-- Barre de recherche : MOBILE (à côté du logo) -->
@@ -94,7 +103,7 @@
     </form>
 
     <!-- Bouton sidebar mobile -->
-    <button class="btn d-lg-none ms-2" id="mobileMenuBtn" aria-label="Ouvrir le menu">
+    <button class="btn d-lg-none ms-1" id="mobileMenuBtn" aria-label="Ouvrir le menu">
       <i class="fas fa-bars"></i>
     </button>
 
