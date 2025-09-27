@@ -78,6 +78,10 @@
       <p class="text-center">Aucun produit disponible.</p>
     {% endfor %}
   </div>
+
+    {% if is_paginated %}
+        {% include "includes/paginator.html" %}
+    {% endif %}
 </div>
 
 <!-- MODAL global -->
@@ -135,7 +139,7 @@
         try {
           const resp = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }});
           const html = await resp.text();
-          modalContent.innerHTML = html; // on injecte le fragment du serveur
+          modalContent.innerHTML = html;
         } catch (e) {
           modalContent.querySelector('.modal-body').innerHTML = "<div class='text-danger'>Erreur de chargement.</div>";
         }

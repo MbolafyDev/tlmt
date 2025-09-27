@@ -4,6 +4,7 @@ from users.models import CustomUser
 from .forms import UserValidationForm, ProduitForm, ProduitImageForm
 from common.decorators import admin_required
 from article.models import Produit, ProduitImage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ---------------- Users ----------------
 @admin_required
@@ -27,8 +28,29 @@ def edit_user(request, user_id):
 # ---------------- Articles ----------------
 @admin_required
 def produit_list(request):
-    produits = Produit.objects.all()
-    return render(request, "configuration/produit_list.html", {"produits": produits})
+    """
+    Liste paginée des produits (12 par page).
+    IMPORTANT : on passe 'produits' = objet Page, pour matcher ton paginator.html.
+    """
+    qs = (
+        Produit.objects
+        .all()
+        .prefetch_related("images")
+        .order_by("-id")
+    )
+    paginator = Paginator(qs, 1)
+    page = request.GET.get("page", 12)
+    try:
+        produits = paginator.page(page)   # ← objet Page attendu par ton paginator.html
+    except PageNotAnInteger:
+        produits = paginator.page(1)
+    except EmptyPage:
+        produits = paginator.page(paginator.num_pages)
+
+    return render(request, "configuration/produit_list.html", {
+        "produits": produits,            # ← objet Page
+        "is_paginated": paginator.num_pages > 1,
+    })
 
 @admin_required
 def produit_add(request):
