@@ -3,6 +3,11 @@ from article.models import Produit, Categorie
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from decimal import Decimal
+import stripe
+from django.conf import settings
+
+# Configure Stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # ------------------ VIEWS ------------------
 
@@ -47,7 +52,6 @@ def produit_detail(request, produit_id):
 
 
 def ajouter_au_panier(request):
-    # Vérifier si l'utilisateur est connecté
     if not request.user.is_authenticated:
         return JsonResponse({
             "success": False,
@@ -77,7 +81,7 @@ def ajouter_au_panier(request):
             }
 
         request.session["panier"] = panier
-        request.session.modified = True  # important pour sauvegarder la session
+        request.session.modified = True
 
         total_items = sum(item["quantite"] for item in panier.values())
 
@@ -90,7 +94,6 @@ def ajouter_au_panier(request):
 
 
 def checkout(request):
-    # 🚨 Vérification utilisateur connecté
     if not request.user.is_authenticated:
         return redirect("login")
 
@@ -109,14 +112,42 @@ def checkout(request):
             request.session.modified = True
             return redirect('checkout')
 
-        # Traitement de commande (simulé)
-        request.session['panier'] = {}
-        request.session.modified = True
-        return redirect('home')  
+        # 🔹 Récupération infos client
+        customer_name = request.POST.get("nom")
+        customer_email = request.POST.get("email")
+        customer_address = request.POST.get("adresse")
+        customer_city = request.POST.get("ville")
+        customer_zip = request.POST.get("code_postal")
+
+        # 🔹 Créer une session Stripe Checkout
+        line_items = []
+        for item in panier.values():
+            line_items.append({
+                'price_data': {
+                    'currency': 'MGA',  # Ariary
+                    'product_data': {
+                        'name': item['nom'],
+                    },
+                    'unit_amount': int(item['prix']),
+                },
+                'quantity': item['quantite'],
+            })
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=line_items,
+            mode='payment',
+            customer_email=customer_email,
+            success_url=request.build_absolute_uri('/') + '?success=true',
+            cancel_url=request.build_absolute_uri('/') + '?canceled=true',
+        )
+
+        return JsonResponse({'sessionId': session.id})
 
     return render(request, 'home/checkout.html', {
-        'panier': panier,  # Passez le dict complet
-        'total': total
+        'panier': panier,
+        'total': total,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY
     })
 
 
@@ -128,7 +159,6 @@ def categorie_detail(request, slug):
     page_number = request.GET.get('page')
     produits = paginator.get_page(page_number)
 
-    # Panier sécurisé
     panier = request.session.get('panier', {})
     if isinstance(panier, list):
         panier = {}

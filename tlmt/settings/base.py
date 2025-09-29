@@ -1,6 +1,7 @@
 # settings/base.py
 from .env_base_dir import BASE_DIR
 import os
+import stripe
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
@@ -90,3 +91,8 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", f"[{SITE_NAME}] ")
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))  # évite les blocages SMTP
+
+STRIPE_PUBLIC_KEY = "pk_test_51SC1qGP5LifJlFLw6Pp21GbFFJ1Y2DqNDxkTKpoEMmKlUdh4u90J46Ew9uk4KIZfSVQYMauCYrwb7s5QzrsImGZz00diJHZ3LC"
+STRIPE_SECRET_KEY = "sk_test_51SC1qGP5LifJlFLwLYWh2zXZdsRhVkwSI9t996LP4PVB9m71WY2iXXuJTU4J1c6ZpZ1JBFVjlDjaYLn33W2vqudX00zEtnh4xG"
+
+stripe.api_key = STRIPE_SECRET_KEY
