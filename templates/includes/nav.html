@@ -122,7 +122,7 @@
         <li class="nav-item">
           <a class="nav-link position-relative" href="{% url 'checkout' %}" data-bs-toggle="tooltip" title="Panier">
             <i class="fas fa-shopping-cart"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ total_items }}</span>
+            <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ total_items }}</span>
           </a>
         </li>
 
@@ -207,7 +207,7 @@
     <li>
       <a href="{% url 'checkout' %}" class="menu-link">
         <span class="left"><i class="fas fa-shopping-cart"></i> <span class="label">Panier</span></span>
-        <span class="badge bg-danger">{{ total_items }}</span>
+        <span id="cart-badge-mobile" class="badge bg-danger">{{ total_items }}</span>
       </a>
     </li>
 

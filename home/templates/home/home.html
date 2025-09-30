@@ -8,6 +8,27 @@
 {% include 'includes/sub_menu.html' %}
 {% include 'includes/carousel.html' %}
 
+<style>
+  @media (max-width: 576px) {
+  .card-produit .card-body .d-flex {
+    flex-wrap: wrap;           /* Les boutons passent à la ligne si manque de place */
+    justify-content: center;   /* Centrer les éléments */
+    gap: 6px;                  /* Espacement entre boutons */
+  }
+
+  .card-produit .input-group {
+    width: 100% !important;    /* L'input s'étire sur la largeur dispo */
+    max-width: 150px;          /* mais reste raisonnable */
+    margin-bottom: 6px;
+  }
+
+  .card-produit .btn {
+    flex: 1 1 auto;            /* Les boutons s’adaptent */
+    min-width: 45px;           /* taille minimum lisible */
+  }
+}
+</style>
+
 <section class="container my-5">
   <h3 class="mb-3">Livrés chez vous en 48 heures</h3>
   <div class="row g-4">
@@ -78,8 +99,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  function updateCartBadge(total) {
+    const desktopBadge = document.querySelector('#cart-badge');
+    const mobileBadge = document.querySelector('#cart-badge-mobile');
+    if(desktopBadge) desktopBadge.textContent = total;
+    if(mobileBadge) mobileBadge.textContent = total;
+  }
+
   document.querySelectorAll('.card-produit').forEach(card => {
     const input = card.querySelector('.qty-input');
+
     card.querySelector('.btn-increase').addEventListener('click', () => {
       input.value = parseInt(input.value) + 1;
     });
@@ -102,8 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(res => res.json())
       .then(data => {
         if(data.success){
-          const badge = document.querySelector('#cart-badge');
-          if(badge) badge.textContent = data.total_items;
+          updateCartBadge(data.total_items);
         } else if(data.redirect) {
           window.location.href = data.login_url;
         } else {

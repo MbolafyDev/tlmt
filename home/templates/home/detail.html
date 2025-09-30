@@ -5,6 +5,26 @@
 {% block title %}{{ produit.nom }} - Zara Store{% endblock %}
 
 {% block content %}
+<style>
+  @media (max-width: 576px) {
+  .card-produit .card-body .d-flex {
+    flex-wrap: wrap;           /* Les boutons passent à la ligne si manque de place */
+    justify-content: center;   /* Centrer les éléments */
+    gap: 6px;                  /* Espacement entre boutons */
+  }
+
+  .card-produit .input-group {
+    width: 100% !important;    /* L'input s'étire sur la largeur dispo */
+    max-width: 150px;          /* mais reste raisonnable */
+    margin-bottom: 6px;
+  }
+
+  .card-produit .btn {
+    flex: 1 1 auto;            /* Les boutons s’adaptent */
+    min-width: 45px;           /* taille minimum lisible */
+  }
+}
+</style>
 <div class="container my-5">
   <div class="row g-4">
 
