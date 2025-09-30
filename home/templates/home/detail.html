@@ -8,75 +8,90 @@
 <div class="container my-5">
   <div class="row g-4">
 
+    <!-- Images -->
     <div class="col-md-6">
       <div class="border p-3 rounded shadow-sm">
-        {% if produit.images.all %}
-        <div id="carouselDetail{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for image in produit.images.all %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-              <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ produit.nom }}">
+        {% with images=produit.images.all %}
+          {% if images|length %}
+            <div id="carouselDetail{{ produit.pk }}" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                {% for image in images %}
+                  <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ produit.nom }}">
+                  </div>
+                {% endfor %}
+              </div>
+              {% if images|length > 1 %}
+                <button class="carousel-control-prev" type="button"
+                        data-bs-target="#carouselDetail{{ produit.pk }}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next" type="button"
+                        data-bs-target="#carouselDetail{{ produit.pk }}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Suivant</span>
+                </button>
+              {% endif %}
             </div>
-            {% endfor %}
-          </div>
-          {% if produit.images.count > 1 %}
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselDetail{{ produit.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselDetail{{ produit.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
+          {% else %}
+            <img src="{% static 'images/default.png' %}" class="img-fluid" alt="{{ produit.nom }}">
           {% endif %}
-        </div>
-        {% else %}
-          <img src="{% static 'images/default.png' %}" class="img-fluid" alt="{{ produit.nom }}">
-        {% endif %}
+        {% endwith %}
       </div>
     </div>
 
+    <!-- Détails -->
     <div class="col-md-6">
       <h2 class="fw-bold">{{ produit.nom }}</h2>
       <p class="text-muted">{{ produit.description_courte }}</p>
 
-      <h3>
-        <span class="text-decoration-line-through text-muted fs-5">{{ produit.prix_original|intcomma }} Ar</span>
+      <h3 class="mt-2">
+        {% if produit.prix_original %}
+          <span class="text-decoration-line-through text-muted fs-5">{{ produit.prix_original|intcomma }} Ar</span>
+        {% endif %}
         <span class="fw-bold text-danger ms-3">{{ produit.prix|intcomma }} Ar</span>
       </h3>
 
-      {% if produit.caracteristiques.all %}
-      <ul class="mt-3">
-        {% for c in produit.caracteristiques.all %}
-        <li>{{ c.nom }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      {% with caracteristiques=produit.caracteristiques.all %}
+        {% if caracteristiques|length %}
+          <ul class="mt-3">
+            {% for c in caracteristiques %}
+              <li>{{ c.nom }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
-      {% if produit.couleurs.all %}
-      <div class="mt-3">
-        <label for="color" class="form-label">Couleur :</label>
-        <select id="color" class="form-select w-50">
-          {% for couleur in produit.couleurs.all %}
-          <option>{{ couleur.nom }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      {% endif %}
+      {% with couleurs=produit.couleurs.all %}
+        {% if couleurs|length %}
+          <div class="mt-3">
+            <label for="color" class="form-label">Couleur :</label>
+            <select id="color" class="form-select w-50">
+              {% for couleur in couleurs %}
+                <option>{{ couleur.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+      {% endwith %}
 
-      <div class="d-flex align-items-center mt-4">
-        <div class="input-group input-group-sm" style="width: 100px;">
+      <!-- Boutons et quantité -->
+      <div class="d-flex align-items-center mt-4 flex-wrap">
+        <div class="input-group input-group-sm" style="width: 120px;">
           <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
-          <input type="text" class="form-control text-center qty-input" value="1">
+          <input type="number" min="1" step="1" class="form-control text-center qty-input" value="1">
           <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
         </div>
-        <button class="btn btn-success btn-lg ms-3 btn-add-cart" data-id="{{ produit.id }}">
+        <button class="btn btn-success btn-lg ms-3 mt-2 mt-md-0 btn-add-cart" data-id="{{ produit.id }}">
           <i class="fas fa-cart-arrow-down"></i> Ajouter au panier
         </button>
       </div>
 
       <div class="mt-3">
-        <a href="{% url 'home' %}" class="btn btn-link"><i class="fas fa-arrow-left"></i> Retour à la boutique</a>
+        <a href="{% url 'home' %}" class="btn btn-link">
+          <i class="fas fa-arrow-left"></i> Retour à la boutique
+        </a>
       </div>
     </div>
   </div>
@@ -86,36 +101,45 @@
     <p>{{ produit.description_detaillee|default:"Pas de description détaillée disponible." }}</p>
   </div>
 </div>
+{% endblock content %}
 
+{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
   const input = document.querySelector('.qty-input');
-  document.querySelector('.btn-increase').addEventListener('click', () => input.value = parseInt(input.value) + 1);
-  document.querySelector('.btn-decrease').addEventListener('click', () => input.value = Math.max(1, parseInt(input.value) - 1));
+  document.querySelector('.btn-increase').addEventListener('click', () => {
+    input.value = Math.max(1, parseInt(input.value || '1', 10) + 1);
+  });
+  document.querySelector('.btn-decrease').addEventListener('click', () => {
+    input.value = Math.max(1, parseInt(input.value || '1', 10) - 1);
+  });
 
   document.querySelector('.btn-add-cart').addEventListener('click', function() {
     const produit_id = this.dataset.id;
-    const quantite = parseInt(input.value);
+    const quantite = Math.max(1, parseInt(input.value || '1', 10));
+    const csrftoken = getCookie('csrftoken');
 
     fetch("{% url 'ajouter_au_panier' %}", {
       method: 'POST',
       headers: {
-        'X-CSRFToken': '{{ csrf_token }}',
+        'X-CSRFToken': csrftoken,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: `produit_id=${produit_id}&quantite=${quantite}`
+      body: `produit_id=${encodeURIComponent(produit_id)}&quantite=${encodeURIComponent(quantite)}`
     })
-    .then(res => res.json())
+    .then(res => res.ok ? res.json() : Promise.reject(res))
     .then(data => {
-      if(data.success){
-        // Met à jour le badge du panier dynamiquement
+      if (data.success) {
         const badge = document.querySelector('#cart-badge');
-        if(badge) badge.textContent = data.total_items;
-      } else {
-        console.error('Erreur ajout panier');
+        if (badge) badge.textContent = data.total_items;
       }
-    });
+    })
+    .catch(err => console.error('Erreur réseau', err));
   });
-});
+})();
 </script>
-{% endblock %}
+{% endblock extra_js %}

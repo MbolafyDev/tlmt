@@ -24,7 +24,6 @@
 
   <!-- PWA -->
   <link rel="manifest" href="{% url 'manifest' %}">
-  <!-- Aligner le theme-color avec celui du manifest (#f9fd0dff) -->
   <meta name="theme-color" content="#f9fd0dff">
 
   <!-- iOS (ajouts utiles) -->
@@ -59,28 +58,22 @@
   (function() {
     if (!("serviceWorker" in navigator)) return;
 
-    // Enregistrer le SW après le chargement de la page
     window.addEventListener("load", function () {
       const swUrl = "{% url 'service_worker_root' %}";
       navigator.serviceWorker.register(swUrl)
         .then(function(reg) {
-          // Détection d'une nouvelle version
           reg.addEventListener("updatefound", function () {
             const newSW = reg.installing;
             if (!newSW) return;
             newSW.addEventListener("statechange", function () {
-              // Si une nouvelle version est installée et qu'il y a déjà un SW actif
               if (newSW.state === "installed" && navigator.serviceWorker.controller) {
                 console.log("Mise à jour PWA disponible.");
-                // Optionnel : demander au SW d'activer immédiatement
                 reg.waiting && reg.waiting.postMessage("SKIP_WAITING");
               }
             });
           });
 
-          // Si le SW prend le contrôle → possibilité d'auto-refresh
           navigator.serviceWorker.addEventListener("controllerchange", function () {
-            // Option : forcer un rafraîchissement unique
             if (!window.__sw_refresh_done) {
               window.__sw_refresh_done = true;
               window.location.reload();

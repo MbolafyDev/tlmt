@@ -1,0 +1,104 @@
+{% load static %}
+{% load humanize %}
+
+<div class="modal-header">
+  <h5 class="modal-title">{{ produit.nom }}</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+  <div class="row g-4">
+    <div class="col-md-6">
+      {% with images=produit.images.all %}
+        {% if images|length %}
+          <div id="carouselModal{{ produit.pk }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for image in images %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded shadow-sm" alt="{{ produit.nom }}">
+                </div>
+              {% endfor %}
+            </div>
+            {% if images|length > 1 %}
+              <button class="carousel-control-prev" type="button"
+                      data-bs-target="#carouselModal{{ produit.pk }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+              </button>
+              <button class="carousel-control-next" type="button"
+                      data-bs-target="#carouselModal{{ produit.pk }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+              </button>
+            {% endif %}
+          </div>
+        {% else %}
+          <img src="{% static 'images/default.png' %}" class="img-fluid rounded shadow-sm" alt="{{ produit.nom }}">
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="col-md-6">
+      <p class="text-muted">{{ produit.description_courte }}</p>
+      <h5 class="mb-3">
+        {% if produit.prix_original %}
+          <span class="text-decoration-line-through text-muted">{{ produit.prix_original|intcomma }} Ar</span>
+        {% endif %}
+        <span class="fw-bold text-danger ms-3">{{ produit.prix|intcomma }} Ar</span>
+      </h5>
+
+      <div class="d-flex align-items-center mt-2 flex-wrap">
+        <div class="input-group input-group-sm" style="width: 120px;">
+          <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
+          <input type="number" min="1" step="1" class="form-control text-center qty-input" value="1">
+          <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
+        </div>
+        <button class="btn btn-success btn-lg ms-3 mt-2 mt-md-0 btn-add-cart" data-id="{{ produit.id }}">
+          <i class="fas fa-cart-arrow-down"></i> Ajouter au panier
+        </button>
+        <a href="{% url 'produit_detail' produit.id %}" class="btn btn-link ms-2 mt-2 mt-md-0">
+          Ouvrir la fiche complète
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
+  const root = document.currentScript.parentElement;
+  const input = root.querySelector('.qty-input');
+  root.querySelector('.btn-increase').addEventListener('click', () => {
+    input.value = Math.max(1, parseInt(input.value || '1', 10) + 1);
+  });
+  root.querySelector('.btn-decrease').addEventListener('click', () => {
+    input.value = Math.max(1, parseInt(input.value || '1', 10) - 1);
+  });
+  root.querySelector('.btn-add-cart').addEventListener('click', function() {
+    const produit_id = this.dataset.id;
+    const quantite = Math.max(1, parseInt(input.value || '1', 10));
+    const csrftoken = getCookie('csrftoken');
+
+    fetch("{% url 'ajouter_au_panier' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `produit_id=${encodeURIComponent(produit_id)}&quantite=${encodeURIComponent(quantite)}`
+    })
+    .then(r => r.ok ? r.json() : Promise.reject(r))
+    .then(data => {
+      if (data.success) {
+        const badge = document.querySelector('#cart-badge');
+        if (badge) badge.textContent = data.total_items;
+      }
+    })
+    .catch(err => console.error(err));
+  });
+})();
+</script>

@@ -34,7 +34,7 @@ def home(request):
 def produit_detail(request, produit_id):
     produit = get_object_or_404(
         Produit.objects.prefetch_related("images", "caracteristiques", "couleurs"),
-        id=produit_id
+        pk=produit_id
     )
 
     # Panier sécurisé
@@ -42,10 +42,16 @@ def produit_detail(request, produit_id):
     if isinstance(panier, list):
         panier = {}
     request.session['panier'] = panier
+    total_items = sum(item.get('quantite', 0) for item in panier.values())
 
-    total_items = sum(item['quantite'] for item in panier.values())
+    # Si c'est un appel via HTMX/AJAX pour une modale, on renvoie un fragment
+    is_htmx = (
+        request.headers.get("HX-Request") == "true"
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    )
+    template_name = "home/_detail_modal_body.html" if is_htmx else "home/detail.html"
 
-    return render(request, 'home/detail.html', {
+    return render(request, template_name, {
         'produit': produit,
         'total_items': total_items
     })
