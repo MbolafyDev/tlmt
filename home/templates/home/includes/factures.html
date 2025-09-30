@@ -1,0 +1,119 @@
+{% load static %}
+{% load math_filters %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Facture</title>
+  <style>
+    /* ton CSS complet ici (inchangé) */
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sheet" role="document" aria-label="Facture">
+      <!-- EN-TÊTE -->
+      <header>
+        <div class="brand">
+          <div class="logo-wrap">
+            <img src="{% static 'images/logo.jpg' %}" class="logo-img" alt="Logo société">
+          </div>
+          <div class="company">
+            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+            <p>{{ user.profile.adresse|default:"Adresse non fournie" }}</p>
+            <p>Tél : {{ user.profile.telephone|default:"---" }} · {{ user.email }}</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="title">FACTURE</div>
+          <div class="row">Facture n° <strong>{{ commande.numero_facture }}</strong></div>
+          <div class="row">Date : <strong>{{ commande.date_creation|date:"d/m/Y" }}</strong></div>
+          <div class="row">Échéance : <strong>{{ commande.date_creation|add:"30 days"|date:"d/m/Y" }}</strong></div>
+        </div>
+      </header>
+
+      <!-- DESTINATAIRES -->
+      <main>
+        <div class="grid">
+          <div class="box">
+            <h4>FACTURER À</h4>
+            <p>{{ user.first_name }} {{ user.last_name }}<br>
+               {{ user.profile.adresse|default:"Adresse inconnue" }}</p>
+          </div>
+          <div class="box" style="text-align:right">
+            <h4>RÉFÉRENCES</h4>
+            <p>Projet : {{ commande.numero_facture }}</p>
+          </div>
+        </div>
+
+        <!-- LIGNES -->
+        <table role="table" aria-label="Détails">
+          <thead>
+            <tr>
+              <th style="width:56%">DESCRIPTION</th>
+              <th style="width:14%">PRIX</th>
+              <th style="width:10%">QTÉ</th>
+              <th style="width:20%;text-align:right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.produit.nom }}</td>
+              <td class="num">{{ item.prix_unitaire }} €</td>
+              <td class="num">{{ item.quantite }}</td>
+              <td class="num">{{ item.quantite|floatformat:0|add:""|safe|default:"0" }}</td>
+              <td class="num">{{ item.quantite|mul:item.prix_unitaire }} €</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="num">Sous-total :</td>
+              <td class="num">{{ commande.total }} €</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td class="num">TVA (20 %) :</td>
+              <td class="num">{{ commande.total|mul:0.2 }} €</td>
+            </tr>
+            <tr class="grand-total total-line">
+              <td colspan="2"></td>
+              <td class="num">TOTAL :</td>
+              <td class="num">{{ commande.total|add:commande.total|mul:1.2 }} €</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- RÉSUMÉ & PAIEMENT -->
+        <div class="summary" aria-hidden="true">
+          <div class="panel">
+            <div class="row-flex"><span>Sous-total</span><strong>{{ commande.total }} €</strong></div>
+            <div class="row-flex"><span>TVA (20 %)</span><strong>{{ commande.total|mul:0.2 }} €</strong></div>
+            <div class="hr"></div>
+            <div class="row-flex" style="font-size:18px"><span>Total</span><strong>{{ commande.total|mul:1.2 }} €</strong></div>
+            <div class="pay-info">
+              <b>Paiement :</b> à l’ordre de Votre Société<br>
+              Banque : 12345 · RIB/IBAN : 0000 0000 0000 0000<br>
+              Objet : {{ commande.numero_facture }}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- PIED -->
+      <footer>
+        <div class="notes">
+          <b>Merci de votre confiance.</b><br>
+          Conditions : paiement à 30 jours. Pénalités légales en cas de retard.
+        </div>
+        <div class="contact">
+          votre-site.com · contact@votre-site.com · 000 00 000
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

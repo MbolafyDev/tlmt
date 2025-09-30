@@ -3,6 +3,14 @@ from .env_base_dir import BASE_DIR
 import os
 import stripe
 
+# settings.py (tout en haut)
+import hashlib as _hashlib
+__orig_md5 = _hashlib.md5
+def _md5_compat(*args, **kwargs):
+    kwargs.pop("usedforsecurity", None)
+    return __orig_md5(*args, **kwargs)
+_hashlib.md5 = _md5_compat
+
 # -----------------------------
 # Charger dotenv uniquement si pas en production
 # -----------------------------
