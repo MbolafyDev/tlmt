@@ -98,5 +98,3 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", f"[{SITE_NAME}] ")
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))  # évite les blocages SMTP
-
-stripe.api_key = STRIPE_SECRET_KEY
