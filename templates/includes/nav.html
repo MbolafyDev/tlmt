@@ -242,6 +242,16 @@
         </li>
       {% endif %}
     {% endif %}
+    <li>
+      <a href="{% url 'contact' %}" class="menu-link">
+        <span class="left"><i class="fas fa-envelope"></i> <span class="label">Contactez-nous</span></span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'apropos' %}" class="menu-link">
+        <span class="left"><i class="fas fa-info-circle"></i> <span class="label">Apropos</span></span>
+      </a>
+    </li>
 
     {% if user.is_authenticated %}
       <li><a href="{% url 'logout' %}" class="menu-link"><span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span></a></li>
