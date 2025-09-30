@@ -6,6 +6,15 @@
 
 {% block content %}
 <section class="container my-5">
+  {% if request.GET.success %}
+  <div class="alert alert-success text-center" role="alert">
+    Paiement effectué avec succès !
+  </div>
+  {% elif request.GET.canceled %}
+  <div class="alert alert-danger text-center" role="alert">
+    Paiement annulé ou erreur lors du paiement.
+  </div>
+  {% endif %}
   <h2 class="mb-4">Votre Panier</h2>
 
   <div class="row">
@@ -84,19 +93,15 @@ const elements = stripe.elements();
 const card = elements.create("card", { hidePostalCode: true });
 card.mount("#card-element");
 
+// Affiche les erreurs de saisie de carte en temps réel
 card.on("change", function(event) {
   const displayError = document.getElementById("card-errors");
-  if (event.error) {
-    displayError.textContent = event.error.message;
-  } else {
-    displayError.textContent = "";
-  }
+  displayError.textContent = event.error ? event.error.message : "";
 });
 
 const form = document.getElementById("payment-form");
 form.addEventListener("submit", async function(event) {
   event.preventDefault();
-
   document.getElementById("submit-button").disabled = true;
 
   let response = await fetch("{% url 'checkout' %}", {
@@ -106,26 +111,11 @@ form.addEventListener("submit", async function(event) {
 
   let data = await response.json();
 
-  if(data.clientSecret){
-    const result = await stripe.confirmCardPayment(data.clientSecret, {
-      payment_method: {
-        card: card,
-        billing_details: {
-          name: form.name.value,
-          email: form.email.value,
-          address: { line1: form.address.value }
-        }
-      }
-    });
-
-    if(result.error){
-      document.getElementById("card-errors").textContent = result.error.message;
-      document.getElementById("submit-button").disabled = false;
-    } else {
-      if(result.paymentIntent.status === "succeeded"){
-        window.location.href = "{% url 'home' %}?success=true";
-      }
-    }
+  if(data.sessionId){
+    stripe.redirectToCheckout({ sessionId: data.sessionId });
+  } else if(data.error){
+    document.getElementById("card-errors").textContent = data.error;
+    document.getElementById("submit-button").disabled = false;
   }
 });
 </script>

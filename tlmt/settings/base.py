@@ -2,7 +2,6 @@
 from .env_base_dir import BASE_DIR
 import os
 import stripe
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
