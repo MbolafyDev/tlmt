@@ -61,10 +61,10 @@
             {% for item in items %}
             <tr>
               <td>{{ item.produit.nom }}</td>
-              <td class="num">{{ item.prix_unitaire }} €</td>
+              <td class="num">{{ item.prix_unitaire }} Ar</td>
               <td class="num">{{ item.quantite }}</td>
               <td class="num">{{ item.quantite|floatformat:0|add:""|safe|default:"0" }}</td>
-              <td class="num">{{ item.quantite|mul:item.prix_unitaire }} €</td>
+              <td class="num">{{ item.quantite|mul:item.prix_unitaire }} Ar</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -72,17 +72,17 @@
             <tr>
               <td colspan="2"></td>
               <td class="num">Sous-total :</td>
-              <td class="num">{{ commande.total }} €</td>
+              <td class="num">{{ commande.total }} Ar</td>
             </tr>
             <tr>
               <td colspan="2"></td>
               <td class="num">TVA (20 %) :</td>
-              <td class="num">{{ commande.total|mul:0.2 }} €</td>
+              <td class="num">{{ commande.total|mul:0.2 }} Ar</td>
             </tr>
             <tr class="grand-total total-line">
               <td colspan="2"></td>
               <td class="num">TOTAL :</td>
-              <td class="num">{{ commande.total|add:commande.total|mul:1.2 }} €</td>
+              <td class="num">{{ commande.total|add:commande.total|mul:1.2 }} Ar</td>
             </tr>
           </tfoot>
         </table>
@@ -90,10 +90,10 @@
         <!-- RÉSUMÉ & PAIEMENT -->
         <div class="summary" aria-hidden="true">
           <div class="panel">
-            <div class="row-flex"><span>Sous-total</span><strong>{{ commande.total }} €</strong></div>
-            <div class="row-flex"><span>TVA (20 %)</span><strong>{{ commande.total|mul:0.2 }} €</strong></div>
+            <div class="row-flex"><span>Sous-total</span><strong>{{ commande.total }} Ar</strong></div>
+            <div class="row-flex"><span>TVA (20 %)</span><strong>{{ commande.total|mul:0.2 }} Ar</strong></div>
             <div class="hr"></div>
-            <div class="row-flex" style="font-size:18px"><span>Total</span><strong>{{ commande.total|mul:1.2 }} €</strong></div>
+            <div class="row-flex" style="font-size:18px"><span>Total</span><strong>{{ commande.total|mul:1.2 }} Ar</strong></div>
             <div class="pay-info">
               <b>Paiement :</b> à l’ordre de Votre Société<br>
               Banque : 12345 · RIB/IBAN : 0000 0000 0000 0000<br>

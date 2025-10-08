@@ -28,4 +28,5 @@ urlpatterns = [
     path("contact/", include("contact.urls")),
     path('pwa/', include('pwa.urls')),
     path("configuration/", include("configuration.urls")),
+    path('plomberie/', include("plomberie.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

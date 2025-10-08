@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Calcul de dimensionnement des tuyauteries sanitaires</h2>
+
+  <form method="post" action="{% url 'calcul_tuyauterie' %}">
+    {% csrf_token %}
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Nom *</label>
+        <input type="text" name="nom" class="form-control" required placeholder="Nom de l’utilisateur">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Email *</label>
+        <input type="email" name="email" class="form-control" required placeholder="ex: nom@gmail.com">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Téléphone</label>
+        <input type="text" name="telephone" class="form-control" placeholder="+261...">
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Appareils sanitaires</h5>
+      <div class="d-flex gap-2">
+        <button type="button" id="btnAddRow" class="btn btn-sm btn-primary">+ Ajouter un appareil</button>
+        <button type="button" id="btnClearRows" class="btn btn-sm btn-outline-danger">Effacer tout</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-0" id="tableAppareils">
+        <thead class="table-light text-center">
+          <tr>
+            <th style="width: 20%;">Image</th>
+            <th style="width: 30%;">Appareil</th>
+            <th style="width: 20%;">Débit brut (L/s)</th>
+            <th style="width: 15%;">Quantité</th>
+            <th style="width: 15%;">Eau chaude ?</th>
+            <th style="width: 5%;">—</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyAppareils">
+          <!-- Lignes ajoutées dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success">Calculer le diamètre</button>
+    </div>
+  </form>
+
+  {% if resultats %}
+  <hr class="my-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Résultats du calcul</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">💧 Débit brut total (eau froide) : <strong>{{ resultats.Qb_total_froide }} L/s</strong></li>
+        <li class="list-group-item">⚙️ Débit probable (eau froide) : <strong>{{ resultats.Qr_froide }} L/s</strong></li>
+        <li class="list-group-item">📏 Diamètre calculé (eau froide) : <strong>{{ resultats.diametre_calcule_froide }} mm</strong></li>
+        <li class="list-group-item">✅ Diamètre recommandé (eau froide) : <strong>{{ resultats.diametre_recommande_froide }} mm</strong></li>
+        {% if resultats.diametre_recommande_chaude %}
+          <li class="list-group-item text-danger">🔥 Diamètre eau chaude : <strong>{{ resultats.diametre_recommande_chaude }} mm</strong></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+(function(){
+  const btnAddRow = document.getElementById('btnAddRow');
+  const btnClearRows = document.getElementById('btnClearRows');
+  const tbody = document.getElementById('tbodyAppareils');
+
+  // Données appareils venant de Django
+  const appareilsData = [
+    {% for a in appareils %}
+      {id: '{{ a.id }}', nom: '{{ a.nom }}', debit: '{{ a.debit_brut }}', eauchaude: '{{ a.eau_chaude|yesno:"Oui,Non" }}', image: '{% if a.image %}{{ a.image.url }}{% endif %}'},
+    {% endfor %}
+  ];
+
+  function createSelect(){
+    const select = document.createElement('select');
+    select.className = 'form-select form-select-sm selectAppareil';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Choisir un appareil --';
+    defaultOption.selected = true;
+    defaultOption.disabled = true;
+    select.appendChild(defaultOption);
+
+    appareilsData.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.dataset.debit = a.debit;
+      opt.dataset.eauchaude = a.eauchaude;
+      opt.dataset.image = a.image;
+      opt.textContent = a.nom;
+      select.appendChild(opt);
+    });
+    return select;
+  }
+
+  function addRow(){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="text-center imgCell"></td>
+      <td class="nameCell"></td>
+      <td class="text-center debitCell"></td>
+      <td><input type="number" class="form-control" min="0" value="1"></td>
+      <td class="text-center eauCell"></td>
+      <td class="text-center"><button type="button" class="btn btn-sm btn-outline-secondary btnRemoveRow">×</button></td>
+    `;
+
+    const nameCell = tr.querySelector('.nameCell');
+    const select = createSelect();
+    nameCell.appendChild(select);
+
+    // Mettre à jour les données à la sélection
+    select.addEventListener('change', function(){
+      const selected = this.selectedOptions[0];
+      tr.querySelector('.debitCell').textContent = selected.dataset.debit;
+      tr.querySelector('.eauCell').innerHTML = selected.dataset.eauchaude === 'Oui' ? '<span class="badge bg-warning text-dark">Oui</span>' : '<span class="badge bg-secondary">Non</span>';
+      tr.querySelector('.imgCell').innerHTML = selected.dataset.image ? `<img src="${selected.dataset.image}" width="70" height="70" style="object-fit: cover;" class="rounded shadow-sm">` : '<span class="text-muted small">Pas d’image</span>';
+      tr.querySelector('input[type="number"]').name = `quantites_${selected.value}`;
+    });
+
+    tbody.appendChild(tr);
+  }
+
+  // Ajouter une ligne au clic
+  btnAddRow.addEventListener('click', addRow);
+
+  // Supprimer une ligne
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.btnRemoveRow');
+    if(!btn) return;
+    const tr = btn.closest('tr');
+    if(tr) tr.remove();
+  });
+
+  // Effacer tout le tableau
+  btnClearRows.addEventListener('click', ()=>{ tbody.innerHTML = ''; });
+
+})();
+</script>
+{% endblock %}

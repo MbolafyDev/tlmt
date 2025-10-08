@@ -1,34 +1,42 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from article.models import Produit, Categorie
-from django.core.paginator import Paginator
-from django.http import JsonResponse
 from decimal import Decimal
-import stripe
-from django.conf import settings
-from article.utils import render_to_pdf
 import random
-from .models import Commande, CommandeItem
+
+from django.conf import settings
+from django.contrib import messages
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
+
+import stripe
+
+from article.models import Produit, Categorie
+from article.utils import render_to_pdf  # ta fonction utilitaire
+from .models import Commande, CommandeItem
 
 # Configure Stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 # ------------------ VIEWS ------------------
 
 def home(request):
+    """
+    Page d'accueil : liste paginée des produits + compteur panier.
+    """
     produits_list = Produit.objects.prefetch_related("images").all()
     paginator = Paginator(produits_list, 10)
     page_number = request.GET.get('page')
     produits = paginator.get_page(page_number)
 
-    # Récupérer le panier et forcer dict
+    # Panier: garantir un dict
     panier = request.session.get('panier', {})
-    if isinstance(panier, list):
+    if isinstance(panier, list) or panier is None:
         panier = {}
     request.session['panier'] = panier
 
-    total_items = sum(item['quantite'] for item in panier.values())
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
     return render(request, 'home/home.html', {
         "produits": produits,
@@ -37,19 +45,21 @@ def home(request):
 
 
 def produit_detail(request, produit_id):
+    """
+    Détail produit ; renvoie un fragment si appel HTMX/AJAX (modale).
+    """
     produit = get_object_or_404(
         Produit.objects.prefetch_related("images", "caracteristiques", "couleurs"),
         pk=produit_id
     )
 
-    # Panier sécurisé
     panier = request.session.get('panier', {})
-    if isinstance(panier, list):
+    if isinstance(panier, list) or panier is None:
         panier = {}
     request.session['panier'] = panier
-    total_items = sum(item.get('quantite', 0) for item in panier.values())
 
-    # Si c'est un appel via HTMX/AJAX pour une modale, on renvoie un fragment
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
     is_htmx = (
         request.headers.get("HX-Request") == "true"
         or request.headers.get("X-Requested-With") == "XMLHttpRequest"
@@ -63,6 +73,9 @@ def produit_detail(request, produit_id):
 
 
 def ajouter_au_panier(request):
+    """
+    Ajoute un produit au panier en session. Répond en JSON.
+    """
     if not request.user.is_authenticated:
         return JsonResponse({
             "success": False,
@@ -72,29 +85,40 @@ def ajouter_au_panier(request):
 
     if request.method == "POST":
         produit_id = request.POST.get("produit_id")
-        quantite = int(request.POST.get("quantite", 1))
+        try:
+            quantite = int(request.POST.get("quantite", 1))
+        except (TypeError, ValueError):
+            quantite = 1
 
         produit = get_object_or_404(Produit, id=produit_id)
 
         panier = request.session.get("panier", {})
-        if isinstance(panier, list):
+        if isinstance(panier, list) or panier is None:
             panier = {}
 
-        if produit_id in panier:
-            panier[produit_id]["quantite"] += quantite
+        # Toujours stocker la clé en str (cohérence session)
+        key = str(produit_id)
+
+        if key in panier:
+            panier[key]["quantite"] = int(panier[key].get("quantite", 0)) + quantite
         else:
-            panier[produit_id] = {
+            image_url = "/static/images/default.png"
+            first_img = getattr(produit.images.first(), "image", None)
+            if first_img and getattr(first_img, "url", None):
+                image_url = first_img.url
+
+            panier[key] = {
                 "nom": produit.nom,
                 "prix": float(produit.prix),
-                "prix_original": float(produit.prix_original),
+                "prix_original": float(getattr(produit, "prix_original", produit.prix)),
                 "quantite": quantite,
-                "image": produit.images.first().image.url if produit.images.exists() else "/static/images/default.png"
+                "image": image_url,
             }
 
         request.session["panier"] = panier
         request.session.modified = True
 
-        total_items = sum(item["quantite"] for item in panier.values())
+        total_items = sum(int(item.get("quantite", 0)) for item in panier.values())
 
         return JsonResponse({
             "success": True,
@@ -104,74 +128,66 @@ def ajouter_au_panier(request):
     return JsonResponse({"success": False})
 
 
-from decimal import Decimal
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from django.conf import settings
-from django.contrib import messages
-import stripe, random
-
-from article.models import Produit, Categorie
-from article.utils import render_to_pdf
-from .models import Commande, CommandeItem
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
 def checkout(request):
     """
     Page checkout :
     - GET : affiche le panier + formulaire
     - POST (remove_id) : supprime un article du panier
-    - POST (paiement) : crée une Session Stripe et redirige vers Stripe
+    - POST (paiement) : crée une Session Stripe et renvoie l'id de session
     - GET ?success=true : paiement confirmé => création commande + envoi facture PDF + vidage panier
+    - GET ?canceled=true : paiement annulé
     """
-
     if not request.user.is_authenticated:
         return redirect("login")
 
-    # --- Sanitize panier depuis la session ---
+    # Panier propre depuis la session
     panier = request.session.get('panier', {})
     if isinstance(panier, list) or panier is None:
         panier = {}
-    request.session['panier'] = panier  # normalise la session
+    request.session['panier'] = panier
 
-    # --- Suppression d'un article du panier (formulaire dans checkout.html) ---
+    # Suppression d'un article du panier
     if request.method == "POST" and request.POST.get("remove_id"):
-        remove_id = request.POST.get("remove_id")
+        remove_id = str(request.POST.get("remove_id"))
         if remove_id in panier:
             del panier[remove_id]
             request.session['panier'] = panier
             request.session.modified = True
             messages.success(request, "Article supprimé du panier.")
-        # recalcule le total puis on retombe en rendu GET
-        total = sum(Decimal(str(item['prix'])) * int(item['quantite']) for item in panier.values()) if panier else Decimal('0')
+
+        total = sum(
+            Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0))
+            for item in panier.values()
+        ) if panier else Decimal('0')
+
         return render(request, 'home/checkout.html', {
             'panier': panier,
             'total': total,
             'stripe_public_key': settings.STRIPE_PUBLIC_KEY
         })
 
-    # --- Total courant ---
-    total = sum(Decimal(str(item['prix'])) * int(item['quantite']) for item in panier.values()) if panier else Decimal('0')
+    # Total courant
+    total = sum(
+        Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0))
+        for item in panier.values()
+    ) if panier else Decimal('0')
 
-    # --- Création de la session Stripe Checkout ---
+    # Démarrer un paiement Stripe
     if request.method == "POST":
-        # si ce n'est pas une suppression, on considère que c'est un paiement
         if not panier:
             return JsonResponse({'error': "Votre panier est vide."}, status=400)
 
         try:
             line_items = []
             for item in panier.values():
-                unit_amount = int(Decimal(str(item["prix"])) * 100)  # cents
+                unit_amount = int(Decimal(str(item.get("prix", 0))) * 100)  # en cents
                 line_items.append({
                     'price_data': {
-                        'currency': 'eur',  # adapte si nécessaire (ex: 'mga' non supporté par Stripe)
-                        'product_data': {'name': item["nom"]},
+                        'currency': 'eur',  # adapter si besoin (MGA non supporté par Stripe)
+                        'product_data': {'name': item.get("nom", "Article")},
                         'unit_amount': unit_amount,
                     },
-                    'quantity': int(item["quantite"]),
+                    'quantity': int(item.get("quantite", 0)),
                 })
 
             session = stripe.checkout.Session.create(
@@ -186,9 +202,8 @@ def checkout(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    # --- Retour Stripe ---
+    # Retour succès depuis Stripe
     if request.GET.get('success') == 'true':
-        # Génère un numéro de facture
         numero_facture = f"TEP-{random.randint(1000, 9999)}"
 
         # Crée la commande (total figé au moment du paiement)
@@ -199,14 +214,14 @@ def checkout(request):
             email=request.user.email
         )
 
-        # Crée les lignes de commande
+        # Lignes de commande
         for produit_id, item in panier.items():
             produit_obj = get_object_or_404(Produit, id=produit_id)
             CommandeItem.objects.create(
                 commande=commande,
                 produit=produit_obj,
-                quantite=int(item['quantite']),
-                prix_unitaire=Decimal(str(item['prix']))
+                quantite=int(item.get('quantite', 0)),
+                prix_unitaire=Decimal(str(item.get('prix', 0)))
             )
 
         # Génère le PDF + envoi mail
@@ -215,33 +230,42 @@ def checkout(request):
             'items': commande.items.all(),
             'user': request.user,
         }
-        pdf = render_to_pdf('home/includes/factures.html', context_pdf)
-        if pdf:
-            from django.core.mail import EmailMessage
+
+        # Compat : si ta util accepte base_url (WeasyPrint), on la passe ; sinon on retombe sur l'appel simple
+        pdf_bytes = None
+        try:
+            pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf,
+                                      base_url=request.build_absolute_uri('/'))
+        except TypeError:
+            # signature sans base_url
+            pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
+
+        if pdf_bytes:
             email = EmailMessage(
                 subject=f"Votre facture {numero_facture}",
                 body="Veuillez trouver votre facture en pièce jointe.",
                 from_email="no-reply@votre-site.com",
                 to=[request.user.email],
             )
-            email.attach(f"{numero_facture}.pdf", pdf, "application/pdf")
+            email.attach(f"{numero_facture}.pdf", pdf_bytes, "application/pdf")
             email.send()
 
-        # Vide le panier (session + variables locales)
+        # Vider le panier
         request.session['panier'] = {}
         request.session.modified = True
+
+        messages.success(
+            request,
+            "Paiement effectué avec succès. Votre facture vous a été envoyée par e-mail."
+        )
+        # Rendre la page checkout avec panier vide
         panier = {}
         total = Decimal('0')
 
-        messages.success(request, "Paiement effectué avec succès. Votre facture vous a été envoyée par e-mail.")
-        # NOTE : si tu préfères éviter le refresh sur ?success=true, fais plutôt :
-        # return redirect('checkout')  # puis affiche un bandeau de succès
-
-    # --- Annulation Stripe ---
     elif request.GET.get('canceled') == 'true':
         messages.error(request, "Paiement annulé ou erreur lors du paiement.")
 
-    # --- Rendu ---
+    # Rendu
     return render(request, 'home/checkout.html', {
         'panier': panier,
         'total': total,
@@ -250,6 +274,9 @@ def checkout(request):
 
 
 def categorie_detail(request, slug):
+    """
+    Liste des produits d'une catégorie (pagination) + compteur panier.
+    """
     categorie = get_object_or_404(Categorie, slug=slug)
     produits_list = categorie.produits.all()
 
@@ -258,11 +285,11 @@ def categorie_detail(request, slug):
     produits = paginator.get_page(page_number)
 
     panier = request.session.get('panier', {})
-    if isinstance(panier, list):
+    if isinstance(panier, list) or panier is None:
         panier = {}
     request.session['panier'] = panier
 
-    total_items = sum(item['quantite'] for item in panier.values())
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
     return render(request, 'home/home.html', {
         'produits': produits,
