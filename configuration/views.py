@@ -274,3 +274,22 @@ def appareil_delete(request, appareil_id):
     appareil.delete()
     messages.success(request, f"L’appareil sanitaire '{appareil.nom}' a été supprimé avec succès.")
     return redirect("appareil_list")
+
+@admin_required
+def appareil_edit(request, appareil_id):
+    appareil = get_object_or_404(AppareilSanitaire, id=appareil_id)
+    
+    if request.method == "POST":
+        form = AppareilSanitaireForm(request.POST, request.FILES, instance=appareil)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"L’appareil '{appareil.nom}' a été modifié avec succès.")
+            return redirect("appareil_list")
+    else:
+        form = AppareilSanitaireForm(instance=appareil)
+
+    return render(
+        request,
+        "configuration/appareil_edit.html",
+        {"form": form, "title": f"Modifier {appareil.nom}"}
+    )

@@ -24,5 +24,6 @@ urlpatterns = [
 
     path("appareils/", views.appareil_list, name="appareil_list"),
     path("appareils/add/", views.appareil_add, name="appareil_add"),
+    path("appareils/<int:appareil_id>/edit/", views.appareil_edit, name="appareil_edit"),
     path("appareils/<int:appareil_id>/delete/", views.appareil_delete, name="appareil_delete"),
 ]

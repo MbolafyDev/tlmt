@@ -29,6 +29,9 @@
           <td>{{ appareil.debit_brut }}</td>
           <td>{% if appareil.eau_chaude %}Oui{% else %}Non{% endif %}</td>
           <td>
+             <a href="{% url 'appareil_edit' appareil.id %}" class="btn btn-sm btn-primary me-1">
+              Modifier
+            </a>
             <a href="{% url 'appareil_delete' appareil.id %}" class="btn btn-sm btn-danger"
                onclick="return confirm('Supprimer {{ appareil.nom }} ?')">
                Supprimer
