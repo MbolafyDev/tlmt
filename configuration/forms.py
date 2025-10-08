@@ -1,6 +1,7 @@
 from django import forms
 from users.models import CustomUser
 from article.models import Produit, ProduitImage
+from plomberie.models import AppareilSanitaire
 
 class UserValidationForm(forms.ModelForm):
     class Meta:
@@ -109,4 +110,15 @@ class ProduitImageForm(forms.ModelForm):
         widgets = {
             'image': forms.ClearableFileInput(attrs={"class": "form-control"}),
             'principale': forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+class AppareilSanitaireForm(forms.ModelForm):
+    class Meta:
+        model = AppareilSanitaire
+        fields = ["nom", "debit_brut", "eau_chaude", "image"]
+        widgets = {
+            "nom": forms.TextInput(attrs={"class": "form-control"}),
+            "debit_brut": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "eau_chaude": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }

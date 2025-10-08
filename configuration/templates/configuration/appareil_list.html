@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">{{ title }}</h2>
+
+  <a href="{% url 'appareil_add' %}" class="btn btn-success mb-3">+ Ajouter un appareil</a>
+
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Nom</th>
+        <th>Débit (L/s)</th>
+        <th>Eau chaude</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for appareil in appareils %}
+        <tr>
+          <td>
+            {% if appareil.image %}
+              <img src="{{ appareil.image.url }}" alt="{{ appareil.nom }}" width="60">
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>{{ appareil.nom }}</td>
+          <td>{{ appareil.debit_brut }}</td>
+          <td>{% if appareil.eau_chaude %}Oui{% else %}Non{% endif %}</td>
+          <td>
+            <a href="{% url 'appareil_delete' appareil.id %}" class="btn btn-sm btn-danger"
+               onclick="return confirm('Supprimer {{ appareil.nom }} ?')">
+               Supprimer
+            </a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">Aucun appareil sanitaire ajouté.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

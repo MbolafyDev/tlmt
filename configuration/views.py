@@ -7,6 +7,8 @@ from users.models import CustomUser
 from .forms import UserValidationForm, ProduitForm, ProduitImageForm
 from common.decorators import admin_required
 from article.models import Produit, ProduitImage, Categorie, Caracteristique
+from plomberie.models import AppareilSanitaire
+from .forms import AppareilSanitaireForm
 
 
 # ---------------- Users ----------------
@@ -238,3 +240,37 @@ def caracteristique_delete(request, caracteristique_id):
     caracteristique.delete()
     messages.success(request, f"Caractéristique '{caracteristique.nom}' supprimée avec succès.")
     return redirect("caracteristique_list")
+
+@admin_required
+def appareil_add(request):
+    if request.method == "POST":
+        form = AppareilSanitaireForm(request.POST, request.FILES)
+        if form.is_valid():
+            appareil = form.save()
+            messages.success(request, f"L’appareil sanitaire '{appareil.nom}' a été ajouté avec succès.")
+            return redirect("appareil_list")
+    else:
+        form = AppareilSanitaireForm()
+    return render(
+        request,
+        "configuration/appareil_form.html",
+        {"form": form, "title": "Ajouter un appareil sanitaire"},
+    )
+
+
+@admin_required
+def appareil_list(request):
+    appareils = AppareilSanitaire.objects.all().order_by("nom")
+    return render(
+        request,
+        "configuration/appareil_list.html",
+        {"appareils": appareils, "title": "Liste des appareils sanitaires"},
+    )
+
+
+@admin_required
+def appareil_delete(request, appareil_id):
+    appareil = get_object_or_404(AppareilSanitaire, id=appareil_id)
+    appareil.delete()
+    messages.success(request, f"L’appareil sanitaire '{appareil.nom}' a été supprimé avec succès.")
+    return redirect("appareil_list")
