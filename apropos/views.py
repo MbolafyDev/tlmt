@@ -17,3 +17,6 @@ def apropos_view(request):
         "points_cles": points_cles,
     }
     return render(request, "apropos/apropos.html", context)
+
+def apropos_dev(request):
+    return render(request, 'apropos/apropos-dev.html')

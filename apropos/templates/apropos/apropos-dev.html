@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}À propos de Mbola Fy – Développeur TLMT Services{% endblock %}
+
+{% block extra_css %}
+<style>
+  .apropos-intro {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .feature-card {
+    height: 100%;
+  }
+  .feature-head {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .75rem;
+  }
+  .feature-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: .5rem;
+    background: #f8f9fa;
+    padding: .25rem;
+  }
+  .feature-title {
+    font-weight: 700;
+    margin: 0;
+  }
+  .feature-desc {
+    margin: 0;
+    line-height: 1.5;
+  }
+  .checklist {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.05rem;
+  }
+  .photo-profil {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 3px solid #ddd;
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<section class="container my-5 text-center">
+
+  <!-- Photo -->
+  <img src="{% static 'images/mbola_fy.jpg' %}" alt="Mbola Fy" class="photo-profil">
+
+  <h2 class="mb-3">Mbola Fy</h2>
+  <p class="text-muted mb-4">25 ans • Célibataire • Spécialiste en électricité et plomberie • Étudiant en 1ère année de Génie Logiciel</p>
+
+  <p class="apropos-intro text-center text-muted mb-5">
+    Développeur de l’application <strong>TLMT Services</strong>, je combine mes compétences techniques en électricité et plomberie avec mes connaissances en génie logiciel pour créer des solutions web efficaces et pratiques. Mes projets incluent la conception d’applications e-commerce et e-learning pour faciliter l’accès aux services et produits techniques.
+  </p>
+
+  <h4>Parcours académique</h4>
+  <ul class="list-unstyled checklist text-start mt-3">
+    <li>✅ 2023 – 2025 : Formation en Électricité et Plomberie, CFP Soltec</li>
+    <li>✅ 2019 : Baccalauréat série D, Lycée Ambohidratrimo</li>
+    <li>✅ 2015 : BEPC général, CEG Ambohidratrimo</li>
+    <li>✅ 2011 : CEPE, EPP Ambohidratrimo</li>
+  </ul>
+
+  <h4 class="mt-4">Expériences professionnelles</h4>
+  <ul class="list-unstyled checklist text-start mt-3">
+    <li>✅ 2023 : Agent de production, AMCHO Ambohibao</li>
+    <li>✅ 2020 : Agent enquêteur (FID) pour la prévention du Coronavirus</li>
+  </ul>
+
+  <h4 class="mt-4">Projets réalisés</h4>
+  <ul class="list-unstyled checklist text-start mt-3">
+    <li>✅ <strong>TLMT Services</strong> – <a href="https://tlmt.pythonanywhere.com" target="_blank">tlmt.pythonanywhere.com</a> : Plateforme web e-commerce et e-learning développée avec Django.</li>
+    <li>✅ <strong>Bike in Mada</strong> – <a href="https://bikeinmada1.pythonanywhere.com" target="_blank">bikeinmada1.pythonanywhere.com</a> : Gestion des ventes et du stock pour boutique de vélos.</li>
+  </ul>
+
+  <div class="mt-5">
+    <h4>Compétences et spécialités</h4>
+    <ul class="list-unstyled checklist text-start mt-3">
+      <li>✅ Développement web : Python, Django, HTML, CSS, JavaScript</li>
+      <li>✅ Gestion de bases de données : PostgreSQL, SQLite</li>
+      <li>✅ Conception et maintenance d’applications web et e-commerce</li>
+      <li>✅ Expertise professionnelle en électricité et plomberie</li>
+    </ul>
+  </div>
+
+  <div class="mt-5">
+    <h4>Pourquoi choisir TLMT Services ?</h4>
+    <ul class="list-unstyled mt-3 checklist text-start">
+      <li>✅ Solutions web fiables et adaptées aux besoins des clients</li>
+      <li>✅ Expertise combinée en génie logiciel et techniques électriques/plomberie</li>
+      <li>✅ Projets complets : e-commerce, e-learning, gestion technique</li>
+      <li>✅ Support et suivi personnalisé</li>
+    </ul>
+  </div>
+
+</section>
+{% endblock %}

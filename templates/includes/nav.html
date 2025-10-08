@@ -149,10 +149,16 @@
         </li>
 
         <!-- À propos -->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'apropos' %}" data-bs-toggle="tooltip" title="À propos">
+        <!-- À propos dropdown (desktop) -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="aproposDropdown" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false" title="À propos">
             <i class="fas fa-info-circle"></i>
           </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="aproposDropdown">
+            <li><a class="dropdown-item" href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos de TLMT Services</a></li>
+            <li><a class="dropdown-item" href="{% url 'apropos_dev' %}"><i class="fas fa-laptop-code"></i> À propos du développeur</a></li>
+          </ul>
         </li>
 
         <!-- Paramètres (Desktop) -->
@@ -251,11 +257,18 @@
         <span class="left"><i class="fas fa-envelope"></i> <span class="label">Contactez-nous</span></span>
       </a>
     </li>
+    <!-- À propos (mobile) -->
     <li>
-      <a href="{% url 'apropos' %}" class="menu-link">
-        <span class="left"><i class="fas fa-info-circle"></i> <span class="label">Apropos</span></span>
+      <a href="#" class="menu-link submenu-toggle">
+        <span class="left"><i class="fas fa-info-circle"></i> <span class="label">À propos</span></span>
+        <i class="fas fa-caret-down"></i>
       </a>
+      <ul class="submenu">
+        <li><a href="{% url 'apropos' %}"><i class="fas fa-info-circle"></i> À propos de TLMT Services</a></li>
+        <li><a href="{% url 'apropos_dev' %}"><i class="fas fa-laptop-code"></i> À propos du développeur</a></li>
+      </ul>
     </li>
+
 
     {% if user.is_authenticated %}
       <li><a href="{% url 'logout' %}" class="menu-link"><span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span></a></li>
