@@ -44,7 +44,6 @@
         {% endfor %}
       </div>
 
-      <!-- Total -->
       <div class="mt-4 d-flex justify-content-end">
         <h5>Total: <span class="text-danger">{{ total|intcomma }} Ar</span></h5>
       </div>
@@ -58,6 +57,7 @@
       <h4 class="mb-3">Paiement</h4>
       <form id="payment-form" method="POST" action="{% url 'checkout' %}">
         {% csrf_token %}
+        <input type="hidden" name="payment_method" value="stripe">
         <div class="mb-3">
           <label for="name" class="form-label">Nom complet</label>
           <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required>
@@ -76,11 +76,20 @@
           <div id="card-errors" class="text-danger mt-2" role="alert"></div>
         </div>
         {% if panier %}
-        <button type="submit" id="submit-button" class="btn btn-primary w-100">Valider la commande</button>
+        <button type="submit" id="submit-button" class="btn btn-primary w-100 mb-2">Valider la commande (Stripe)</button>
         {% else %}
         <button type="button" class="btn btn-secondary w-100" disabled>Panier vide</button>
         {% endif %}
       </form>
+
+      <!-- Bouton PayPal -->
+      {% if panier %}
+      <form id="paypal-form" method="POST" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="paypal">
+        <button type="submit" class="btn btn-warning w-100 mt-2">Payer avec PayPal</button>
+      </form>
+      {% endif %}
     </div>
   </div>
 </section>
@@ -93,7 +102,6 @@ const elements = stripe.elements();
 const card = elements.create("card", { hidePostalCode: true });
 card.mount("#card-element");
 
-// Affiche les erreurs de saisie de carte en temps réel
 card.on("change", function(event) {
   const displayError = document.getElementById("card-errors");
   displayError.textContent = event.error ? event.error.message : "";
@@ -119,4 +127,27 @@ form.addEventListener("submit", async function(event) {
   }
 });
 </script>
+<script>
+const paypalForm = document.getElementById("paypal-form");
+paypalForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(paypalForm);
+
+    let response = await fetch("{% url 'checkout' %}", {
+        method: "POST",
+        body: formData,
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    });
+
+    let data = await response.json();
+
+    if(data.approval_url){
+        window.location.href = data.approval_url;  // Redirection automatique
+    } else if(data.error){
+        alert("Erreur PayPal : " + data.error);
+    }
+});
+</script>
+
 {% endblock %}

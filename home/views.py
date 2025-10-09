@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
+from .utils import create_paypal_payment, capture_paypal_order, is_paypal_capture_successful
 
 import stripe
 
@@ -129,84 +130,127 @@ def ajouter_au_panier(request):
 
 
 def checkout(request):
-    """
-    Page checkout :
-    - GET : affiche le panier + formulaire
-    - POST (remove_id) : supprime un article du panier
-    - POST (paiement) : crée une Session Stripe et renvoie l'id de session
-    - GET ?success=true : paiement confirmé => création commande + envoi facture PDF + vidage panier
-    - GET ?canceled=true : paiement annulé
-    """
     if not request.user.is_authenticated:
         return redirect("login")
 
-    # Panier propre depuis la session
+    # --- Récupération du panier ---
     panier = request.session.get('panier', {})
     if isinstance(panier, list) or panier is None:
         panier = {}
     request.session['panier'] = panier
 
-    # Suppression d'un article du panier
-    if request.method == "POST" and request.POST.get("remove_id"):
-        remove_id = str(request.POST.get("remove_id"))
-        if remove_id in panier:
-            del panier[remove_id]
-            request.session['panier'] = panier
-            request.session.modified = True
-            messages.success(request, "Article supprimé du panier.")
+    # --- Calcul du total ---
+    total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values()) if panier else Decimal('0')
 
-        total = sum(
-            Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0))
-            for item in panier.values()
-        ) if panier else Decimal('0')
+    # --- Si retour depuis PayPal (avec token ou order_id) ---
+    paypal_token = request.GET.get('token')
+    paypal_success = request.GET.get('success')
+    if paypal_token and paypal_success:
+        try:
+            capture_resp = capture_paypal_order(paypal_token)
+            if is_paypal_capture_successful(capture_resp):
+                numero_facture = f"TEP-{random.randint(1000, 9999)}"
+                commande = Commande.objects.create(
+                    user=request.user,
+                    numero_facture=numero_facture,
+                    total=total,
+                    email=request.user.email
+                )
 
-        return render(request, 'home/checkout.html', {
-            'panier': panier,
-            'total': total,
-            'stripe_public_key': settings.STRIPE_PUBLIC_KEY
-        })
+                # Enregistrer les produits dans CommandeItem
+                for produit_id, item in panier.items():
+                    produit_obj = get_object_or_404(Produit, id=produit_id)
+                    CommandeItem.objects.create(
+                        commande=commande,
+                        produit=produit_obj,
+                        quantite=int(item.get('quantite', 0)),
+                        prix_unitaire=Decimal(str(item.get('prix', 0)))
+                    )
 
-    # Total courant
-    total = sum(
-        Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0))
-        for item in panier.values()
-    ) if panier else Decimal('0')
+                # Générer la facture PDF et l'envoyer par e-mail
+                context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
+                pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
-    # Démarrer un paiement Stripe
+                if pdf_bytes:
+                    email = EmailMessage(
+                        subject=f"Votre facture {numero_facture}",
+                        body="Merci pour votre achat ! Votre facture est en pièce jointe.",
+                        from_email="no-reply@tlmtstore.com",
+                        to=[request.user.email],
+                    )
+                    email.attach(f"{numero_facture}.pdf", pdf_bytes, "application/pdf")
+                    email.send()
+
+                # Vider le panier
+                request.session['panier'] = {}
+                request.session.modified = True
+
+                messages.success(request, "Paiement PayPal effectué avec succès. Votre facture a été envoyée par e-mail.")
+                return redirect('checkout')
+
+            else:
+                messages.error(request, "Certaines informations PayPal sont incorrectes. Réessayez.")
+                return redirect('checkout')
+
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la capture PayPal : {str(e)}")
+            return redirect('checkout')
+
+    # --- Traitement POST (Stripe ou PayPal) ---
     if request.method == "POST":
+        mode = request.POST.get("payment_method")
+
         if not panier:
             return JsonResponse({'error': "Votre panier est vide."}, status=400)
 
-        try:
-            line_items = []
-            for item in panier.values():
-                unit_amount = int(Decimal(str(item.get("prix", 0))) * 100)  # en cents
-                line_items.append({
-                    'price_data': {
-                        'currency': 'eur',  # adapter si besoin (MGA non supporté par Stripe)
-                        'product_data': {'name': item.get("nom", "Article")},
-                        'unit_amount': unit_amount,
-                    },
-                    'quantity': int(item.get("quantite", 0)),
-                })
+        # --- Stripe ---
+        if mode == "stripe":
+            try:
+                line_items = []
+                for item in panier.values():
+                    unit_amount = int(Decimal(str(item.get("prix", 0))) * 100)
+                    line_items.append({
+                        'price_data': {
+                            'currency': 'eur',
+                            'product_data': {'name': item.get("nom", "Article")},
+                            'unit_amount': unit_amount,
+                        },
+                        'quantity': int(item.get("quantite", 0)),
+                    })
 
-            session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=line_items,
-                mode='payment',
-                success_url=request.build_absolute_uri('?success=true'),
-                cancel_url=request.build_absolute_uri('?canceled=true'),
-            )
-            return JsonResponse({'sessionId': session.id})
+                session = stripe.checkout.Session.create(
+                    payment_method_types=['card'],
+                    line_items=line_items,
+                    mode='payment',
+                    success_url=request.build_absolute_uri('?stripe=1&success=true'),
+                    cancel_url=request.build_absolute_uri('?stripe=1&canceled=true'),
+                )
+                return JsonResponse({'sessionId': session.id})
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=400)
 
-    # Retour succès depuis Stripe
-    if request.GET.get('success') == 'true':
+        # --- PayPal ---
+        elif mode == "paypal":
+            try:
+                return_url = request.build_absolute_uri('?success=true')
+                cancel_url = request.build_absolute_uri('?canceled=true')
+                paypal_resp = create_paypal_payment(float(total), 'EUR', return_url, cancel_url)
+
+                approval_url = paypal_resp.get('approval_url')
+                if approval_url:
+                    return JsonResponse({'approval_url': approval_url})
+                else:
+                    return JsonResponse({'error': 'Impossible de créer le paiement PayPal.'}, status=400)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=400)
+
+        else:
+            return JsonResponse({'error': 'Mode de paiement non valide.'}, status=400)
+
+    # --- Capture Stripe (success=true) ---
+    if request.GET.get('stripe') == '1' and request.GET.get('success'):
         numero_facture = f"TEP-{random.randint(1000, 9999)}"
-
-        # Crée la commande (total figé au moment du paiement)
         commande = Commande.objects.create(
             user=request.user,
             numero_facture=numero_facture,
@@ -214,7 +258,6 @@ def checkout(request):
             email=request.user.email
         )
 
-        # Lignes de commande
         for produit_id, item in panier.items():
             produit_obj = get_object_or_404(Produit, id=produit_id)
             CommandeItem.objects.create(
@@ -224,27 +267,15 @@ def checkout(request):
                 prix_unitaire=Decimal(str(item.get('prix', 0)))
             )
 
-        # Génère le PDF + envoi mail
-        context_pdf = {
-            'commande': commande,
-            'items': commande.items.all(),
-            'user': request.user,
-        }
-
-        # Compat : si ta util accepte base_url (WeasyPrint), on la passe ; sinon on retombe sur l'appel simple
-        pdf_bytes = None
-        try:
-            pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf,
-                                      base_url=request.build_absolute_uri('/'))
-        except TypeError:
-            # signature sans base_url
-            pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
+        # Génération facture PDF
+        context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
+        pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
         if pdf_bytes:
             email = EmailMessage(
                 subject=f"Votre facture {numero_facture}",
-                body="Veuillez trouver votre facture en pièce jointe.",
-                from_email="no-reply@votre-site.com",
+                body="Merci pour votre achat ! Votre facture est en pièce jointe.",
+                from_email="no-reply@tlmtstore.com",
                 to=[request.user.email],
             )
             email.attach(f"{numero_facture}.pdf", pdf_bytes, "application/pdf")
@@ -254,18 +285,10 @@ def checkout(request):
         request.session['panier'] = {}
         request.session.modified = True
 
-        messages.success(
-            request,
-            "Paiement effectué avec succès. Votre facture vous a été envoyée par e-mail."
-        )
-        # Rendre la page checkout avec panier vide
-        panier = {}
-        total = Decimal('0')
+        messages.success(request, "Paiement Stripe effectué avec succès.")
+        return redirect('checkout')
 
-    elif request.GET.get('canceled') == 'true':
-        messages.error(request, "Paiement annulé ou erreur lors du paiement.")
-
-    # Rendu
+    # --- Rendu du template ---
     return render(request, 'home/checkout.html', {
         'panier': panier,
         'total': total,
