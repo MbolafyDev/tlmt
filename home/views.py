@@ -134,15 +134,16 @@ def checkout(request):
         return redirect("login")
 
     # --- Récupération du panier ---
-    panier = request.session.get('panier', {})
-    if isinstance(panier, list) or panier is None:
+    panier = request.session.get('panier')
+    if not isinstance(panier, dict):
         panier = {}
     request.session['panier'] = panier
 
-    # --- Calcul du total ---
+    # --- Calcul du total et total_items ---
     total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values()) if panier else Decimal('0')
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
-    # --- Si retour depuis PayPal (avec token ou order_id) ---
+    # --- Retour depuis PayPal ---
     paypal_token = request.GET.get('token')
     paypal_success = request.GET.get('success')
     if paypal_token and paypal_success:
@@ -157,7 +158,6 @@ def checkout(request):
                     email=request.user.email
                 )
 
-                # Enregistrer les produits dans CommandeItem
                 for produit_id, item in panier.items():
                     produit_obj = get_object_or_404(Produit, id=produit_id)
                     CommandeItem.objects.create(
@@ -167,7 +167,7 @@ def checkout(request):
                         prix_unitaire=Decimal(str(item.get('prix', 0)))
                     )
 
-                # Générer la facture PDF et l'envoyer par e-mail
+                # Générer facture PDF
                 context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
                 pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
@@ -187,19 +187,34 @@ def checkout(request):
 
                 messages.success(request, "Paiement PayPal effectué avec succès. Votre facture a été envoyée par e-mail.")
                 return redirect('checkout')
-
             else:
                 messages.error(request, "Certaines informations PayPal sont incorrectes. Réessayez.")
                 return redirect('checkout')
-
         except Exception as e:
             messages.error(request, f"Erreur lors de la capture PayPal : {str(e)}")
             return redirect('checkout')
 
-    # --- Traitement POST (Stripe ou PayPal) ---
+    # --- POST : suppression ou paiement ---
     if request.method == "POST":
-        mode = request.POST.get("payment_method")
 
+        # --- Suppression d'un produit ---
+        remove_id = request.POST.get("remove_id")
+        if remove_id:
+            remove_id = str(remove_id)  # toujours en str pour correspondre à la clé du dict
+            if remove_id in panier:
+                del panier[remove_id]
+                request.session['panier'] = panier
+                request.session.modified = True
+
+            # Recalculer total et total_items après suppression (optionnel)
+            total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values())
+            total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
+            # 🔹 Redirection vers la page panier
+            return redirect('checkout')
+
+        # --- Paiement ---
+        mode = request.POST.get("payment_method")
         if not panier:
             return JsonResponse({'error': "Votre panier est vide."}, status=400)
 
@@ -226,7 +241,6 @@ def checkout(request):
                     cancel_url=request.build_absolute_uri('?stripe=1&canceled=true'),
                 )
                 return JsonResponse({'sessionId': session.id})
-
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
 
@@ -292,8 +306,10 @@ def checkout(request):
     return render(request, 'home/checkout.html', {
         'panier': panier,
         'total': total,
+        'total_items': total_items,
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY
     })
+
 
 
 def categorie_detail(request, slug):

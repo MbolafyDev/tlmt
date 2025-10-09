@@ -150,4 +150,34 @@ paypalForm.addEventListener("submit", async function(event) {
 });
 </script>
 
+<script>
+document.querySelectorAll('form[action=""]').forEach(form => {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    let response = await fetch("{% url 'checkout' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    });
+
+    let data = await response.json();
+    if(data.success){
+      // Supprimer l'élément du DOM
+      form.closest('.list-group-item').remove();
+
+      // Mettre à jour le total
+      const totalEl = document.querySelector('.mt-4 h5 span');
+      totalEl.textContent = new Intl.NumberFormat().format(data.total) + ' Ar';
+
+      // Si panier vide
+      if(data.total_items === 0){
+        document.querySelector('.list-group').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
+      }
+    }
+  });
+});
+</script>
+
 {% endblock %}
