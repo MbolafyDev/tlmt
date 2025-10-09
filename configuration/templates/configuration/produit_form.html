@@ -83,6 +83,21 @@
             {% if form.couleurs.errors %}<div class="text-danger small">{{ form.couleurs.errors }}</div>{% endif %}
           </div>
         </div>
+        <!-- active -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="form-check">
+              {{ form.is_active }}
+              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                Produit actif
+              </label>
+              {% if form.is_active.errors %}
+                <div class="text-danger small">{{ form.is_active.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
 
         <!-- Upload images -->
         <div class="card">

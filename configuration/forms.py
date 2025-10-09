@@ -91,6 +91,7 @@ class ProduitForm(forms.ModelForm):
             "prix",
             "caracteristiques",
             "couleurs",
+            "is_active",  # ← ajouté
         ]
         widgets = {
             'nom': forms.TextInput(attrs={"class": "form-control"}),
@@ -101,6 +102,7 @@ class ProduitForm(forms.ModelForm):
             'categorie': forms.Select(attrs={"class": "form-control"}),
             'caracteristiques': forms.SelectMultiple(attrs={"class": "form-control"}),
             'couleurs': forms.SelectMultiple(attrs={"class": "form-control"}),
+            'is_active': forms.CheckboxInput(attrs={"class": "form-check-input"}),  # ← widget pour checkbox
         }
 
 class ProduitImageForm(forms.ModelForm):

@@ -12,7 +12,7 @@ class ProduitForm(forms.ModelForm):
             "prix_original",
             "prix",
             "caracteristiques",
-            # "couleurs",  # ← décommente si tu veux aussi gérer les couleurs
+            "is_active",  # ← Ajout ici
         ]
         labels = {
             "categorie": "Catégorie",
@@ -22,7 +22,7 @@ class ProduitForm(forms.ModelForm):
             "prix_original": "Prix d’origine",
             "prix": "Prix actuel",
             "caracteristiques": "Caractéristiques",
-            # "couleurs": "Couleurs",
+            "is_active": "Produit actif",  # label pour checkbox
         }
         widgets = {
             "categorie": forms.Select(attrs={"class": "form-select"}),
@@ -32,8 +32,9 @@ class ProduitForm(forms.ModelForm):
             "prix_original": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "prix": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "caracteristiques": forms.SelectMultiple(attrs={"class": "form-select", "size": 6}),
-            # "couleurs": forms.SelectMultiple(attrs={"class": "form-select", "size": 6}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),  # widget checkbox
         }
+
 
     # (Facultatif) pour limiter les listes si besoin
     def __init__(self, *args, **kwargs):

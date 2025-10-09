@@ -25,7 +25,7 @@ def home(request):
     """
     Page d'accueil : liste paginée des produits + compteur panier.
     """
-    produits_list = Produit.objects.prefetch_related("images").all()
+    produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
     paginator = Paginator(produits_list, 10)
     page_number = request.GET.get('page')
     produits = paginator.get_page(page_number)

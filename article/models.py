@@ -90,6 +90,7 @@ class Produit(models.Model):
 
     date_ajout = models.DateTimeField(auto_now_add=True)
     date_modif = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-date_ajout"]
