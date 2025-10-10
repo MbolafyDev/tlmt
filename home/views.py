@@ -14,7 +14,7 @@ import stripe
 
 from article.models import Produit, Categorie
 from article.utils import render_to_pdf  # ta fonction utilitaire
-from .models import Commande, CommandeItem
+from .models import Commande, CommandeItem, Service
 
 # Configure Stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -24,25 +24,61 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def home(request):
     """
-    Page d'accueil : liste paginée des produits + compteur panier.
+    Page d'accueil : services + produits + compteur panier.
     """
+    # Services actifs
+    services = Service.objects.prefetch_related("images").filter(is_active=True).order_by('-date_creation')
+
+    # Produits actifs
     produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
     paginator = Paginator(produits_list, 12)
     page_number = request.GET.get('page')
     produits = paginator.get_page(page_number)
 
-    # Panier: garantir un dict
+    # Panier
     panier = request.session.get('panier', {})
     if isinstance(panier, list) or panier is None:
         panier = {}
     request.session['panier'] = panier
-
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
     return render(request, 'home/home.html', {
+        "services": services,
         "produits": produits,
         "total_items": total_items
     })
+
+def ventes(request, slug=None):
+    """
+    Page vente : tous les produits actifs + pagination + compteur panier + nav-tabs catégories.
+    Si slug fourni, filtre par catégorie.
+    """
+    categories_menu = Categorie.objects.all()
+
+    if slug:
+        categorie = get_object_or_404(Categorie, slug=slug)
+        produits_list = categorie.produits.filter(is_active=True)
+    else:
+        categorie = None
+        produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
+
+    paginator = Paginator(produits_list, 12)
+    page_number = request.GET.get('page')
+    produits = paginator.get_page(page_number)
+
+    panier = request.session.get('panier', {})
+    if isinstance(panier, list) or panier is None:
+        panier = {}
+    request.session['panier'] = panier
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
+    return render(request, 'home/vente.html', {
+        "produits": produits,
+        "total_items": total_items,
+        "categories_menu": categories_menu,
+        "slug": slug
+    })
+
 
 
 def produit_detail(request, produit_id):

@@ -5,106 +5,92 @@
 
 {% block content %}
 
-<!-- ================= CAROUSEL ================= -->
+<!-- ================= CAROUSEL PRINCIPAL ================= -->
 {% include 'includes/carousel.html' %}
 
-<!-- ================= NAV-TABS CATEGORIES ================= -->
-<section class="container my-4">
+<!-- ================= SERVICES ================= -->
+<section class="container my-5">
+  <h3 class="mb-3">Nos Services & Travaux Réalisés</h3>
+  <div class="row g-4">
+    {% for service in services %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm position-relative service-card" style="height: 450px; overflow: hidden;">
 
-  <!-- Bouton toggle mobile -->
-  <div class="d-md-none text-center mb-2">
-    <button id="toggleCategoriesBtn" class="btn btn-info">
-      <i class="fas fa-chevron-down me-1"></i> Catégories
-    </button>
+        <!-- Badge statut -->
+        {% with statut_display=service.get_statut_display %}
+        {% if statut_display %}
+          {% if statut_display == 'Planifié' %}
+            <span class="badge bg-warning position-absolute top-0 end-0 m-2" style="z-index: 10;">{{ statut_display }}</span>
+          {% elif statut_display == 'En cours' %}
+            <span class="badge bg-secondary position-absolute top-0 end-0 m-2" style="z-index: 10;">{{ statut_display }}</span>
+          {% elif statut_display == 'Terminé' %}
+            <span class="badge bg-success position-absolute top-0 end-0 m-2" style="z-index: 10;">{{ statut_display }}</span>
+          {% endif %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Image service -->
+        <div class="service-img-wrapper" style="height: 200px; overflow: hidden;">
+          {% if service.images.exists %}
+            <img src="{{ service.images.first.image.url }}" class="w-100 h-100" style="object-fit: contain;" alt="{{ service.titre }}">
+          {% else %}
+            <img src="{% static 'images/default.png' %}" class="w-100 h-100" style="object-fit: contain;" alt="{{ service.titre }}">
+          {% endif %}
+        </div>
+
+        <!-- Contenu card -->
+        <div class="card-body d-flex flex-column" style="height: calc(100% - 200px); overflow: hidden;">
+          <h5 class="card-title text-info">{{ service.titre }}</h5>
+          <p class="card-text flex-grow-1" style="overflow: hidden; text-overflow: ellipsis;">{{ service.description|truncatewords:20 }}</p>
+          <p class="mb-1"><strong>Lieu :</strong> {{ service.lieu }}</p>
+          <p class="mb-1"><strong>Durée :</strong> {{ service.duree }}</p>
+          {% if service.date_debut %}<p class="mb-1"><strong>Début :</strong> {{ service.date_debut }}</p>{% endif %}
+          {% if service.date_fin %}<p class="mb-1"><strong>Fin :</strong> {{ service.date_fin }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
-
-  <!-- Liste des catégories desktop -->
-  <ul class="nav nav-tabs justify-content-center flex-wrap d-none d-md-flex" id="categoriesTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <a href="{% url 'home' %}" class="nav-link {% if not request.resolver_match.kwargs.slug %}active{% endif %}">Tous</a>
-    </li>
-    {% for categorie in categories_menu %}
-    <li class="nav-item" role="presentation">
-      <a href="{% url 'categorie_detail' slug=categorie.slug %}" 
-         class="nav-link {% if request.resolver_match.kwargs.slug == categorie.slug %}active{% endif %}">
-        {{ categorie.nom }}
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-
-  <!-- Liste catégories mobile (toggle) -->
-  <ul class="nav flex-column d-md-none" id="categoriesTabMobile" style="display:none;">
-    <li class="nav-item" role="presentation">
-      <a href="{% url 'home' %}" class="nav-link {% if not request.resolver_match.kwargs.slug %}active{% endif %}">Tous</a>
-    </li>
-    {% for categorie in categories_menu %}
-    <li class="nav-item" role="presentation">
-      <a href="{% url 'categorie_detail' slug=categorie.slug %}" 
-         class="nav-link {% if request.resolver_match.kwargs.slug == categorie.slug %}active{% endif %}">
-        {{ categorie.nom }}
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-
 </section>
 
 <!-- ================= PRODUITS ================= -->
 <section class="container my-5">
-  <h3 class="mb-3">Livrés chez vous en 48 heures</h3>
-  <div class="row g-4">
+  <h3 class="mb-3">Produits en Vente</h3>
+  <div class="row g-3">
     {% for produit in produits %}
-    <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card shadow-sm text-center card-produit" data-active="{{ produit.is_active|yesno:'true,false' }}">
-        {% if produit.images.all %}
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm p-2">
+        {% if produit.images.exists %}
         <div id="carouselProduit{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             {% for image in produit.images.all %}
-              <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ image.image.url }}" class="d-block w-100 h-100 produit-img" alt="{{ produit.nom }}">
-              </div>
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ image.image.url }}" class="d-block mx-auto" style="width:50px; height:50px; object-fit:cover;">
+            </div>
             {% endfor %}
           </div>
           {% if produit.images.count > 1 %}
           <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduit{{ produit.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+            <span class="carousel-control-prev-icon"></span>
           </button>
           <button class="carousel-control-next" type="button" data-bs-target="#carouselProduit{{ produit.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+            <span class="carousel-control-next-icon"></span>
           </button>
           {% endif %}
         </div>
         {% else %}
-          <img src="{% static 'images/default.png' %}" class="card-img-top produit-img" alt="{{ produit.nom }}">
+        <img src="{% static 'images/default.png' %}" class="mx-auto" style="width:50px; height:50px; object-fit:cover;">
         {% endif %}
-
-        <div class="card-body d-flex flex-column justify-content-between">
-          {% if produit.reduction > 0 %}
-            <span class="badge bg-danger">-{{ produit.reduction }}%</span>
-          {% endif %}
-          <p class="card-text mt-2">{{ produit.description_courte|default:"Pas de description" }}</p>
-          <p class="text-primary fw-bold mb-1">{{ produit.nom }}</p>
-          <div class="mb-2 text-warning">★★★★☆</div>
-          <p class="mb-2">
-            <span class="text-decoration-line-through text-muted">{{ produit.prix_original }} Ar</span>
-            <span class="fw-bold text-danger ms-2">{{ produit.prix }} Ar</span>
-          </p>
-          <div class="d-flex justify-content-center align-items-center mt-auto">
-            <div class="input-group input-group-sm" style="width: 100px;">
-              <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
-              <input type="text" class="form-control text-center qty-input" value="1">
-              <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
-            </div>
-            <button class="btn btn-success btn-sm ms-2 btn-add-cart" data-id="{{ produit.id }}">
-              <i class="fas fa-cart-arrow-down"></i>
-            </button>
-            <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm ms-2">
-              <i class="fas fa-eye"></i>
-            </a>
-          </div>
+        <p class="mt-2 mb-1 fw-bold">{{ produit.nom }}</p>
+        <p class="mb-1 text-danger fw-bold">{{ produit.prix }} Ar</p>
+        <div class="d-flex justify-content-center align-items-center">
+          <input type="number" value="1" min="1" class="form-control form-control-sm me-1 qty-input" style="width:50px;">
+          <button class="btn btn-success btn-sm btn-add-cart" data-id="{{ produit.id }}">
+            <i class="fas fa-cart-arrow-down"></i>
+          </button>
+          <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm ms-1">
+            <i class="fas fa-eye"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -113,36 +99,45 @@
   {% include 'includes/paginator.html' %}
 </section>
 
-<!-- ================= STYLES ================= -->
-<style>
-/* Categories mobile font-size auto */
-@media (max-width: 576px) {
-    #categoriesTabMobile .nav-link { font-size: calc(12px + 0.5vw); }
-}
-</style>
-
-<!-- ================= SCRIPT ================= -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('toggleCategoriesBtn');
-  const mobileTab = document.getElementById('categoriesTabMobile');
+    const addButtons = document.querySelectorAll('.btn-add-cart');
 
-  if(toggleBtn && mobileTab){
-    toggleBtn.addEventListener('click', function() {
-      mobileTab.style.display = (mobileTab.style.display === "block") ? "none" : "block";
+    addButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const produitId = this.dataset.id;
+            const qtyInput = this.closest('.d-flex').querySelector('.qty-input');
+            const quantite = qtyInput ? parseInt(qtyInput.value) : 1;
+
+            fetch("{% url 'ajouter_au_panier' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: new URLSearchParams({
+                    'produit_id': produitId,
+                    'quantite': quantite
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success){
+                    const cartBadgeDesktop = document.getElementById('cart-badge');
+                    const cartBadgeMobile = document.getElementById('cart-badge-mobile');
+                    if(cartBadgeDesktop) cartBadgeDesktop.textContent = data.total_items;
+                    if(cartBadgeMobile) cartBadgeMobile.textContent = data.total_items;
+                } else if(data.redirect){
+                    window.location.href = data.login_url;
+                }
+            })
+            .catch(error => console.error('Erreur AJAX panier:', error));
+        });
     });
-  }
-
-  // Masquer automatiquement les produits non actifs
-  const allProducts = Array.from(document.querySelectorAll('.card-produit'));
-  allProducts.forEach(card => {
-    if (!card.dataset.active || card.dataset.active === "false") {
-      card.style.display = 'none';
-    }
-  });
-
-  // Votre script d'ajout au panier inchangé
 });
 </script>
 
 {% endblock %}
+
