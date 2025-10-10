@@ -13,7 +13,9 @@
 
   <!-- Bouton toggle mobile -->
   <div class="d-md-none text-center mb-2">
-    <button id="toggleCategoriesBtn" class="btn btn-info"><i class="fas fa-chevron-down me-1"></i> Catégories</button>
+    <button id="toggleCategoriesBtn" class="btn btn-info">
+      <i class="fas fa-chevron-down me-1"></i> Catégories
+    </button>
   </div>
 
   <!-- Liste des catégories desktop -->
@@ -54,7 +56,7 @@
   <div class="row g-4">
     {% for produit in produits %}
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card shadow-sm text-center card-produit">
+      <div class="card shadow-sm text-center card-produit" data-active="{{ produit.is_active|yesno:'true,false' }}">
         {% if produit.images.all %}
         <div id="carouselProduit{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
@@ -130,6 +132,14 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileTab.style.display = (mobileTab.style.display === "block") ? "none" : "block";
     });
   }
+
+  // Masquer automatiquement les produits non actifs
+  const allProducts = Array.from(document.querySelectorAll('.card-produit'));
+  allProducts.forEach(card => {
+    if (!card.dataset.active || card.dataset.active === "false") {
+      card.style.display = 'none';
+    }
+  });
 
   // Votre script d'ajout au panier inchangé
 });
