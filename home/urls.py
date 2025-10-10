@@ -12,4 +12,6 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('categorie/<slug:slug>/', views.categorie_detail, name='categorie_detail'),
     path('ajouter-au-panier/', views.ajouter_au_panier, name='ajouter_au_panier'),
+
+    path('service/voir-plus/<int:service_id>/', views.voir_plus_service, name='voir_plus_service'),
 ]

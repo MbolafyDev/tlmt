@@ -9,6 +9,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from .utils import create_paypal_payment, capture_paypal_order, is_paypal_capture_successful
+from django.views.decorators.http import require_GET
 
 import stripe
 
@@ -387,3 +388,12 @@ def categorie_detail(request, slug):
         'categorie': categorie,
         'total_items': total_items
     })
+
+@require_GET
+def voir_plus_service(request, service_id):
+    """
+    Renvoie le modal complet d'un service pour affichage via AJAX.
+    """
+    service = get_object_or_404(Service.objects.prefetch_related("images"), pk=service_id)
+    html_modal = render_to_string('home/_modal_service.html', {'service': service}, request=request)
+    return JsonResponse({'html': html_modal})

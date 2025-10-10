@@ -14,7 +14,8 @@
   <div class="row g-4">
     {% for service in services %}
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card shadow-sm position-relative service-card" style="height: 450px; overflow: hidden;">
+      <!-- HAUTEUR AUGMENTÉE à 500px pour laisser de la place aux icônes -->
+      <div class="card shadow-sm position-relative service-card" style="height: 500px; overflow: hidden;">
 
         <!-- Badge statut -->
         {% with statut_display=service.get_statut_display %}
@@ -39,13 +40,39 @@
         </div>
 
         <!-- Contenu card -->
-        <div class="card-body d-flex flex-column" style="height: calc(100% - 200px); overflow: hidden;">
+        <!-- HAUTEUR AJUSTÉE : calc(100% - 200px) -> calc(100% - 200px) pour laisser plus de place -->
+        <div class="card-body d-flex flex-column" style="height: calc(100% - 200px);">
           <h5 class="card-title text-info">{{ service.titre }}</h5>
-          <p class="card-text flex-grow-1" style="overflow: hidden; text-overflow: ellipsis;">{{ service.description|truncatewords:20 }}</p>
+
+          <!-- Aperçu description en haut -->
+          <p class="card-text flex-grow-1">
+            {% if service.description %}
+              {% if service.description|length > 50 %}
+                {{ service.description|slice:":50" }}...
+              {% else %}
+                {{ service.description }}
+              {% endif %}
+              <a href="#" class="text-primary voir-plus-service" data-service-id="{{ service.id }}" style="text-decoration: underline;">Voir plus</a>
+            {% else %}
+              Aucune description disponible.
+            {% endif %}
+          </p>
+
+          <!-- Infos supplémentaires -->
           <p class="mb-1"><strong>Lieu :</strong> {{ service.lieu }}</p>
           <p class="mb-1"><strong>Durée :</strong> {{ service.duree }}</p>
           {% if service.date_debut %}<p class="mb-1"><strong>Début :</strong> {{ service.date_debut }}</p>{% endif %}
           {% if service.date_fin %}<p class="mb-1"><strong>Fin :</strong> {{ service.date_fin }}</p>{% endif %}
+
+          <!-- ICÔNES COMMENTAIRE & LIKE -->
+          <div class="d-flex justify-content-start align-items-center mt-2">
+            <button class="btn btn-sm btn-outline-primary me-2 like-btn" data-service-id="{{ service.id }}">
+              <i class="fas fa-thumbs-up"></i> <span class="like-count">{{ service.likes|default:0 }}</span>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary comment-btn" data-service-id="{{ service.id }}">
+              <i class="fas fa-comment"></i> <span class="comment-count">{{ service.comments|default:0 }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -99,10 +126,17 @@
   {% include 'includes/paginator.html' %}
 </section>
 
+<!-- Modal container pour service -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content-container"></div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Ajouter au panier
     const addButtons = document.querySelectorAll('.btn-add-cart');
-
     addButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -136,8 +170,40 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Erreur AJAX panier:', error));
         });
     });
+
+    // Voir plus service - modal AJAX
+    const serviceModal = new bootstrap.Modal(document.getElementById('serviceModal'));
+    document.querySelectorAll('.voir-plus-service').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const serviceId = this.dataset.serviceId;
+            fetch(`/service/voir-plus/${serviceId}/`)
+                .then(resp => resp.json())
+                .then(data => {
+                    document.querySelector('#serviceModal .modal-content-container').innerHTML = data.html;
+                    serviceModal.show();
+                })
+                .catch(err => console.error("Erreur modal service:", err));
+        });
+    });
+
+    // Like & Comment buttons (dummy click)
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            let countSpan = this.querySelector('.like-count');
+            let count = parseInt(countSpan.textContent);
+            countSpan.textContent = count + 1;
+            // Ici vous pouvez ajouter fetch AJAX pour sauvegarder le like dans DB
+        });
+    });
+
+    document.querySelectorAll('.comment-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Ici vous pouvez ouvrir un modal de commentaire ou rediriger
+            alert('Fonction commentaire pour le service ' + this.dataset.serviceId);
+        });
+    });
 });
 </script>
 
 {% endblock %}
-

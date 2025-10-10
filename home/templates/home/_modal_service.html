@@ -1,0 +1,65 @@
+<!-- Modal Détail Service -->
+<div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+  <!-- HEADER -->
+  <div class="modal-header bg-light border-0">
+    <h5 class="modal-title fw-bold text-primary">{{ service.titre }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+  </div>
+
+  <!-- BODY -->
+  <div class="modal-body p-0">
+    {% if service.images.all %}
+      <div id="carouselService{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for img in service.images.all %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <div class="d-flex justify-content-center align-items-center bg-light" style="max-height: 400px;">
+                <img src="{{ img.image.url }}" class="img-fluid" style="max-height: 400px; width: auto; object-fit: contain;" alt="Image du service">
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        {% if service.images.count > 1 %}
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Précédent</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Suivant</span>
+          </button>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Détails -->
+    <div class="p-4">
+      <h5 class="fw-semibold mb-3 text-secondary">Détails du service</h5>
+      <p><strong>Description :</strong> {{ service.description|default:"—" }}</p>
+      <p><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
+      <p><strong>Durée :</strong> {{ service.duree|default:"—" }}</p>
+      <p><strong>Date début :</strong> {{ service.date_debut|date:"d/m/Y"|default:"—" }}</p>
+      <p><strong>Date fin :</strong> {{ service.date_fin|date:"d/m/Y"|default:"—" }}</p>
+      <p><strong>Statut :</strong> {{ service.get_statut_display }}</p>
+      <p><strong>Actif :</strong> {{ service.is_active|yesno:"Oui,Non" }}</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="modal-footer border-0">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+  </div>
+</div>
+
+<style>
+  /* Pas de fond trop sombre */
+  .modal-backdrop.show {
+    opacity: 0.4 !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .modal-content {
+    background: #fff !important;
+    border-radius: 1rem !important;
+  }
+</style>
