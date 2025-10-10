@@ -200,17 +200,15 @@ def checkout(request):
         # --- Suppression d'un produit ---
         remove_id = request.POST.get("remove_id")
         if remove_id:
-            remove_id = str(remove_id)  # toujours en str pour correspondre à la clé du dict
+            remove_id = str(remove_id)
             if remove_id in panier:
                 del panier[remove_id]
                 request.session['panier'] = panier
                 request.session.modified = True
 
-            # Recalculer total et total_items après suppression (optionnel)
             total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values())
             total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
-            # 🔹 Redirection vers la page panier
             return redirect('checkout')
 
         # --- Paiement ---
@@ -247,9 +245,27 @@ def checkout(request):
         # --- PayPal ---
         elif mode == "paypal":
             try:
-                return_url = request.build_absolute_uri('?success=true')
-                cancel_url = request.build_absolute_uri('?canceled=true')
-                paypal_resp = create_paypal_payment(float(total), 'EUR', return_url, cancel_url)
+                # --- Conversion Ariary → USD ---
+                MGA_TO_USD = 0.00022
+                total_usd = float(total) * MGA_TO_USD
+
+                # PayPal sandbox refuse 0.00 USD
+                if total_usd < 0.01:
+                    total_usd = 0.01
+
+                total_usd = round(total_usd, 2)  # obligatoire pour PayPal (2 décimales minimum)
+
+                # --- URLs complètes ---
+                if "localhost" in request.get_host() or "127.0.0.1" in request.get_host():
+                    # Utiliser ngrok si en local
+                    base_url = "https://xxxxxx.ngrok.io"  # <- à remplacer par ton URL ngrok
+                else:
+                    base_url = request.build_absolute_uri("/").rstrip("/")
+
+                return_url = f"{base_url}/checkout?success=true"
+                cancel_url = f"{base_url}/checkout?canceled=true"
+
+                paypal_resp = create_paypal_payment(total_usd, 'USD', return_url, cancel_url)
 
                 approval_url = paypal_resp.get('approval_url')
                 if approval_url:
@@ -281,7 +297,6 @@ def checkout(request):
                 prix_unitaire=Decimal(str(item.get('prix', 0)))
             )
 
-        # Génération facture PDF
         context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
         pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
@@ -295,7 +310,6 @@ def checkout(request):
             email.attach(f"{numero_facture}.pdf", pdf_bytes, "application/pdf")
             email.send()
 
-        # Vider le panier
         request.session['panier'] = {}
         request.session.modified = True
 
@@ -309,6 +323,8 @@ def checkout(request):
         'total_items': total_items,
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY
     })
+
+
 
 
 

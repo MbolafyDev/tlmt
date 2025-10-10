@@ -52,7 +52,7 @@ def activate_account(request, uidb64, token):
         user.is_active = True
         user.validated_by_admin = True
         user.save()
-        messages.success(request, "Votre compte est maintenant activé !")
+        messages.success(request, "Votre compte est maintenant activé ! Vous pouvez connecté !")
         return redirect('login')
     else:
         messages.error(request, "Lien d'activation invalide ou expiré.")
