@@ -6,15 +6,16 @@ class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = [
-            'titre', 'description', 'lieu', 'date_debut', 'date_fin', 
-            'duree', 'statut', 'is_active'
+            'titre', 'description', 'lieu',
+            'date_debut', 'date_fin', 'duree',
+            'statut', 'is_active'
         ]
         labels = {
-            'duree': 'Durée du travail',  # Label personnalisé
+            'duree': 'Durée du travail',
         }
         widgets = {
             'titre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Titre du service'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description du service'}),
             'lieu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu'}),
             'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -23,20 +24,20 @@ class ServiceForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+
 class ServiceImageForm(forms.ModelForm):
     class Meta:
         model = ServiceImage
         fields = ['image', 'ordre']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'ordre': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
         }
 
-# Inline formset pour gérer les images liées au service
+
 ServiceImageFormSet = inlineformset_factory(
     Service,
     ServiceImage,
     form=ServiceImageForm,
-    extra=1,
+    extra=0,
     can_delete=True
 )
