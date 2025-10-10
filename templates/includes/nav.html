@@ -1,6 +1,9 @@
 {% load static %}
 
 <style>
+  body {
+    padding-top: 60px; /* Ajuste selon la hauteur exacte de ta navbar */
+  }
 /* ---------- Desktop navbar ---------- */
 .navbar-nav .nav-item { margin-right: 8px; }
 .navbar-nav .nav-link { padding: 5px 8px; font-size: 1.4rem; position: relative; }
@@ -92,7 +95,7 @@
 #cart-badge, #cart-badge-mobile{ font-size:.7rem; padding:.25em .4em; }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
   <div class="container-fluid align-items-center">
 
     <!-- Logo -->
