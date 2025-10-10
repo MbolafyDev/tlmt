@@ -3,6 +3,15 @@
 {% block content %}
 <div class="container mt-4 mb-5">
   <h2>Gestion des services</h2>
+   <!-- ✅ Messages de succès / erreur -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
   <a href="{% url 'service_add' %}" class="btn btn-success mb-3">Ajouter un service</a>
 
   <div class="row">

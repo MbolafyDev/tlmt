@@ -3,7 +3,6 @@
 <div class="container mt-4 mb-5">
   <h2 class="mb-3">{{ title }}</h2>
 
-  <!-- ✅ Messages de succès / erreur -->
   {% if messages %}
     {% for message in messages %}
       <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
@@ -23,101 +22,58 @@
     <div class="card">
       <div class="card-body">
         <div class="row g-3">
-          <!-- Champ Titre -->
-          <div class="col-md-6">
-            <label class="form-label" for="{{ form.titre.id_for_label }}">Titre</label>
-            {{ form.titre }}
-            {% for error in form.titre.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Champ Lieu -->
-          <div class="col-md-6">
-            <label class="form-label" for="{{ form.lieu.id_for_label }}">Lieu</label>
-            {{ form.lieu }}
-            {% for error in form.lieu.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Champ Description -->
-          <div class="col-md-12">
-            <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
-            {{ form.description }}
-            {% for error in form.description.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Date début -->
-          <div class="col-md-6">
-            <label class="form-label">Date de début</label>
-            {{ form.date_debut }}
-            {% for error in form.date_debut.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Date fin -->
-          <div class="col-md-6">
-            <label class="form-label">Date de fin</label>
-            {{ form.date_fin }}
-            {% for error in form.date_fin.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Durée -->
-          <div class="col-md-6">
-            <label class="form-label">Durée</label>
-            {{ form.duree }}
-            {% for error in form.duree.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Statut -->
-          <div class="col-md-6">
-            <label class="form-label">Statut</label>
-            {{ form.statut }}
-            {% for error in form.statut.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Actif -->
-          <div class="col-md-6">
-            <div class="form-check mt-4">
-              {{ form.is_active }}
-              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Actif</label>
-            </div>
-          </div>
-        </div>
-
-        <hr>
-        <h5>Images du service</h5>
-
-        <!-- Gestion des images -->
-        {{ formset.management_form }}
-        <div class="row g-3">
-          {% for f in formset %}
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Image</label>
-              {{ f.image }}
-              {% for error in f.image.errors %}
-                <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
-
-              {% if f.DELETE %}
-                <div class="form-check mt-2">
-                  {{ f.DELETE }}
-                  <label class="form-check-label">Supprimer</label>
-                </div>
+          <!-- Champs Service -->
+          {% for field in form %}
+            <div class="col-md-6">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
               {% endif %}
             </div>
           {% endfor %}
         </div>
+
+        <hr>
+        <h5>Images du service <small class="text-muted">(optionnel)</small></h5>
+
+        <!-- Formset management form -->
+        {{ formset.management_form }}
+
+        <!-- Image actuelle -->
+        {% if service.images.exists %}
+          <div class="mb-2">
+            <strong>Image actuelle:</strong><br>
+            <img src="{{ service.images.first.image.url }}" alt="Image du service" class="img-fluid" style="max-height: 200px;">
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label">Modifier l'image</label>
+          <!-- Champ file unique -->
+          <input type="file" name="image" class="form-control">
+
+          <!-- Champs cachés nécessaires pour Django -->
+          {% for f in formset %}
+            {{ f.id }}
+            {{ f.ordre }}
+            {% for hidden in f.hidden_fields %}
+              {{ hidden }}
+            {% endfor %}
+          {% endfor %}
+
+          <!-- Affichage des erreurs du formset -->
+          {% for f in formset %}
+            {% if f.image.errors %}
+              {% for error in f.image.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
       </div>
     </div>
 

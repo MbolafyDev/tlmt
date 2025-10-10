@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, BaseInlineFormSet
 from .models import Service, ServiceImage
 
 class ServiceForm(forms.ModelForm):
@@ -31,13 +31,27 @@ class ServiceImageForm(forms.ModelForm):
         fields = ['image', 'ordre']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'ordre': forms.HiddenInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].required = False
+        self.fields['ordre'].required = False
+
+class BaseServiceImageFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for form in self.forms:
+            form.fields['image'].required = False
+            form.fields['ordre'].required = False
+            form.empty_permitted = True
 
 ServiceImageFormSet = inlineformset_factory(
     Service,
     ServiceImage,
     form=ServiceImageForm,
-    extra=0,
+    formset=BaseServiceImageFormSet,
+    extra=1,
     can_delete=True
 )
