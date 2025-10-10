@@ -26,4 +26,10 @@ urlpatterns = [
     path("appareils/add/", views.appareil_add, name="appareil_add"),
     path("appareils/<int:appareil_id>/edit/", views.appareil_edit, name="appareil_edit"),
     path("appareils/<int:appareil_id>/delete/", views.appareil_delete, name="appareil_delete"),
+
+    path('services/', views.service_list, name='service_list'),
+    path('services/add/', views.service_add, name='service_add'),
+    path('services/<int:service_id>/edit/', views.service_edit, name='service_edit'),
+    path('services/<int:service_id>/delete/', views.service_delete, name='service_delete'),
+    path('services/<int:service_id>/detail/', views.service_detail, name='service_detail'),
 ]

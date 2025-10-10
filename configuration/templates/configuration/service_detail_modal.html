@@ -1,0 +1,32 @@
+<div class="modal-body">
+  <h5>{{ service.titre }}</h5>
+  <p><strong>Description :</strong> {{ service.description|default:"—" }}</p>
+  <p><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
+  <p><strong>Durée :</strong> {{ service.duree|default:"—" }}</p>
+  <p><strong>Date début :</strong> {{ service.date_debut|date:"d/m/Y"|default:"—" }}</p>
+  <p><strong>Date fin :</strong> {{ service.date_fin|date:"d/m/Y"|default:"—" }}</p>
+  <p><strong>Statut :</strong> {{ service.get_statut_display }}</p>
+  <p><strong>Actif :</strong> {{ service.is_active|yesno:"Oui,Non" }}</p>
+
+  {% if service.images.all %}
+    <div id="carouselService{{ service.id }}" class="carousel slide mt-3" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {% for img in service.images.all %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ img.image.url }}" class="d-block w-100" style="max-height: 300px; object-fit: cover;" alt="Image du service">
+          </div>
+        {% endfor %}
+      </div>
+      {% if service.images.count > 1 %}
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Précédent</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Suivant</span>
+        </button>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

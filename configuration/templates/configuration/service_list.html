@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <h2>Gestion des services</h2>
+  <a href="{% url 'service_add' %}" class="btn btn-success mb-3">Ajouter un service</a>
+
+  <div class="row">
+    {% for service in services %}
+      <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+        <div class="card h-100 d-flex flex-column position-relative">
+
+          <!-- Badge is_active -->
+          <span class="badge position-absolute top-0 end-0 m-2
+             {% if service.statut == 'planifie' %}bg-primary
+             {% elif service.statut == 'en_cours' %}bg-warning
+            {% elif service.statut == 'termine' %}bg-success{% endif %}">
+        {% if service.statut == 'planifie' %}Planifié
+        {% elif service.statut == 'en_cours' %}En cours
+        {% elif service.statut == 'termine' %}Terminé{% endif %}
+        </span>
+
+          <!-- Bloc titre + image centrés -->
+          <div class="p-3 text-center">
+            <h5 class="card-title service-title mb-2">{{ service.titre }}</h5>
+
+            {% if service.images.all %}
+              <div id="carouselService{{ service.id }}" class="carousel slide img-carousel mx-auto" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  {% for img in service.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                      <img src="{{ img.image.url }}" class="img-card" alt="{{ service.titre }}">
+                    </div>
+                  {% endfor %}
+                </div>
+                {% if service.images.count > 1 %}
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carouselService{{ service.id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                  </button>
+                {% endif %}
+              </div>
+            {% else %}
+              <img src="https://via.placeholder.com/150?text=Pas+d'image" class="img-card mx-auto" alt="No image">
+            {% endif %}
+          </div>
+
+          <!-- Bloc détails -->
+          <div class="d-flex flex-column flex-grow-1">
+            <div class="card-body py-2">
+              <p class="card-text mb-2">{{ service.description|truncatechars:60 }}</p>
+              <p class="mb-0"><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
+            </div>
+
+            <div class="card-footer mt-auto d-flex align-items-center">
+              <!-- Voir (modal) -->
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary me-2 btn-view"
+                      data-url="{% url 'service_detail' service.id %}"
+                      title="Voir les détails">
+                <i class="fa fa-eye"></i>
+              </button>
+
+              <!-- Modifier -->
+              <a href="{% url 'service_edit' service.id %}"
+                 class="btn btn-sm btn-outline-primary me-2" title="Modifier">
+                 <i class="fa fa-pen"></i>
+              </a>
+
+              <!-- Supprimer -->
+              <a href="{% url 'service_delete' service.id %}"
+                 class="btn btn-sm btn-outline-danger"
+                 onclick="return confirm('Supprimer ce service ?')"
+                 title="Supprimer">
+                 <i class="fa fa-trash"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">Aucun service disponible.</p>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+    {% include "includes/paginator.html" %}
+  {% endif %}
+</div>
+
+<!-- MODAL global -->
+<div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Détails du service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-muted">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card { overflow: hidden; }
+  .img-card {
+    width: 120px; height: 120px; object-fit: cover;
+    border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: block;
+  }
+  .img-carousel { width: 120px; }
+  .img-carousel .carousel-inner, .img-carousel .carousel-item { width: 120px; }
+  .service-title {
+    font-size: 1rem; font-weight: 600; line-height: 1.2;
+    white-space: normal; word-wrap: break-word; overflow-wrap: anywhere;
+    text-align: center;
+  }
+  .service-title.long-text { font-size: 0.9rem; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll(".service-title").forEach(function(el) {
+    if (el.textContent.length > 25) { el.classList.add("long-text"); }
+  });
+
+  const modalEl = document.getElementById('serviceDetailModal');
+  const bsModal = new bootstrap.Modal(modalEl);
+
+  document.querySelectorAll(".btn-view").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      const url = btn.getAttribute("data-url");
+      const modalContent = modalEl.querySelector('.modal-content');
+      modalContent.innerHTML = `
+        <div class="modal-header">
+          <h5 class="modal-title">Détails du service</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body"><div class="text-muted">Chargement…</div></div>
+      `;
+      try {
+        const resp = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }});
+        const html = await resp.text();
+        modalContent.innerHTML = html;
+      } catch (e) {
+        modalContent.querySelector('.modal-body').innerHTML = "<div class='text-danger'>Erreur de chargement.</div>";
+      }
+      bsModal.show();
+    });
+  });
+});
+</script>
+{% endblock %}

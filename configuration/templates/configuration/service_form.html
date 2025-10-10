@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <h2 class="mb-3">{{ title }}</h2>
+
+  <!-- Messages Django -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Champs du service -->
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.titre.id_for_label }}">Titre</label>
+            {{ form.titre }}
+            {% if form.titre.errors %}
+              <div class="text-danger small">{{ form.titre.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.lieu.id_for_label }}">Lieu</label>
+            {{ form.lieu }}
+            {% if form.lieu.errors %}
+              <div class="text-danger small">{{ form.lieu.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.date_debut.id_for_label }}">Date de début</label>
+            {{ form.date_debut }}
+            {% if form.date_debut.errors %}
+              <div class="text-danger small">{{ form.date_debut.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.date_fin.id_for_label }}">Date de fin</label>
+            {{ form.date_fin }}
+            {% if form.date_fin.errors %}
+              <div class="text-danger small">{{ form.date_fin.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.duree.id_for_label }}">Durée</label>
+            {{ form.duree }}
+            {% if form.duree.errors %}
+              <div class="text-danger small">{{ form.duree.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.statut.id_for_label }}">Statut</label>
+            {{ form.statut }}
+            {% if form.statut.errors %}
+              <div class="text-danger small">{{ form.statut.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-check mt-4">
+              {{ form.is_active }}
+              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Actif</label>
+              {% if form.is_active.errors %}
+                <div class="text-danger small">{{ form.is_active.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <hr>
+        <h5>Images du service</h5>
+        {{ formset.management_form }}
+        <div class="row g-3">
+          {% for f in formset %}
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Image</label>
+              {{ f.image }}
+              {% if f.image.errors %}
+                <div class="text-danger small">{{ f.image.errors }}</div>
+              {% endif %}
+
+              <label class="form-label mt-1">Ordre</label>
+              {{ f.ordre }}
+              {% if f.ordre.errors %}
+                <div class="text-danger small">{{ f.ordre.errors }}</div>
+              {% endif %}
+
+              {% if f.DELETE %}
+                <div class="form-check mt-1">
+                  {{ f.DELETE }} <label class="form-check-label">Supprimer</label>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-success">Enregistrer</button>
+      <a href="{% url 'service_list' %}" class="btn btn-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -9,6 +9,8 @@ from common.decorators import admin_required
 from article.models import Produit, ProduitImage, Categorie, Caracteristique
 from plomberie.models import AppareilSanitaire
 from .forms import AppareilSanitaireForm
+from home.forms import ServiceForm, ServiceImageFormSet
+from home.models import Service, ServiceImage
 
 
 # ---------------- Users ----------------
@@ -267,6 +269,39 @@ def appareil_list(request):
         {"appareils": appareils, "title": "Liste des appareils sanitaires"},
     )
 
+@admin_required
+def service_list(request):
+    # Recherche simple via ?q=
+    q = (request.GET.get("q") or "").strip()
+    qs = Service.objects.prefetch_related("images").order_by("-id")
+
+    if q:
+        qs = qs.filter(
+            Q(titre__icontains=q) |
+            Q(description__icontains=q) |
+            Q(lieu__icontains=q)
+        )
+
+    paginator = Paginator(qs, 12)  # 12 services par page
+    page = request.GET.get("page", 1)
+
+    try:
+        services = paginator.page(page)
+    except PageNotAnInteger:
+        services = paginator.page(1)
+    except EmptyPage:
+        services = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        "configuration/service_list.html",
+        {
+            "services": services,
+            "is_paginated": paginator.num_pages > 1,
+            "q": q,
+        },
+    )
+
 
 @admin_required
 def appareil_delete(request, appareil_id):
@@ -293,3 +328,49 @@ def appareil_edit(request, appareil_id):
         "configuration/appareil_edit.html",
         {"form": form, "title": f"Modifier {appareil.nom}"}
     )
+
+
+@admin_required
+def service_add(request):
+    if request.method == "POST":
+        form = ServiceForm(request.POST)
+        formset = ServiceImageFormSet(request.POST, request.FILES, queryset=ServiceImage.objects.none())
+        if form.is_valid() and formset.is_valid():
+            service = form.save()
+            formset.instance = service
+            formset.save()
+            messages.success(request, f"Service '{service.titre}' ajouté avec succès.")
+            return redirect('service_list')
+    else:
+        form = ServiceForm()
+        formset = ServiceImageFormSet(queryset=ServiceImage.objects.none())
+    return render(request, 'configuration/service_form.html', {'form': form, 'formset': formset, 'title': 'Ajouter un service'})
+
+@admin_required
+def service_edit(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    if request.method == "POST":
+        form = ServiceForm(request.POST, instance=service)
+        formset = ServiceImageFormSet(request.POST, request.FILES, instance=service)
+        if form.is_valid() and formset.is_valid():
+            service = form.save()
+            formset.save()
+            messages.success(request, f"Service '{service.titre}' mis à jour avec succès.")
+            return redirect('service_list')
+    else:
+        form = ServiceForm(instance=service)
+        formset = ServiceImageFormSet(instance=service)
+    return render(request, 'configuration/service_form.html', {'form': form, 'formset': formset, 'title': f"Modifier le service : {service.titre}"})
+
+@admin_required
+def service_delete(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    service.delete()
+    messages.success(request, f"Service '{service.titre}' supprimé avec succès.")
+    return redirect('service_list')
+
+# ---------------- Détails d'un service (modal) ----------------
+@admin_required
+def service_detail(request, service_id):
+    service = get_object_or_404(Service.objects.prefetch_related('images'), id=service_id)
+    return render(request, 'configuration/service_detail_modal.html', {'service': service})
