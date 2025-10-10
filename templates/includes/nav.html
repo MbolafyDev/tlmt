@@ -20,7 +20,6 @@
 @media (max-width: 991px){
   .navbar .container-fluid{ gap:6px; }
   .navbar-brand{ flex:0 0 auto; }
-  /* Forme mobile : largeur bornée pour ne pas pousser le bouton menu */
   form.navbar-search.d-lg-none{
     flex:0 1 auto;
     width:clamp(140px, 58vw, 320px);
@@ -83,6 +82,14 @@
 /* Active */
 #mobileSidebar.active{ left:0; }
 #sidebarOverlay.active{ display:block; }
+
+/* Panier mobile à côté de la recherche */
+.mobile-search-cart{
+  display:flex; align-items:center; gap:6px;
+}
+.mobile-search-cart .nav-link{ font-size:1.4rem; position:relative; }
+/* Badge plus petite */
+#cart-badge, #cart-badge-mobile{ font-size:.7rem; padding:.25em .4em; }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -93,13 +100,23 @@
       <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40" style="border-radius: 50%;">
     </a>
 
-    <!-- Barre de recherche : MOBILE -->
-    <form class="navbar-search ms-2 flex-grow-1 d-flex d-lg-none" method="get" action="{% url 'produit_list' %}">
-      <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
-      <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
-        <i class="fas fa-search"></i>
-      </button>
-    </form>
+    <!-- Barre de recherche + panier : MOBILE -->
+    <div class="mobile-search-cart ms-2 d-flex d-lg-none flex-grow-1">
+      <form class="navbar-search flex-grow-1" method="get" action="{% url 'produit_list' %}">
+        <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
+        <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+
+      {% if user.is_authenticated %}
+      <!-- Panier mobile -->
+      <a class="nav-link position-relative" href="{% url 'checkout' %}" data-bs-toggle="tooltip" title="Panier">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="cart-badge-mobile" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ total_items }}</span>
+      </a>
+      {% endif %}
+    </div>
 
     <!-- Bouton sidebar mobile -->
     <button class="btn d-lg-none ms-1" id="mobileMenuBtn" aria-label="Ouvrir le menu">
@@ -118,13 +135,15 @@
     <div class="collapse navbar-collapse" id="navbarIcons">
       <ul class="navbar-nav ms-auto align-items-center">
 
-        <!-- Panier -->
-        <li class="nav-item">
+        {% if user.is_authenticated %}
+        <!-- Panier desktop -->
+        <li class="nav-item d-none d-lg-block">
           <a class="nav-link position-relative" href="{% url 'checkout' %}" data-bs-toggle="tooltip" title="Panier">
             <i class="fas fa-shopping-cart"></i>
             <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ total_items }}</span>
           </a>
         </li>
+        {% endif %}
 
         <!-- Services -->
         <li class="nav-item dropdown">
@@ -149,7 +168,6 @@
         </li>
 
         <!-- À propos -->
-        <!-- À propos dropdown (desktop) -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="aproposDropdown" role="button"
             data-bs-toggle="dropdown" aria-expanded="false" title="À propos">
@@ -212,13 +230,6 @@
   <span class="close-btn" id="closeSidebarBtn" aria-label="Fermer">&times;</span>
 
   <ul class="mobile-menu">
-    <li>
-      <a href="{% url 'checkout' %}" class="menu-link">
-        <span class="left"><i class="fas fa-shopping-cart"></i> <span class="label">Panier</span></span>
-        <span id="cart-badge-mobile" class="badge bg-danger">{{ total_items }}</span>
-      </a>
-    </li>
-
     <!-- Services -->
     <li>
       <a href="#" class="menu-link submenu-toggle">
@@ -252,11 +263,13 @@
         </li>
       {% endif %}
     {% endif %}
+
     <li>
       <a href="{% url 'contact' %}" class="menu-link">
         <span class="left"><i class="fas fa-envelope"></i> <span class="label">Contactez-nous</span></span>
       </a>
     </li>
+
     <!-- À propos (mobile) -->
     <li>
       <a href="#" class="menu-link submenu-toggle">
@@ -268,7 +281,6 @@
         <li><a href="{% url 'apropos_dev' %}"><i class="fas fa-laptop-code"></i> À propos du développeur</a></li>
       </ul>
     </li>
-
 
     {% if user.is_authenticated %}
       <li><a href="{% url 'logout' %}" class="menu-link"><span class="left"><i class="fas fa-sign-out-alt"></i> <span class="label">Déconnexion</span></span></a></li>
@@ -285,9 +297,7 @@
 <script>
 (function(){
   function onReady(fn){
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fn,{once:true});}else{fn();}
-  }
-
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fn,{once:true});}else{fn();}}
   onReady(function(){
     if(window.bootstrap){
       document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap.Tooltip.getOrCreateInstance(el); });
