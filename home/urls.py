@@ -14,4 +14,8 @@ urlpatterns = [
     path('ajouter-au-panier/', views.ajouter_au_panier, name='ajouter_au_panier'),
 
     path('service/voir-plus/<int:service_id>/', views.voir_plus_service, name='voir_plus_service'),
+
+    path('service/like/', views.like_service, name='like_service'),
+    path('service/comment/', views.comment_service, name='comment_service'),
+    path('service/comments/<int:service_id>/', views.get_comments_service, name='get_comments_service'),
 ]

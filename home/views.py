@@ -10,6 +10,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from .utils import create_paypal_payment, capture_paypal_order, is_paypal_capture_successful
 from django.views.decorators.http import require_GET
+from .models import Service, ServiceLike, ServiceComment
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 import stripe
 
@@ -397,3 +400,63 @@ def voir_plus_service(request, service_id):
     service = get_object_or_404(Service.objects.prefetch_related("images"), pk=service_id)
     html_modal = render_to_string('home/_modal_service.html', {'service': service}, request=request)
     return JsonResponse({'html': html_modal})
+
+@login_required
+@require_POST
+def like_service(request):
+    service_id = request.POST.get('service_id')
+    service = get_object_or_404(Service, id=service_id)
+    
+    # Like ou dislike uniquement pour ce service et cet utilisateur
+    like, created = ServiceLike.objects.get_or_create(user=request.user, service=service)
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'likes_count': service.likes_count
+    })
+
+
+# ======== Ajouter un commentaire ========
+@login_required
+@require_POST
+def comment_service(request):
+    service_id = request.POST.get('service_id')
+    content = request.POST.get('content')
+    service = get_object_or_404(Service, id=service_id)
+    
+    if content.strip() == "":
+        return JsonResponse({'success': False, 'error': 'Le commentaire ne peut pas être vide.'})
+    
+    # Création du commentaire lié à l'utilisateur
+    comment = ServiceComment.objects.create(user=request.user, service=service, content=content)
+    
+    return JsonResponse({
+        'success': True,
+        'comment_id': comment.id,
+        'username': comment.user.username,
+        'content': comment.content,
+        'comments_count': service.comments_count
+    })
+
+
+# ======== Récupérer tous les commentaires d’un service ========
+@login_required
+def get_comments_service(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    
+    # Récupère uniquement les commentaires liés à ce service
+    comments = service.comments.select_related('user').order_by('created_at')
+    
+    # On renvoie la liste des commentaires avec l'utilisateur
+    comments_data = [{
+        'username': c.user.username,
+        'content': c.content,
+        'created_at': c.created_at.strftime("%d/%m/%Y %H:%M")
+    } for c in comments]
+    
+    return JsonResponse({'comments': comments_data})
