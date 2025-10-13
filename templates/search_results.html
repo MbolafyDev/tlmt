@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <h2>Résultats pour "{{ query }}"</h2>
+  <hr>
+
+  {% if not query %}
+    <p>Veuillez entrer un mot-clé pour rechercher.</p>
+  {% else %}
+
+    {% if not produits and not categories and not services and not apropos and not features and not points_cles %}
+      <p>Aucun résultat trouvé pour "{{ query }}".</p>
+    {% endif %}
+
+    {# ================= PRODUITS ================= #}
+    {% if produits %}
+      <h4>Produits</h4>
+      <ul class="list-group mb-4">
+        {% for produit in produits %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ produit.nom }}</strong>
+              <p class="small text-muted mb-0">{{ produit.description_courte|truncatechars:120|default:"Pas de description disponible" }}</p>
+              <p class="small text-danger mt-1">
+                Prix: {{ produit.prix|intcomma }} Ar
+                {% if produit.prix_original %}
+                  <span class="text-decoration-line-through text-muted ms-2">{{ produit.prix_original|intcomma }} Ar</span>
+                {% endif %}
+              </p>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#produitModal{{ produit.id }}">
+              Voir le produit
+            </button>
+          </li>
+        {% endfor %}
+      </ul>
+
+      {# Bouton Voir plus produits #}
+      <div class="text-center mb-4">
+        <a href="{% url 'produits_liste' %}?q={{ query }}" class="btn btn-outline-primary">
+          Voir plus de produits
+        </a>
+      </div>
+
+      {# Modals produits #}
+      {% for produit in produits %}
+        <div class="modal fade" id="produitModal{{ produit.id }}" tabindex="-1" aria-labelledby="produitModalLabel{{ produit.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="produitModalLabel{{ produit.id }}">{{ produit.nom }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    {% with images=produit.images.all %}
+                      {% if images|length %}
+                        <div id="carouselModal{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
+                          <div class="carousel-inner">
+                            {% for image in images %}
+                              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded shadow-sm" alt="{{ produit.nom }}">
+                              </div>
+                            {% endfor %}
+                          </div>
+                          {% if images|length > 1 %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselModal{{ produit.id }}" data-bs-slide="prev">
+                              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Précédent</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselModal{{ produit.id }}" data-bs-slide="next">
+                              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Suivant</span>
+                            </button>
+                          {% endif %}
+                        </div>
+                      {% else %}
+                        <img src="{% static 'images/default.png' %}" class="img-fluid rounded shadow-sm" alt="{{ produit.nom }}">
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                  <div class="col-md-6">
+                    <p class="text-muted">{{ produit.description_courte|default:"Pas de description disponible" }}</p>
+                    <h5 class="mb-3">
+                      {% if produit.prix_original %}
+                        <span class="text-decoration-line-through text-muted">{{ produit.prix_original|intcomma }} Ar</span>
+                      {% endif %}
+                      <span class="fw-bold text-danger ms-3">{{ produit.prix|intcomma }} Ar</span>
+                    </h5>
+                    <div class="d-flex align-items-center mt-2 flex-wrap">
+                      <div class="input-group input-group-sm" style="width: 120px;">
+                        <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
+                        <input type="number" min="1" step="1" class="form-control text-center qty-input" value="1">
+                        <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
+                      </div>
+                      <button class="btn btn-success btn-lg ms-3 mt-2 mt-md-0 btn-add-cart" data-id="{{ produit.id }}">
+                        <i class="fas fa-cart-arrow-down"></i> Ajouter au panier
+                      </button>
+                      <a href="{% url 'produit_detail' produit.id %}" class="btn btn-link ms-2 mt-2 mt-md-0">
+                        Ouvrir la fiche complète
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {# ================= SERVICES ================= #}
+    {% if services %}
+      <h4>Services</h4>
+      <ul class="list-group mb-4">
+        {% for s in services %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ s.titre }}</strong>
+              <p class="small text-muted">{{ s.description|truncatechars:100|default:"Pas de description" }}</p>
+              <p class="small text-muted">Lieu: {{ s.lieu|default:"Non précisé" }}</p>
+            </div>
+            <a href="{% url 'service_detail' s.id %}" class="btn btn-sm btn-primary">
+              Voir le service
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-center mb-4">
+        <a href="" class="btn btn-outline-primary">
+          Voir plus de services
+        </a>
+      </div>
+    {% endif %}
+
+    {# ================= CATÉGORIES ================= #}
+    {% if categories %}
+      <h4>Catégories</h4>
+      <ul class="list-group mb-4">
+        {% for c in categories %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>{{ c.nom }}</div>
+            <a href="{% url 'categorie_detail' c.id %}" class="btn btn-sm btn-primary">
+              Voir la catégorie
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-center mb-4">
+        <a href="{% url 'categories_liste' %}?q={{ query }}" class="btn btn-outline-primary">
+          Voir plus de catégories
+        </a>
+      </div>
+    {% endif %}
+
+    {# ================= À PROPOS ================= #}
+    {% if apropos %}
+      <h4>À propos</h4>
+      <ul class="list-group mb-4">
+        {% for a in apropos %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ a.titre }}</strong>
+              <p class="small text-muted">{{ a.description|truncatechars:100|default:"Pas de description" }}</p>
+            </div>
+            <a href="{% url 'apropos_detail' a.id %}" class="btn btn-sm btn-primary">
+              Voir le détail
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-center mb-4">
+        <a href="{% url 'apropos_liste' %}?q={{ query }}" class="btn btn-outline-primary">
+          Voir plus
+        </a>
+      </div>
+    {% endif %}
+
+    {# ================= FEATURES ================= #}
+    {% if features %}
+      <h4>Fonctionnalités</h4>
+      <ul class="list-group mb-4">
+        {% for f in features %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ f.titre }}</strong>
+              <p class="small text-muted">{{ f.description|truncatechars:100|default:"Pas de description" }}</p>
+            </div>
+            <a href="{% url 'feature_detail' f.id %}" class="btn btn-sm btn-primary">
+              Voir le détail
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-center mb-4">
+        <a href="{% url 'features_liste' %}?q={{ query }}" class="btn btn-outline-primary">
+          Voir plus
+        </a>
+      </div>
+    {% endif %}
+
+    {# ================= POINTS CLÉS ================= #}
+    {% if points_cles %}
+      <h4>Points Clés</h4>
+      <ul class="list-group mb-4">
+        {% for p in points_cles %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>{{ p.texte|truncatechars:100 }}</div>
+            <a href="{% url 'pointcle_detail' p.id %}" class="btn btn-sm btn-primary">
+              Voir le détail
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-center mb-4">
+        <a href="{% url 'pointscles_liste' %}?q={{ query }}" class="btn btn-outline-primary">
+          Voir plus
+        </a>
+      </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+
+<script>
+(function() {
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
+
+  document.querySelectorAll('.modal').forEach(modal => {
+    const input = modal.querySelector('.qty-input');
+    if(!input) return;
+
+    modal.querySelector('.btn-increase').addEventListener('click', () => {
+      input.value = Math.max(1, parseInt(input.value || '1', 10) + 1);
+    });
+    modal.querySelector('.btn-decrease').addEventListener('click', () => {
+      input.value = Math.max(1, parseInt(input.value || '1', 10) - 1);
+    });
+    modal.querySelector('.btn-add-cart').addEventListener('click', function() {
+      const produit_id = this.dataset.id;
+      const quantite = Math.max(1, parseInt(input.value || '1', 10));
+      const csrftoken = getCookie('csrftoken');
+
+      fetch("{% url 'ajouter_au_panier' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `produit_id=${encodeURIComponent(produit_id)}&quantite=${encodeURIComponent(quantite)}`
+      })
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(data => {
+        if (data.success) {
+          const badge = document.querySelector('#cart-badge');
+          if (badge) badge.textContent = data.total_items;
+        }
+      })
+      .catch(err => console.error(err));
+    });
+  });
+})();
+</script>
+
+{% include 'home/resultat_detail_modal_body.html' %}
+
+{% endblock %}

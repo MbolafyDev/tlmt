@@ -5,122 +5,351 @@
   <title>Rapport de dimensionnement PV</title>
   {% load static %}
   <style>
-    body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
-    h1,h2,h3 { margin: 0 0 8px 0; }
-    .muted { color: #666; }
-    .mb-2 { margin-bottom: 8px; }
-    .mb-3 { margin-bottom: 12px; }
-    .mb-4 { margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #444; padding: 6px; text-align: center; }
-    th { background: #f2f2f2; }
-    .small { font-size: 12px; }
-    .left { text-align: left; }
-    /* Conteneur titre + logo */
-    .header-logo {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+    /* ===========
+   Base & thèmes
+   =========== */
+:root{
+  --ink:#1f2937;           /* gris-ardoise */
+  --muted:#6b7280;         /* gris moyen */
+  --line:#e5e7eb;          /* gris clair */
+  --brand:#0ea5e9;         /* bleu azur doux */
+  --brand-ink:#0369a1;
+  --card:#ffffff;          /* fond carte */
+  --bg:#f8fafc;            /* fond page */
+}
+
+@page{
+  size: A4;
+  margin: 18mm 16mm 20mm 16mm;
+}
+
+html, body{
+  padding:0; margin:0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.45 "Arial", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+h1,h2,h3{
+  margin:0 0 6px 0;
+  font-weight:700;
+  line-height:1.2;
+  color: var(--brand-ink);
+}
+
+h1.title{
+  font-size: 20px;
+}
+h2.section-title{
+  font-size: 15px;
+  margin-bottom: 8px;
+  padding-left: 10px;
+  border-left: 3px solid var(--brand);
+}
+
+/* ===========
+   Header
+   =========== */
+.doc-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.header-left .subtitle{
+  margin:6px 0 2px 0;
+}
+.muted{ color: var(--muted); }
+.small{ font-size: 12px; }
+
+.header-right .logo{
+  height: 50px;
+  object-fit: contain;
+}
+
+.divider{
+  height: 1px;
+  border: 0;
+  background: var(--line);
+  margin: 10px 0 14px 0;
+}
+
+/* ===========
+   Sections & cartes
+   =========== */
+.section{
+  margin-bottom: 14px;
+}
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+/* ===========
+   Tables
+   =========== */
+.table{
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th{
+  background: #f3f4f6;
+  color: #111827;
+  font-weight: 600;
+  font-size: 12.5px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  padding: 7px 6px;
+}
+
+.table tbody td,
+.table tbody th{
+  border-top: 1px solid var(--line);
+  padding: 7px 6px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12.5px;
+}
+
+.table .left{ text-align: left; }
+
+/* tableau "key-value" (2 colonnes ou entête réduite) */
+.table-kv th{
+  width: 50%;
+  text-align: left;
+  background: #f9fafb;
+}
+.table-kv td{
+  text-align: left;
+}
+
+/* tableaux avec zébrage léger */
+.table-lined tbody tr:nth-child(even){
+  background: #fafafa;
+}
+
+.table-compact thead th,
+.table-compact tbody td{
+  padding-top: 6px; padding-bottom: 6px;
+}
+
+/* ===========
+   Badges
+   =========== */
+.badge{
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--brand);
+  color: var(--brand-ink);
+  background: #e0f2fe; /* bleu très clair */
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+/* ===========
+   Footer
+   =========== */
+.doc-footer{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Pagination CSS-only (WeasyPrint gère counter(page)) */
+.page-number .page::after{
+  content: counter(page);
+}
+.page-number .pages::after{
+  content: counter(pages);
+}
+
+/* ===========
+   Utilitaires
+   =========== */
+.label{ color:#111827; }
+@media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
     }
-    .header-logo img {
-      height: 50px; /* Ajuste la taille du logo */
-    }
+  }
   </style>
 </head>
 <body>
-  <div class="header-logo">
-    <h2>Rapport de dimensionnement photovoltaïque</h2>
-    <img src="file://{{ logo_path }}" alt="Logo">
-  </div>
 
-  <div class="mb-3 small">
-    <b>Client :</b> {{ demande.nom }} — {{ demande.email }}{% if demande.telephone %} — {{ demande.telephone }}{% endif %}<br>
-    <span class="muted">Généré le {{ demande.created_at|date:"d/m/Y H:i" }}</span>
-  </div>
+  <!-- ===== HEADER ===== -->
+  <header class="doc-header">
+    <div class="header-left">
+      <h1 class="title">Rapport de dimensionnement photovoltaïque</h1>
+      <p class="subtitle">
+        <span class="label">Client :</span>
+        <strong>{{ demande.nom }}</strong>
+        — {{ demande.email }}
+        {% if demande.telephone %} — {{ demande.telephone }}{% endif %}
+      </p>
+      <p class="muted small">Généré le {{ demande.created_at|date:"d/m/Y H:i" }}</p>
+    </div>
+    <div class="header-right">
+      <!-- Utilise le chemin absolu file:// pour le rendu PDF -->
+      <img src="file://{{ logo_path }}" alt="Logo" class="logo">
+    </div>
+  </header>
 
-  <h3 class="mb-2">Entrées</h3>
-  <table class="mb-4">
-    <tr>
-      <th>Jours d’autonomie</th>
-      <th>Irradiation (kWh/m².j)</th>
-      <th>Coefficient K</th>
-    </tr>
-    <tr>
-      <td>{{ demande.jours_autonomie }}</td>
-      <td>{{ demande.irradiation }}</td>
-      <td>{{ demande.rendement_k }}</td>
-    </tr>
-  </table>
+  <hr class="divider">
+
+  <!-- ===== ENTRÉES ===== -->
+  <section class="section">
+    <h2 class="section-title">Entrées</h2>
+    <div class="card">
+      <table class="table table-kv">
+        <thead>
+          <tr>
+            <th>Jours d’autonomie</th>
+            <th>Irradiation (kWh/m²·j)</th>
+            <th>Coefficient K</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge">{{ demande.jours_autonomie }}</span></td>
+            <td><span class="badge">{{ demande.irradiation }}</span></td>
+            <td><span class="badge">{{ demande.rendement_k }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   {% if details %}
-  <h3 class="mb-2">Appareils saisis</h3>
-  <table class="mb-4">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th class="left">Nom</th>
-        <th>Puissance (W)</th>
-        <th>Durée (h/j)</th>
-        <th>Quantité</th>
-        <th>Énergie (Wh/j)</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for d in details %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td class="left">{{ d.nom|default:"—" }}</td>
-        <td>{{ d.puissance }}</td>
-        <td>{{ d.duree }}</td>
-        <td>{{ d.quantite }}</td>
-        <td>{{ d.wh|floatformat:2 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- ===== APPAREILS SAISIS ===== -->
+  <section class="section">
+    <h2 class="section-title">Appareils saisis</h2>
+    <div class="card">
+      <table class="table table-lined table-compact">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th class="left">Nom</th>
+            <th>Puissance (W)</th>
+            <th>Durée (h/j)</th>
+            <th>Quantité</th>
+            <th>Énergie (Wh/j)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in details %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="left">{{ d.nom|default:"—" }}</td>
+            <td>{{ d.puissance }}</td>
+            <td>{{ d.duree }}</td>
+            <td>{{ d.quantite }}</td>
+            <td>{{ d.wh|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
   {% endif %}
 
-  <h3 class="mb-2">Résultats & Choix d’équipements</h3>
-  <table class="mb-4">
-    <tr><th>Énergie journalière (Ec)</th><td>{{ demande.energie_journaliere|floatformat:2 }} Wh/j</td></tr>
-    <tr><th>Tension système</th><td>{{ demande.tension_systeme|floatformat:0 }} VDC</td></tr>
-    <tr><th>Puissance onduleur (≈ ΣP × 1.5)</th><td>{{ demande.puissance_onduleur|floatformat:2 }} VA</td></tr>
-  </table>
+  <!-- ===== RÉSULTATS ===== -->
+  <section class="section">
+    <h2 class="section-title">Résultats & Choix d’équipements</h2>
+    <div class="card">
+      <table class="table table-kv">
+        <tbody>
+          <tr>
+            <th>Énergie journalière (Ec)</th>
+            <td><strong>{{ demande.energie_journaliere|floatformat:2 }}</strong> Wh/j</td>
+          </tr>
+          <tr>
+            <th>Tension système</th>
+            <td><strong>{{ demande.tension_systeme|floatformat:0 }}</strong> VDC</td>
+          </tr>
+          <tr>
+            <th>Puissance onduleur (≈ ΣP × 1.5)</th>
+            <td><strong>{{ demande.puissance_onduleur|floatformat:2 }}</strong> VA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-  <h3 class="mb-2">Propositions de panneaux</h3>
-  <table class="mb-4">
-    <thead>
-      <tr><th>Taille panneau</th><th>Quantité</th></tr>
-    </thead>
-    <tbody>
-      {% for p in propositions_pv %}
-      <tr>
-        <td>{{ p.w }} W</td>
-        <td>{{ p.qty }} × ({{ p.w }}W)</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- ===== PROPOSITIONS PV ===== -->
+  <section class="section">
+    <h2 class="section-title">Propositions de panneaux</h2>
+    <div class="card">
+      <table class="table table-lined table-compact">
+        <thead>
+          <tr>
+            <th>Taille panneau</th>
+            <th>Quantité</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in propositions_pv %}
+          <tr>
+            <td>{{ p.w }} W</td>
+            <td>{{ p.qty }} × ({{ p.w }}W)</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-  <h3 class="mb-2">Propositions de batteries</h3>
-  <table class="mb-4">
-    <thead>
-      <tr><th>Capacité batterie</th><th>Quantité</th></tr>
-    </thead>
-    <tbody>
-      {% for b in propositions_batt %}
-      <tr>
-        <td>{{ b.ah }} Ah</td>
-        <td>{{ b.qty }} × ({{ b.ah }}Ah)</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- ===== PROPOSITIONS BATTERIES ===== -->
+  <section class="section">
+    <h2 class="section-title">Propositions de batteries</h2>
+    <div class="card">
+      <table class="table table-lined table-compact">
+        <thead>
+          <tr>
+            <th>Capacité batterie</th>
+            <th>Quantité</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in propositions_batt %}
+          <tr>
+            <td>{{ b.ah }} Ah</td>
+            <td>{{ b.qty }} × ({{ b.ah }}Ah)</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-  <p class="small muted">
-    Remarque : Les propositions sont arrondies au supérieur. Le choix réel dépend du stock,
-    des montages série/parallèle et des contraintes d’installation.
-  </p>
+  <!-- ===== NOTE ===== -->
+  <section class="section">
+    <p class="muted small">
+      <strong>Remarque :</strong> Les propositions sont arrondies au supérieur. Le choix réel dépend du stock,
+      des montages série/parallèle et des contraintes d’installation.
+    </p>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="doc-footer">
+    <span class="muted">Rapport de dimensionnement • {{ demande.nom }}</span>
+    <span class="page-number">Page <span class="page"></span> / <span class="pages"></span></span>
+  </footer>
+
 </body>
 </html>

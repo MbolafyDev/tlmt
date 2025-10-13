@@ -105,7 +105,7 @@
 
     <!-- Barre de recherche + panier : MOBILE -->
     <div class="mobile-search-cart ms-2 d-flex d-lg-none flex-grow-1">
-      <form class="navbar-search flex-grow-1" method="get" action="{% url 'produit_list' %}">
+      <form class="navbar-search flex-grow-1" method="get" action="{% url 'search_global' %}">
         <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
         <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
           <i class="fas fa-search"></i>
@@ -127,7 +127,7 @@
     </button>
 
     <!-- Barre de recherche : DESKTOP -->
-    <form class="navbar-search ms-2 d-none d-lg-flex" method="get" action="{% url 'produit_list' %}">
+    <form class="navbar-search ms-2 d-none d-lg-flex" method="get" action="{% url 'search_global' %}">
       <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
       <button class="btn btn-outline-secondary" type="submit" title="Rechercher">
         <i class="fas fa-search"></i>
@@ -302,29 +302,38 @@
 <script>
 (function(){
   function onReady(fn){
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fn,{once:true});}else{fn();}}
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fn,{once:true});}else{fn();} }
   onReady(function(){
     if(window.bootstrap){
-      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ bootstrap.Tooltip.getOrCreateInstance(el); });
-      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el){ bootstrap.Dropdown.getOrCreateInstance(el); });
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => bootstrap.Tooltip.getOrCreateInstance(el));
+      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(el => bootstrap.Dropdown.getOrCreateInstance(el));
     }
 
-    // Sidebar mobile
     const mobileBtn=document.getElementById('mobileMenuBtn');
     const mobileSidebar=document.getElementById('mobileSidebar');
     const overlay=document.getElementById('sidebarOverlay');
     const closeBtn=document.getElementById('closeSidebarBtn');
+
     if(mobileBtn && mobileSidebar && overlay && closeBtn){
-      mobileBtn.addEventListener('click',()=>{ mobileSidebar.classList.add('active'); overlay.classList.add('active'); });
-      overlay.addEventListener('click',()=>{ mobileSidebar.classList.remove('active'); overlay.classList.remove('active'); });
-      closeBtn.addEventListener('click',()=>{ mobileSidebar.classList.remove('active'); overlay.classList.remove('active'); });
+      mobileBtn.addEventListener('click', ()=>{
+        mobileSidebar.classList.add('active'); 
+        overlay.classList.add('active'); 
+      });
+      overlay.addEventListener('click', ()=>{
+        mobileSidebar.classList.remove('active'); 
+        overlay.classList.remove('active'); 
+      });
+      closeBtn.addEventListener('click', ()=>{
+        mobileSidebar.classList.remove('active'); 
+        overlay.classList.remove('active'); 
+      });
     }
 
     // Sous-menus mobile
     document.querySelectorAll('.submenu-toggle').forEach(function(t){
-      t.addEventListener('click',function(e){
+      t.addEventListener('click', function(e){
         e.preventDefault();
-        const s=this.parentElement.querySelector('.submenu');
+        const s = this.parentElement.querySelector('.submenu');
         if(s){ s.style.display = (s.style.display==='block') ? 'none' : 'block'; }
       });
     });

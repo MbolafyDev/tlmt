@@ -112,6 +112,33 @@ def produit_detail(request, produit_id):
         'total_items': total_items
     })
 
+def produit_detail_resultat(request, produit_id):
+    """
+    Détail produit ; renvoie un fragment si appel HTMX/AJAX (modale).
+    """
+    produit = get_object_or_404(
+        Produit.objects.prefetch_related("images", "caracteristiques", "couleurs"),
+        pk=produit_id
+    )
+
+    panier = request.session.get('panier', {})
+    if isinstance(panier, list) or panier is None:
+        panier = {}
+    request.session['panier'] = panier
+
+    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
+    is_htmx = (
+        request.headers.get("HX-Request") == "true"
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    )
+    template_name = "home/resultat_detail_modal_body.html" if is_htmx else "home/resultat_detail_modal_body.html"
+
+    return render(request, template_name, {
+        'produit': produit,
+        'total_items': total_items
+    })
+
 
 def ajouter_au_panier(request):
     """
