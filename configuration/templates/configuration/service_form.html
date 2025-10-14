@@ -19,7 +19,7 @@
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
     {% endif %}
 
-    <div class="card">
+    <div class="card shadow-sm">
       <div class="card-body">
         <div class="row g-3">
           <!-- Champs Service -->
@@ -36,50 +36,75 @@
           {% endfor %}
         </div>
 
-        <hr>
-        <h5>Images du service <small class="text-muted">(optionnel)</small></h5>
+        <hr class="my-4">
 
-        <!-- Formset management form -->
+        <!-- Section Images -->
+        <h5 class="mb-3">Images du service <small class="text-muted">(optionnel)</small></h5>
+
         {{ formset.management_form }}
 
-        <!-- Image actuelle -->
-        {% if service.images.exists %}
-          <div class="mb-2">
-            <strong>Image actuelle:</strong><br>
-            <img src="{{ service.images.first.image.url }}" alt="Image du service" class="img-fluid" style="max-height: 200px;">
+        {% if service and service.images.all %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">Images existantes</label>
+            <div class="d-flex flex-wrap gap-3">
+              {% for img in service.images.all %}
+                <div class="border rounded p-2 shadow-sm" style="width: 140px; text-align: center;">
+                  <img src="{{ img.image.url }}" alt="Image" class="img-fluid rounded mb-1" style="max-height: 100px; object-fit: cover;">
+                  <small class="text-muted d-block">#{{ forloop.counter }}</small>
+                </div>
+              {% endfor %}
+            </div>
           </div>
         {% endif %}
 
-        <div class="mb-3">
-          <label class="form-label">Modifier l'image</label>
-          <!-- Champ file unique -->
-          <input type="file" name="image" class="form-control">
+        <!-- Nouveau téléchargement -->
+        <div class="vstack gap-3">
+          {% for f in formset.forms %}
+            <div class="card border-0 border-top">
+              <div class="card-body">
+                {% for hidden in f.hidden_fields %}
+                  {{ hidden }}
+                {% endfor %}
 
-          <!-- Champs cachés nécessaires pour Django -->
-          {% for f in formset %}
-            {{ f.id }}
-            {{ f.ordre }}
-            {% for hidden in f.hidden_fields %}
-              {{ hidden }}
-            {% endfor %}
-          {% endfor %}
+                <div class="row g-3 align-items-end">
+                  <div class="col-md-8">
+                    <label class="form-label">{{ f.image.label }}</label>
+                    {{ f.image }}
+                    {% if f.image.errors %}
+                      <div class="text-danger small">
+                        {% for error in f.image.errors %}{{ error }}{% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
 
-          <!-- Affichage des erreurs du formset -->
-          {% for f in formset %}
-            {% if f.image.errors %}
-              {% for error in f.image.errors %}
-                <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
-            {% endif %}
+                  <div class="col-md-2">
+                    {{ f.ordre }}
+                  </div>
+
+                  <div class="col-md-2">
+                    {% if f.instance.pk %}
+                      <div class="form-check">
+                        {{ f.DELETE }}
+                        <label class="form-check-label">Supprimer</label>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endfor %}
         </div>
 
       </div>
     </div>
 
-    <div class="mt-3 d-flex gap-2">
-      <button type="submit" class="btn btn-success">Enregistrer</button>
-      <a href="{% url 'service_list' %}" class="btn btn-secondary">Annuler</a>
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn btn-success px-4">
+        <i class="bi bi-save"></i> Enregistrer
+      </button>
+      <a href="{% url 'service_list' %}" class="btn btn-secondary px-4">
+        <i class="bi bi-x-circle"></i> Annuler
+      </a>
     </div>
   </form>
 </div>

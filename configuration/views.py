@@ -330,63 +330,77 @@ def service_list(request):
 def service_add(request):
     if request.method == "POST":
         form = ServiceForm(request.POST, request.FILES)
-        formset = ServiceImageFormSet(request.POST, request.FILES)
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
+            # On sauvegarde le parent pour obtenir un PK
             service = form.save()
-            # Sauvegarde uniquement les images ajoutées
-            for f in formset:
-                if f.cleaned_data.get('image') and not f.cleaned_data.get('DELETE', False):
-                    img = f.save(commit=False)
+
+            # ⚠️ Formset RE-binder avec l'instance parent
+            formset = ServiceImageFormSet(request.POST, request.FILES, instance=service)
+
+            if formset.is_valid():
+                # Sauvegarde standard : gère ajouts/suppressions
+                instances = formset.save(commit=False)
+                for img in instances:
                     img.service = service
                     img.save()
-            messages.success(request, f"Service '{service.titre}' ajouté avec succès.")
-            return redirect('service_list')
+                # Supprimer les images marquées DELETE
+                for obj in formset.deleted_objects:
+                    obj.delete()
+
+                messages.success(request, f"Service '{service.titre}' ajouté avec succès.")
+                return redirect('service_list')
+            else:
+                messages.error(request, "Veuillez corriger les erreurs ci-dessous (images).")
         else:
-            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
     else:
         form = ServiceForm()
-        formset = ServiceImageFormSet()
+        formset = ServiceImageFormSet()  # vierge
 
     return render(request, 'configuration/service_form.html', {
         'form': form,
         'formset': formset,
         'title': 'Ajouter un service',
+        # utile pour l'affichage conditionnel d'images
+        'service': None,
     })
 
 
 @admin_required
 def service_edit(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-    
+
     if request.method == "POST":
         form = ServiceForm(request.POST, request.FILES, instance=service)
-        formset = ServiceImageFormSet(
-            request.POST, request.FILES, 
-            instance=service, 
-            queryset=service.images.all()
-        )
+        # ⚠️ inutile de passer queryset=..., l'inline formset s'en charge
+        formset = ServiceImageFormSet(request.POST, request.FILES, instance=service)
+
         if form.is_valid() and formset.is_valid():
             service = form.save()
-            for f in formset:
-                if f.cleaned_data.get('DELETE') and f.instance.pk:
-                    f.instance.delete()
-                elif f.cleaned_data.get('image'):
-                    img = f.save(commit=False)
-                    img.service = service
-                    img.save()
+
+            instances = formset.save(commit=False)
+            for img in instances:
+                img.service = service
+                img.save()
+
+            for obj in formset.deleted_objects:
+                obj.delete()
+
             messages.success(request, f"Service '{service.titre}' mis à jour avec succès.")
             return redirect('service_list')
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
         form = ServiceForm(instance=service)
-        formset = ServiceImageFormSet(instance=service, queryset=service.images.all())
+        formset = ServiceImageFormSet(instance=service)
 
     return render(request, 'configuration/service_form.html', {
         'form': form,
         'formset': formset,
-        'title': f"Modifier le service : {service.titre}"
+        'title': f"Modifier le service : {service.titre}",
+        'service': service,
     })
+
 
 
 
