@@ -52,7 +52,7 @@
     align-items: center;
     gap: 8px;
     flex-grow: 1;
-    flex-wrap: nowrap; /* empêche la recherche de passer en dessous */
+    flex-wrap: nowrap;
 }
 .mobile-topbar .navbar-search {
     display: flex;
@@ -64,31 +64,57 @@
     min-width: 0;
 }
 
+/* Logos */
+.mobile-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.desktop-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Cacher sidebar mobile sur desktop */
 @media(min-width:992px){
     #mobileSidebar, #sidebarOverlay { display: none; }
+}
+
+/* Cacher logo desktop sur mobile */
+@media(max-width:991px){
+    .desktop-logo { display: none; }
 }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="container-fluid align-items-center">
-        <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-            <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" width="40" style="border-radius:50%;">
+
+        <!-- Logo desktop uniquement -->
+        <a class="navbar-brand d-none d-lg-flex me-2" href="{% url 'home' %}">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" class="desktop-logo">
         </a>
 
-        <!-- Mobile topbar: recherche + panier + toggle -->
-        <div class="d-flex d-lg-none mobile-topbar ms-2">
+        <!-- Mobile topbar: logo inline, recherche, panier, toggle -->
+        <div class="d-flex d-lg-none align-items-center w-100 mobile-topbar">
+            <!-- Logo mobile inline -->
+            <a class="me-2" href="{% url 'home' %}">
+                <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" class="mobile-logo">
+            </a>
+
             <form class="navbar-search flex-grow-1" method="get" action="{% url 'search_global' %}">
                 <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
                 <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
             </form>
             {% if user.is_authenticated %}
-            <a class="nav-link position-relative" href="{% url 'checkout' %}" title="Panier">
+            <a class="nav-link position-relative ms-2" href="{% url 'checkout' %}" title="Panier">
                 <i class="fas fa-shopping-cart"></i>
                 <span id="cart-badge-mobile" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ total_items }}</span>
             </a>
             {% endif %}
-            <button class="btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            <button class="btn ms-2" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
         </div>
 
         <!-- Search desktop -->
