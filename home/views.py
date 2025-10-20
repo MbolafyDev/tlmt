@@ -1,3 +1,5 @@
+# tlmt/home/views.py
+
 from decimal import Decimal
 import random
 
@@ -487,3 +489,26 @@ def get_comments_service(request, service_id):
     } for c in comments]
     
     return JsonResponse({'comments': comments_data})
+
+@login_required
+@require_POST
+def reply_comment_service(request):
+    comment_id = request.POST.get('comment_id')
+    content = request.POST.get('content')
+    parent_comment = get_object_or_404(ServiceComment, id=comment_id)
+    
+    if not content.strip():
+        return JsonResponse({'success': False, 'error': 'Le message ne peut pas être vide.'})
+    
+    reply = ServiceComment.objects.create(
+        user=request.user,
+        service=parent_comment.service,
+        content=content,
+        parent=parent_comment  # Assurez-vous que ServiceComment a un champ parent = models.ForeignKey('self', null=True, blank=True)
+    )
+    
+    return JsonResponse({
+        'success': True,
+        'username': reply.user.username,
+        'content': reply.content
+    })
