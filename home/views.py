@@ -221,11 +221,26 @@ def comment_service(request):
 @login_required
 def get_comments_service(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-    comments_data = [{
-        'username': c.user.username,
-        'content': c.content,
-        'created_at': c.created_at.strftime("%d/%m/%Y %H:%M")
-    } for c in service.comments.select_related('user').order_by('created_at')]
+    comments_data = []
+
+    # On ne récupère que les commentaires parent (sans parent)
+    parent_comments = service.comments.filter(parent__isnull=True).select_related('user').order_by('created_at')
+    for c in parent_comments:
+        # Récupérer les réponses du commentaire
+        replies = [{
+            'username': r.user.username,
+            'content': r.content,
+            'created_at': r.created_at.strftime("%d/%m/%Y %H:%M")
+        } for r in service.comments.filter(parent=c).select_related('user').order_by('created_at')]
+
+        comments_data.append({
+            'id': c.id,
+            'username': c.user.username,
+            'content': c.content,
+            'created_at': c.created_at.strftime("%d/%m/%Y %H:%M"),
+            'replies': replies
+        })
+
     return JsonResponse({'comments': comments_data})
 
 @login_required

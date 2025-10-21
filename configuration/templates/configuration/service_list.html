@@ -1,9 +1,131 @@
 {% extends "base.html" %}
 
+{% block title %}Gestion des services - Zara Store{% endblock %}
+
 {% block content %}
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .img-card {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: block;
+    margin: 0 auto;
+  }
+
+  .card-title, .service-title {
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .card-footer .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-primary {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .btn-outline-secondary {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .d-flex.gap-2 {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .img-carousel {
+    width: 100%;
+    max-height: 180px;
+  }
+
+  .carousel-inner, .carousel-item img {
+    border-radius: var(--radius);
+  }
+</style>
+
 <div class="container mt-4 mb-5">
   <h2>Gestion des services</h2>
-   <!-- ✅ Messages de succès / erreur -->
+
+  <!-- ✅ Messages de succès / erreur -->
   {% if messages %}
     {% for message in messages %}
       <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
@@ -12,7 +134,8 @@
       </div>
     {% endfor %}
   {% endif %}
-  <a href="{% url 'service_add' %}" class="btn btn-success mb-3">Ajouter un service</a>
+
+  <a href="{% url 'service_add' %}" class="btn btn-primary mb-3">Ajouter un service</a>
 
   <div class="row">
     {% for service in services %}
@@ -23,15 +146,15 @@
           <span class="badge position-absolute top-0 end-0 m-2
              {% if service.statut == 'planifie' %}bg-primary
              {% elif service.statut == 'en_cours' %}bg-warning
-            {% elif service.statut == 'termine' %}bg-success{% endif %}">
-        {% if service.statut == 'planifie' %}Planifié
-        {% elif service.statut == 'en_cours' %}En cours
-        {% elif service.statut == 'termine' %}Terminé{% endif %}
-        </span>
+             {% elif service.statut == 'termine' %}bg-success{% endif %}">
+            {% if service.statut == 'planifie' %}Planifié
+            {% elif service.statut == 'en_cours' %}En cours
+            {% elif service.statut == 'termine' %}Terminé{% endif %}
+          </span>
 
           <!-- Bloc titre + image centrés -->
           <div class="p-3 text-center">
-            <h5 class="card-title service-title mb-2">{{ service.titre }}</h5>
+            <h5 class="service-title">{{ service.titre }}</h5>
 
             {% if service.images.all %}
               <div id="carouselService{{ service.id }}" class="carousel slide img-carousel mx-auto" data-bs-ride="carousel">
@@ -65,26 +188,23 @@
               <p class="mb-0"><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
             </div>
 
-            <div class="card-footer mt-auto d-flex align-items-center">
+            <div class="card-footer mt-auto d-flex gap-2 justify-content-center">
               <!-- Voir (modal) -->
               <button type="button"
-                      class="btn btn-sm btn-outline-secondary me-2 btn-view"
+                      class="btn btn-outline-secondary btn-view"
                       data-url="{% url 'service_detail' service.id %}"
                       title="Voir les détails">
                 <i class="fa fa-eye"></i>
               </button>
 
               <!-- Modifier -->
-              <a href="{% url 'service_edit' service.id %}"
-                 class="btn btn-sm btn-outline-primary me-2" title="Modifier">
+              <a href="{% url 'service_edit' service.id %}" class="btn btn-outline-primary" title="Modifier">
                  <i class="fa fa-pen"></i>
               </a>
 
               <!-- Supprimer -->
-              <a href="{% url 'service_delete' service.id %}"
-                 class="btn btn-sm btn-outline-danger"
-                 onclick="return confirm('Supprimer ce service ?')"
-                 title="Supprimer">
+              <a href="{% url 'service_delete' service.id %}" class="btn btn-outline-danger"
+                 onclick="return confirm('Supprimer ce service ?')" title="Supprimer">
                  <i class="fa fa-trash"></i>
               </a>
             </div>
@@ -116,23 +236,6 @@
     </div>
   </div>
 </div>
-
-<style>
-  .card { overflow: hidden; }
-  .img-card {
-    width: 120px; height: 120px; object-fit: cover;
-    border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    display: block;
-  }
-  .img-carousel { width: 120px; }
-  .img-carousel .carousel-inner, .img-carousel .carousel-item { width: 120px; }
-  .service-title {
-    font-size: 1rem; font-weight: 600; line-height: 1.2;
-    white-space: normal; word-wrap: break-word; overflow-wrap: anywhere;
-    text-align: center;
-  }
-  .service-title.long-text { font-size: 0.9rem; }
-</style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

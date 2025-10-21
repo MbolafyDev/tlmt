@@ -169,7 +169,7 @@ h3 {
     border-color: #081224;
 }
 
-/* MODAL COMMENTAIRE STYLE INSTAGRAM */
+/* MODAL COMMENTAIRE STYLE FACEBOOK */
 .modal-content {
     border-radius: 16px;
     overflow: hidden;
@@ -187,24 +187,62 @@ h3 {
     overflow-y: auto;
     padding-right: 5px;
 }
+
+/* Commentaires style Facebook */
 #comments-container .comment-item {
     display: flex;
     flex-direction: column;
-    background: var(--bg-light-gray);
-    padding: 0.6rem 0.8rem;
+    background-color: var(--bg-white);
+    padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
-    border-radius: 12px;
+    border-radius: 20px;
     box-shadow: var(--shadow-light);
+    position: relative;
+}
+#comments-container .comment-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 12px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid var(--bg-white);
 }
 #comments-container .comment-item strong {
     color: var(--primary-blue);
     margin-bottom: 0.2rem;
 }
-.reply-input {
-    width: 100%;
-    margin-top: 0.4rem;
+
+/* Réponse petite comme Facebook */
+.btn-reply {
+    background: none;
+    border: none;
+    color: var(--primary-blue);
+    font-size: 0.85rem;
+    padding: 0;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-top: 4px;
 }
-#new-comment-input {
+
+/* Container réponses */
+.reply-container {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    background-color: #f0f2f5;
+    padding: 0.5rem 0.75rem;
+    border-radius: 18px;
+    box-shadow: var(--shadow-light);
+}
+.reply-container strong {
+    color: var(--primary-blue);
+}
+
+/* INPUTS */
+.reply-input, #new-comment-input {
+    width: 100%;
     border-radius: 50px;
 }
 #submit-comment {
@@ -220,14 +258,11 @@ h3 {
     {% for service in services %}
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="service-card shadow-sm">
-        <!-- IMAGE -->
         {% if service.images.exists %}
         <img src="{{ service.images.first.image.url }}" alt="{{ service.titre }}">
         {% else %}
         <img src="{% static 'images/default.png' %}" alt="{{ service.titre }}">
         {% endif %}
-
-        <!-- CONTENU -->
         <div class="card-body d-flex flex-column justify-content-between">
           {% with statut_display=service.get_statut_display %}
           {% if statut_display %}
@@ -398,6 +433,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // ================= COMMENTAIRES =================
     let currentServiceId = null;
 
+    function renderComment(comment, container){
+        const div = document.createElement('div');
+        div.classList.add('comment-item');
+        div.dataset.commentId = comment.id;
+        div.innerHTML = `<strong>${comment.username}</strong> : <span>${comment.content}</span>
+                         <button class="btn-reply" data-username="${comment.username}" data-comment-id="${comment.id}">Répondre</button>`;
+        container.appendChild(div);
+
+        if(comment.replies){
+            comment.replies.forEach(rep => {
+                const replyDiv = document.createElement('div');
+                replyDiv.classList.add('reply-container');
+                replyDiv.innerHTML = `<strong>${rep.username}</strong> : ${rep.content}`;
+                div.appendChild(replyDiv);
+            });
+        }
+    }
+
     document.querySelectorAll('.btn-comment').forEach(btn => {
         btn.addEventListener('click', function(){
             currentServiceId = this.dataset.serviceId;
@@ -409,20 +462,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(data.comments.length === 0){
                     container.innerHTML = '<p>Aucun commentaire pour le moment.</p>';
                 } else {
-                    data.comments.forEach(comment => {
-                        const div = document.createElement('div');
-                        div.classList.add('comment-item');
-                        div.innerHTML = `<strong>${comment.username}</strong> : <span>${comment.content}</span>
-                                         <button class="btn btn-sm btn-outline-primary btn-reply" data-username="${comment.username}" data-comment-id="${comment.id}">Répondre</button>`;
-                        container.appendChild(div);
-                    });
+                    data.comments.forEach(comment => renderComment(comment, container));
                 }
                 document.getElementById('new-comment-input').value = '';
             });
         });
     });
 
-    // ================= SOUMISSION NOUVEAU COMMENTAIRE =================
+    // ================= NOUVEAU COMMENTAIRE =================
     const submitBtn = document.getElementById('submit-comment');
     if(submitBtn){
         submitBtn.addEventListener('click', function(){
@@ -443,14 +490,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if(data.success){
                     const container = document.getElementById('comments-container');
-                    const div = document.createElement('div');
-                    div.classList.add('comment-item');
-                    div.innerHTML = `<strong>${data.username}</strong> : ${data.content}
-                                     <button class="btn btn-sm btn-outline-primary btn-reply" data-username="${data.username}" data-comment-id="${data.comment_id}">Répondre</button>`;
-                    container.appendChild(div);
+                    renderComment({
+                        id: data.comment_id,
+                        username: data.username,
+                        content: data.content,
+                        replies: []
+                    }, container);
                     document.getElementById('new-comment-input').value = '';
 
-                    // Mise à jour compteur
                     const countSpan = document.querySelector(`.btn-comment[data-service-id="${currentServiceId}"] .comment-count`);
                     if(countSpan) countSpan.textContent = data.comments_count;
                 } else {
@@ -466,7 +513,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const commentId = e.target.dataset.commentId;
             const username = e.target.dataset.username;
 
-            // Supprimer input précédent si existe
             const prevInput = e.target.parentNode.querySelector('.reply-input');
             if(prevInput) prevInput.remove();
 
@@ -495,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         if(data.success){
                             const newReply = document.createElement('div');
-                            newReply.classList.add('ms-4','mt-1');
+                            newReply.classList.add('reply-container');
                             newReply.innerHTML = `<strong>${data.username}</strong> : ${data.content}`;
                             replyInput.parentNode.appendChild(newReply);
                             replyInput.remove();

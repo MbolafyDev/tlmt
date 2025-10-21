@@ -14,7 +14,7 @@
           {% for img in service.images.all %}
             <div class="carousel-item {% if forloop.first %}active{% endif %}">
               <div class="d-flex justify-content-center align-items-center bg-light" style="max-height: 400px;">
-                <img src="{{ img.image.url }}" class="img-fluid" style="max-height: 400px; width: auto; object-fit: contain;" alt="Image du service">
+                <img src="{{ img.image.url }}" class="img-fluid rounded shadow-sm" style="max-height: 400px; width: auto; object-fit: contain;" alt="Image du service">
               </div>
             </div>
           {% endfor %}
@@ -33,8 +33,8 @@
     {% endif %}
 
     <!-- Détails -->
-    <div class="p-4">
-      <h5 class="fw-semibold mb-3 text-secondary">Détails du service</h5>
+    <div class="p-4 bg-white rounded-bottom shadow-sm">
+      <h5 class="fw-semibold mb-3 text-secondary border-bottom pb-2">Détails du service</h5>
       <p><strong>Description :</strong> {{ service.description|default:"—" }}</p>
       <p><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
       <p><strong>Durée :</strong> {{ service.duree|default:"—" }}</p>
@@ -47,19 +47,44 @@
 
   <!-- FOOTER -->
   <div class="modal-footer border-0">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+    <button type="button" class="btn btn-secondary rounded-pill fw-semibold" data-bs-dismiss="modal">Fermer</button>
   </div>
 </div>
 
+<!-- ================= STYLES MODAL ================= -->
 <style>
-  /* Pas de fond trop sombre */
+  /* Fond du backdrop plus léger */
   .modal-backdrop.show {
-    opacity: 0.4 !important;
-    background-color: rgba(0, 0, 0, 0.4) !important;
+    opacity: 0.35 !important;
+    background-color: rgba(0, 0, 0, 0.35) !important;
   }
 
+  /* Contenu modal */
   .modal-content {
     background: #fff !important;
     border-radius: 1rem !important;
+  }
+
+  /* Images du carousel */
+  .carousel-inner img {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  /* Bouton fermer */
+  .modal-footer .btn-secondary {
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .modal-footer .btn-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+  }
+
+  /* Détails */
+  .modal-body .p-4 p {
+    margin-bottom: 0.5rem;
+    color: #495057;
   }
 </style>

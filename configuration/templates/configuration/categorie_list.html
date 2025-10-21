@@ -4,6 +4,98 @@
   <div class="row">
     <div class="col-12">
 
+      <!-- ================= STYLES TABLEAU ================= -->
+      <style>
+      :root {
+          --primary-yellow: #ffc107;
+          --primary-blue: #0d1b2a;
+          --bg-white: #ffffff;
+          --bg-light-gray: #f8f9fa;
+          --text-dark: #1a1a2e;
+          --text-muted: #6c757d;
+          --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
+          --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+      }
+
+      /* TITRE */
+      h2 {
+          color: var(--primary-blue);
+          font-weight: 700;
+          border-left: 4px solid var(--primary-yellow);
+          padding-left: 12px;
+      }
+
+      /* BOUTONS */
+      .btn-success {
+          background-color: var(--primary-yellow);
+          border-color: var(--primary-yellow);
+          color: var(--primary-blue);
+          border-radius: 50px;
+          font-weight: 600;
+          transition: all 0.3s;
+      }
+      .btn-success:hover {
+          background-color: #e0a800;
+          border-color: #e0a800;
+          color: var(--primary-blue);
+      }
+
+      .btn-primary {
+          background-color: var(--primary-blue);
+          border-color: var(--primary-blue);
+          color: var(--bg-white);
+          border-radius: 50px;
+          font-weight: 600;
+          transition: all 0.3s;
+      }
+      .btn-primary:hover {
+          background-color: #081224;
+          border-color: #081224;
+      }
+
+      .btn-danger {
+          background-color: #dc3545;
+          border-color: #dc3545;
+          color: var(--bg-white);
+          border-radius: 50px;
+          font-weight: 600;
+          transition: all 0.3s;
+      }
+      .btn-danger:hover {
+          background-color: #b02a37;
+          border-color: #b02a37;
+      }
+
+      /* TABLEAU */
+      table.table {
+          background-color: var(--bg-white);
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: var(--shadow-light);
+      }
+
+      table.table th {
+          background-color: var(--bg-light-gray);
+          color: var(--primary-blue);
+          font-weight: 600;
+      }
+
+      table.table td, table.table th {
+          vertical-align: middle;
+      }
+
+      table.table tbody tr:hover {
+          background-color: #f1f3f5;
+          transition: background-color 0.3s;
+      }
+
+      .table-responsive {
+          border-radius: 12px;
+          overflow: hidden;
+      }
+      </style>
+      <!-- ================= FIN STYLES ================= -->
+
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Catégories</h2>
         <a href="{% url 'categorie_add' %}" class="btn btn-success">Ajouter une catégorie</a>

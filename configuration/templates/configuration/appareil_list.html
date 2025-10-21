@@ -1,50 +1,105 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Appareils{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-3">{{ title }}</h2>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <a href="{% url 'appareil_add' %}" class="btn btn-success mb-3">+ Ajouter un appareil</a>
+  <h2 class="mb-4" style="color: #0d1b2a; font-weight: 700; border-left: 4px solid #ffc107; padding-left: 12px;">{{ title }}</h2>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <table class="table table-striped align-middle">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Nom</th>
-        <th>Débit (L/s)</th>
-        <th>Eau chaude</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for appareil in appareils %}
+  <a href="{% url 'appareil_add' %}" class="btn btn-success mb-4" style="border-radius: 50px; font-weight: 500; padding: 0.5rem 1rem; background-color: #ffc107; color: #0d1b2a; border-color: #ffc107;">+ Ajouter un appareil</a>
+
+  <div class="table-responsive">
+    <table class="table align-middle table-hover shadow-sm" style="background-color: #ffffff; border-radius: 12px; overflow: hidden;">
+      <thead class="table-light" style="background-color: #f8f9fa;">
         <tr>
+          <th>Image</th>
+          <th>Nom</th>
+          <th>Débit (L/s)</th>
+          <th>Eau chaude</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appareil in appareils %}
+        <tr style="transition: background 0.3s;">
           <td>
             {% if appareil.image %}
-              <img src="{{ appareil.image.url }}" alt="{{ appareil.nom }}" width="60">
+              <img src="{{ appareil.image.url }}" alt="{{ appareil.nom }}" width="60" style="border-radius: 8px; object-fit: cover;">
             {% else %}
               <span class="text-muted">—</span>
             {% endif %}
           </td>
-          <td>{{ appareil.nom }}</td>
+          <td style="color: #0d1b2a; font-weight: 500;">{{ appareil.nom }}</td>
           <td>{{ appareil.debit_brut }}</td>
           <td>{% if appareil.eau_chaude %}Oui{% else %}Non{% endif %}</td>
-          <td>
-            <!-- Modifier avec icône bleu, fond transparent -->
-            <a href="{% url 'appareil_edit' appareil.id %}" class="btn btn-sm btn-link p-0 me-2" style="color: blue;" title="Modifier">
+          <td class="d-flex align-items-center gap-2">
+            <!-- Modifier -->
+            <a href="{% url 'appareil_edit' appareil.id %}" class="btn btn-link p-0" style="color: #0d1b2a; font-size: 1.2rem;" title="Modifier">
               <i class="bi bi-pencil"></i>
             </a>
-            <!-- Supprimer avec icône rouge, fond transparent -->
-            <a href="{% url 'appareil_delete' appareil.id %}" class="btn btn-sm btn-link p-0" style="color: red;" 
+            <!-- Supprimer -->
+            <a href="{% url 'appareil_delete' appareil.id %}" class="btn btn-link p-0" style="color: #dc3545; font-size: 1.2rem;"
                onclick="return confirm('Supprimer {{ appareil.nom }} ?')" title="Supprimer">
               <i class="bi bi-trash"></i>
             </a>
           </td>
         </tr>
-      {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">Aucun appareil sanitaire ajouté.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">Aucun appareil sanitaire ajouté.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
+
+<!-- ================= STYLES MODERNES ================= -->
+<style>
+:root {
+    --primary-yellow: #ffc107;
+    --primary-blue: #0d1b2a;
+    --bg-white: #ffffff;
+    --bg-light-gray: #f8f9fa;
+    --text-dark: #1a1a2e;
+    --text-muted: #6c757d;
+    --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+/* TABLE HOVER */
+table.table-hover tbody tr:hover {
+    background-color: var(--bg-light-gray);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s;
+}
+
+/* BOUTONS TABLE */
+.btn-success {
+    border-radius: 50px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+    transition: all 0.3s;
+}
+.btn-success:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: var(--primary-blue);
+}
+
+/* ICONES */
+.btn-link {
+    transition: transform 0.3s;
+}
+.btn-link:hover {
+    transform: scale(1.1);
+}
+</style>
 {% endblock %}

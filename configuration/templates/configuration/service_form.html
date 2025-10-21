@@ -1,7 +1,112 @@
 {% extends "base.html" %}
+
+{% block title %}{{ title }} - Zara Store{% endblock %}
+
 {% block content %}
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+
+  h5 {
+    color: var(--primary-blue);
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  label {
+    font-weight: 500;
+  }
+
+  input, select, textarea {
+    border-radius: var(--radius);
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(26,43,76,0.25);
+    outline: none;
+  }
+
+  .img-fluid {
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .vstack > .card {
+    margin-bottom: 10px;
+  }
+
+  .btn-success, .btn-secondary {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary:hover {
+    background-color: #e2e6ea;
+    color: var(--primary-blue);
+  }
+
+  .alert {
+    border-radius: var(--radius);
+    padding: 10px 15px;
+  }
+
+  .d-flex.gap-2 {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
 <div class="container mt-4 mb-5">
-  <h2 class="mb-3">{{ title }}</h2>
+  <h2>{{ title }}</h2>
 
   {% if messages %}
     {% for message in messages %}
@@ -22,7 +127,6 @@
     <div class="card shadow-sm">
       <div class="card-body">
         <div class="row g-3">
-          <!-- Champs Service -->
           {% for field in form %}
             <div class="col-md-6">
               <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -38,8 +142,7 @@
 
         <hr class="my-4">
 
-        <!-- Section Images -->
-        <h5 class="mb-3">Images du service <small class="text-muted">(optionnel)</small></h5>
+        <h5>Images du service <small class="text-muted">(optionnel)</small></h5>
 
         {{ formset.management_form }}
 
@@ -48,8 +151,8 @@
             <label class="form-label fw-bold">Images existantes</label>
             <div class="d-flex flex-wrap gap-3">
               {% for img in service.images.all %}
-                <div class="border rounded p-2 shadow-sm" style="width: 140px; text-align: center;">
-                  <img src="{{ img.image.url }}" alt="Image" class="img-fluid rounded mb-1" style="max-height: 100px; object-fit: cover;">
+                <div class="border rounded p-2 shadow-sm text-center" style="width: 140px;">
+                  <img src="{{ img.image.url }}" alt="Image" class="img-fluid mb-1" style="max-height: 100px; object-fit: cover;">
                   <small class="text-muted d-block">#{{ forloop.counter }}</small>
                 </div>
               {% endfor %}
@@ -57,7 +160,6 @@
           </div>
         {% endif %}
 
-        <!-- Nouveau téléchargement -->
         <div class="vstack gap-3">
           {% for f in formset.forms %}
             <div class="card border-0 border-top">
@@ -71,9 +173,7 @@
                     <label class="form-label">{{ f.image.label }}</label>
                     {{ f.image }}
                     {% if f.image.errors %}
-                      <div class="text-danger small">
-                        {% for error in f.image.errors %}{{ error }}{% endfor %}
-                      </div>
+                      <div class="text-danger small">{% for error in f.image.errors %}{{ error }}{% endfor %}</div>
                     {% endif %}
                   </div>
 

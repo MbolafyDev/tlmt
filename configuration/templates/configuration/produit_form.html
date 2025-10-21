@@ -1,8 +1,114 @@
 {% extends "base.html" %}
 
+{% block title %}{{ title }} - Zara Store{% endblock %}
+
 {% block content %}
-<div class="container mt-4 mb-5">
-  <h2 class="mb-3">{{ title }}</h2>
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+
+  .container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+
+  .form-control, select, textarea {
+    border-radius: var(--radius);
+    border: 1px solid #dcdfe6;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus, select:focus, textarea:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 0.15rem rgba(255, 204, 0, 0.25);
+  }
+
+  .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-success {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-success:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+  }
+
+  .card {
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .text-danger {
+    font-size: 0.875rem;
+  }
+
+  .form-check-input:checked {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+
+  .form-check-label {
+    font-weight: 500;
+  }
+
+  .d-flex.gap-2 {
+    gap: 10px;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container py-4">
+  <h2>{{ title }}</h2>
 
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
@@ -21,42 +127,42 @@
               <div class="col-12 col-md-6">
                 <label class="form-label" for="{{ form.categorie.id_for_label }}">Catégorie</label>
                 {{ form.categorie }}
-                {% if form.categorie.errors %}<div class="text-danger small">{{ form.categorie.errors }}</div>{% endif %}
+                {% if form.categorie.errors %}<div class="text-danger">{{ form.categorie.errors }}</div>{% endif %}
               </div>
 
               <!-- Nom -->
               <div class="col-12 col-md-6">
                 <label class="form-label" for="{{ form.nom.id_for_label }}">Nom du produit</label>
                 {{ form.nom }}
-                {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+                {% if form.nom.errors %}<div class="text-danger">{{ form.nom.errors }}</div>{% endif %}
               </div>
 
               <!-- Prix d’origine -->
               <div class="col-12 col-md-6">
                 <label class="form-label" for="{{ form.prix_original.id_for_label }}">Prix d’origine</label>
                 {{ form.prix_original }}
-                {% if form.prix_original.errors %}<div class="text-danger small">{{ form.prix_original.errors }}</div>{% endif %}
+                {% if form.prix_original.errors %}<div class="text-danger">{{ form.prix_original.errors }}</div>{% endif %}
               </div>
 
               <!-- Prix -->
               <div class="col-12 col-md-6">
                 <label class="form-label" for="{{ form.prix.id_for_label }}">Prix actuel</label>
                 {{ form.prix }}
-                {% if form.prix.errors %}<div class="text-danger small">{{ form.prix.errors }}</div>{% endif %}
+                {% if form.prix.errors %}<div class="text-danger">{{ form.prix.errors }}</div>{% endif %}
               </div>
 
               <!-- Description courte -->
               <div class="col-12">
                 <label class="form-label" for="{{ form.description_courte.id_for_label }}">Description courte</label>
                 {{ form.description_courte }}
-                {% if form.description_courte.errors %}<div class="text-danger small">{{ form.description_courte.errors }}</div>{% endif %}
+                {% if form.description_courte.errors %}<div class="text-danger">{{ form.description_courte.errors }}</div>{% endif %}
               </div>
 
               <!-- Description détaillée -->
               <div class="col-12">
                 <label class="form-label" for="{{ form.description_detaillee.id_for_label }}">Description détaillée</label>
                 {{ form.description_detaillee }}
-                {% if form.description_detaillee.errors %}<div class="text-danger small">{{ form.description_detaillee.errors }}</div>{% endif %}
+                {% if form.description_detaillee.errors %}<div class="text-danger">{{ form.description_detaillee.errors }}</div>{% endif %}
               </div>
             </div>
           </div>
@@ -66,25 +172,26 @@
       <!-- Colonne latérale -->
       <div class="col-12 col-lg-4">
         <!-- Caractéristiques (M2M) -->
-        <div class="card mb-3">
+        <div class="card">
           <div class="card-body">
             <label class="form-label" for="{{ form.caracteristiques.id_for_label }}">Caractéristiques</label>
             <small class="text-muted d-block mb-2">Maintenez Ctrl/Cmd pour sélectionner plusieurs.</small>
             {{ form.caracteristiques }}
-            {% if form.caracteristiques.errors %}<div class="text-danger small">{{ form.caracteristiques.errors }}</div>{% endif %}
+            {% if form.caracteristiques.errors %}<div class="text-danger">{{ form.caracteristiques.errors }}</div>{% endif %}
           </div>
         </div>
 
-        <div class="card mb-3">
+        <div class="card">
           <div class="card-body">
             <label class="form-label" for="{{ form.couleurs.id_for_label }}">Couleurs</label>
             <small class="text-muted d-block mb-2">Maintenez Ctrl/Cmd pour sélectionner plusieurs.</small>
             {{ form.couleurs }}
-            {% if form.couleurs.errors %}<div class="text-danger small">{{ form.couleurs.errors }}</div>{% endif %}
+            {% if form.couleurs.errors %}<div class="text-danger">{{ form.couleurs.errors }}</div>{% endif %}
           </div>
         </div>
-        <!-- active -->
-        <div class="card mb-3">
+
+        <!-- Produit actif -->
+        <div class="card">
           <div class="card-body">
             <div class="form-check">
               {{ form.is_active }}
@@ -92,12 +199,11 @@
                 Produit actif
               </label>
               {% if form.is_active.errors %}
-                <div class="text-danger small">{{ form.is_active.errors }}</div>
+                <div class="text-danger">{{ form.is_active.errors }}</div>
               {% endif %}
             </div>
           </div>
         </div>
-
 
         <!-- Upload images -->
         <div class="card">
