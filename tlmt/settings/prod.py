@@ -2,14 +2,15 @@ from .env_base_dir import BASE_DIR
 from .base import *
 import os
 
+# ===================== DEBUG =====================
 DEBUG = False
-
 ALLOWED_HOSTS = ["tlmt.pythonanywhere.com"]
 
+# ===================== MIDDLEWARE / STATIC =====================
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-# --- Base de données (MySQL PA) ---
+# ===================== BASE DE DONNÉES =====================
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -26,24 +27,22 @@ DATABASES = {
     }
 }
 
-# --- Email (Gmail / Google Workspace) ---
+# ===================== EMAIL =====================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"  # reste False si TLS:587
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 
-# From réel = ton compte SMTP (améliore la délivrabilité)
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# Préfixe objet et timeout repris de base.py (override possible par .env)
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", EMAIL_SUBJECT_PREFIX)
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", str(EMAIL_TIMEOUT)))
 
-# --- Sécurité HTTPS ---
+# ===================== SÉCURITÉ HTTPS =====================
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -64,3 +63,11 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# ===================== NOTES IMPORTANTES =====================
+# 1️⃣ Pour que fetch POST fonctionne en prod :
+#    - Toujours utiliser HTTPS
+#    - Toujours utiliser `credentials: 'include'` côté JS
+#    - Récupérer le CSRF depuis le cookie, pas uniquement depuis le template
+# 2️⃣ Collect static avant déploiement : python manage.py collectstatic
+# 3️⃣ Vérifier que toutes les URLs fetch utilisent {% url ... %} correctement généré
