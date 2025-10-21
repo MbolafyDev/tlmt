@@ -431,10 +431,15 @@ def service_detail(request, service_id):
     return render(request, 'configuration/service_detail_modal.html', {'service': service})
 
 # ---------------- Journal des commandes ----------------
-@admin_required  # ou @staff_member_required
+@admin_required
 def journal_commandes(request):
     q = (request.GET.get("q") or "").strip()
-    commandes = Commande.objects.select_related('user').prefetch_related('items__produit').order_by('-date_creation')
+    view_mode = request.GET.get("view", "table")  # table par défaut
+
+    # Trier par date_creation décroissante pour afficher les nouvelles commandes en premier
+    commandes = Commande.objects.select_related('user')\
+        .prefetch_related('items__produit')\
+        .order_by('-date_creation')
 
     if q:
         commandes = commandes.filter(
@@ -456,4 +461,5 @@ def journal_commandes(request):
         "commandes": commandes_page,
         "is_paginated": paginator.num_pages > 1,
         "q": q,
+        "view_mode": view_mode,
     })
