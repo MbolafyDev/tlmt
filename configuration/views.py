@@ -11,6 +11,8 @@ from plomberie.models import AppareilSanitaire
 from .forms import AppareilSanitaireForm
 from home.forms import ServiceForm, ServiceImageFormSet
 from home.models import Service, ServiceImage
+from home.models import Commande, CommandeItem
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # ---------------- Users ----------------
@@ -427,3 +429,31 @@ def service_delete(request, service_id):
 def service_detail(request, service_id):
     service = get_object_or_404(Service.objects.prefetch_related('images'), id=service_id)
     return render(request, 'configuration/service_detail_modal.html', {'service': service})
+
+# ---------------- Journal des commandes ----------------
+@admin_required  # ou @staff_member_required
+def journal_commandes(request):
+    q = (request.GET.get("q") or "").strip()
+    commandes = Commande.objects.select_related('user').prefetch_related('items__produit').order_by('-date_creation')
+
+    if q:
+        commandes = commandes.filter(
+            Q(numero_facture__icontains=q) |
+            Q(user__username__icontains=q) |
+            Q(email__icontains=q)
+        )
+
+    paginator = Paginator(commandes, 15)
+    page = request.GET.get("page", 1)
+    try:
+        commandes_page = paginator.page(page)
+    except PageNotAnInteger:
+        commandes_page = paginator.page(1)
+    except EmptyPage:
+        commandes_page = paginator.page(paginator.num_pages)
+
+    return render(request, "configuration/journal_commandes.html", {
+        "commandes": commandes_page,
+        "is_paginated": paginator.num_pages > 1,
+        "q": q,
+    })

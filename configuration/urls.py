@@ -38,4 +38,7 @@ urlpatterns = [
     path('services/<int:service_id>/edit/', views.service_edit, name='service_edit'),
     path('services/<int:service_id>/delete/', views.service_delete, name='service_delete'),
     path('services/<int:service_id>/detail/', views.service_detail, name='service_detail'),
+
+    # ---------------- Journal des commandes ----------------
+    path('journal-commandes/', views.journal_commandes, name='journal_commandes'),
 ]
