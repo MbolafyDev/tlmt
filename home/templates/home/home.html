@@ -245,6 +245,15 @@ h3 {
     width: 100%;
     border-radius: 50px;
 }
+.reply-input-container {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.reply-input-container button {
+    border-radius: 50%;
+    padding: 0.35rem 0.5rem;
+}
 #submit-comment {
     border-radius: 50px;
     padding: 0.35rem 1rem;
@@ -513,49 +522,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ================= RÉPONSES =================
+    // ================= RÉPONSES AVEC BOUTON SEND =================
     document.addEventListener('click', function(e){
         if(e.target && e.target.classList.contains('btn-reply')){
             const commentId = e.target.dataset.commentId;
             const username = e.target.dataset.username;
 
-            const prevInput = e.target.parentNode.querySelector('.reply-input');
-            if(prevInput) prevInput.remove();
+            const prevInputContainer = e.target.parentNode.querySelector('.reply-input-container');
+            if(prevInputContainer) prevInputContainer.remove();
+
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'reply-input-container mt-2';
 
             const replyInput = document.createElement('input');
             replyInput.className = 'form-control reply-input';
             replyInput.placeholder = `Répondre à ${username}...`;
-            e.target.parentNode.appendChild(replyInput);
 
-            replyInput.addEventListener('keypress', function(ev){
-                if(ev.key === 'Enter'){
-                    const content = replyInput.value.trim();
-                    if(!content) return alert('Le message ne peut pas être vide.');
+            const sendBtn = document.createElement('button');
+            sendBtn.className = 'btn btn-primary';
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
 
-                    fetch("{% url 'reply_comment_service' %}", {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: new URLSearchParams({
-                            'comment_id': commentId,
-                            'content': content
-                        })
+            containerDiv.appendChild(replyInput);
+            containerDiv.appendChild(sendBtn);
+            e.target.parentNode.appendChild(containerDiv);
+
+            // Submit via bouton ou Entrée sur desktop
+            function sendReply(){
+                const content = replyInput.value.trim();
+                if(!content) return alert('Le message ne peut pas être vide.');
+                fetch("{% url 'reply_comment_service' %}", {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({
+                        'comment_id': commentId,
+                        'content': content
                     })
-                    .then(resp => resp.json())
-                    .then(data => {
-                        if(data.success){
-                            const newReply = document.createElement('div');
-                            newReply.classList.add('reply-container');
-                            newReply.innerHTML = `<strong>${data.username}</strong> : ${data.content}`;
-                            replyInput.parentNode.appendChild(newReply);
-                            replyInput.remove();
-                        } else {
-                            alert(data.error);
-                        }
-                    });
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    if(data.success){
+                        const newReply = document.createElement('div');
+                        newReply.classList.add('reply-container');
+                        newReply.innerHTML = `<strong>${data.username}</strong> : ${data.content}`;
+                        containerDiv.parentNode.appendChild(newReply);
+                        containerDiv.remove();
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            }
+
+            sendBtn.addEventListener('click', sendReply);
+            replyInput.addEventListener('keypress', function(ev){
+                if(ev.key === 'Enter' && window.innerWidth > 576){ // Enter sur desktop seulement
+                    sendReply();
                 }
             });
         }
