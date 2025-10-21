@@ -27,7 +27,8 @@ def home(request):
     return render(request, 'home/home.html', {
         "services": services,
         "produits": produits,
-        "total_items": total_items
+        "total_items": total_items,
+        "request": request,
     })
 
 def ventes(request, slug=None):
