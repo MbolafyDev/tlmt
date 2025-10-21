@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Informations de la commande{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <h2 class="mb-4">Informations pour finaliser votre commande</h2>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Nom complet</label>
+      <input type="text" name="nom_complet" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Contact</label>
+      <input type="text" name="contact" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Adresse de livraison</label>
+      <input type="text" name="adresse_livraison" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Ville</label>
+      <input type="text" name="ville" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Commentaire</label>
+      <textarea name="commentaire" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Finaliser la commande</button>
+  </form>
+</section>
+{% endblock %}

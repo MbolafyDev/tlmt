@@ -10,6 +10,14 @@ class Commande(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=12, decimal_places=2)
     email = models.EmailField()
+    # Nouveau champ pour le mode de paiement
+    MODE_PAIEMENT_CHOICES = [
+        ('espece', 'Espèces'),
+        ('mvola', 'Mvola'),
+        ('airtel', 'Airtel Money'),
+        ('orange', 'Orange Money'),
+    ]
+    mode_paiement = models.CharField(max_length=20, choices=MODE_PAIEMENT_CHOICES, default='espece')
 
     def __str__(self):
         return f"{self.numero_facture} - {self.user.username}"
@@ -23,6 +31,21 @@ class CommandeItem(models.Model):
 
     def __str__(self):
         return f"{self.produit.nom} x {self.quantite}"
+
+
+# ======= Détails de la commande (après checkout) =======
+class CommandeDetail(models.Model):
+    commande = models.OneToOneField(Commande, related_name='details', on_delete=models.CASCADE)
+    nom_complet = models.CharField(max_length=200)
+    contact = models.CharField(max_length=50)
+    email = models.EmailField()
+    adresse_livraison = models.CharField(max_length=255)
+    ville = models.CharField(max_length=100, blank=True, null=True)
+    commentaire = models.TextField(blank=True, null=True)
+    date_commande = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Details de {self.commande.numero_facture}"
 
 
 # ======= Services =======
@@ -86,6 +109,7 @@ class ServiceComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='service_comments', on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user.username} commente {self.service.titre}"
