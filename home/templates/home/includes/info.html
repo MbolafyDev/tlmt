@@ -5,36 +5,112 @@
 
 {% block content %}
 <section class="container my-5">
-  <h2 class="mb-4">Informations pour finaliser votre commande</h2>
 
-  <form method="POST">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label class="form-label">Nom complet</label>
-      <input type="text" name="nom_complet" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" name="email" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Contact</label>
-      <input type="text" name="contact" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Adresse de livraison</label>
-      <input type="text" name="adresse_livraison" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Ville</label>
-      <input type="text" name="ville" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Commentaire</label>
-      <textarea name="commentaire" class="form-control" rows="3"></textarea>
-    </div>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} text-center" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
 
-    <button type="submit" class="btn btn-primary w-100">Finaliser la commande</button>
-  </form>
+  <h2 class="info-title">Informations pour finaliser votre commande</h2>
+
+  <div class="info-form-wrapper">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Nom complet</label>
+        <input type="text" name="nom_complet" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Contact</label>
+        <input type="text" name="contact" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Adresse de livraison</label>
+        <input type="text" name="adresse_livraison" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Ville</label>
+        <input type="text" name="ville" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Commentaire</label>
+        <textarea name="commentaire" class="form-control" rows="3"></textarea>
+      </div>
+
+      <button type="submit" class="btn info-submit-btn">Finaliser la commande</button>
+    </form>
+  </div>
+
 </section>
+
+<!-- ================= STYLES UNIQUEMENT POUR INFO.HTML ================= -->
+<style>
+/* Conteneur du formulaire pour isoler le style */
+.info-form-wrapper {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+/* Titre */
+.info-title {
+    color: #0d1b2a;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Labels */
+.info-form-wrapper .form-label {
+    font-weight: 500;
+    color: #0d1b2a;
+}
+
+/* Champs input */
+.info-form-wrapper .form-control {
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #ced4da;
+}
+.info-form-wrapper .form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.1rem rgba(255,193,7,0.25);
+}
+
+/* Textarea */
+.info-form-wrapper textarea.form-control {
+    resize: none;
+}
+
+/* Bouton submit */
+.info-form-wrapper .info-submit-btn {
+    background-color: #ffc107;
+    color: #0d1b2a;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    transition: 0.3s;
+}
+.info-form-wrapper .info-submit-btn:hover {
+    background-color: #e0a800;
+}
+
+/* Alert messages */
+.info-form-wrapper .alert {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+}
+</style>
 {% endblock %}

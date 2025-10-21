@@ -5,6 +5,108 @@
 {% block title %}Checkout - TLMT Services{% endblock %}
 
 {% block content %}
+<!-- ================= STYLES MODERNES ================= -->
+<style>
+:root {
+    --primary-yellow: #ffc107;
+    --primary-blue: #0d1b2a;
+    --bg-white: #ffffff;
+    --bg-light-gray: #f8f9fa;
+    --text-dark: #1a1a2e;
+    --text-muted: #6c757d;
+    --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+/* BODY */
+body {
+    background-color: var(--bg-light-gray);
+    color: var(--text-dark);
+    font-family: "Poppins", sans-serif;
+}
+
+/* TITRES */
+h2, h4 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+/* ALERTS */
+.alert {
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    padding: 0.75rem 1.25rem;
+}
+
+/* PANIER LISTE */
+.list-group-item {
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.3s, box-shadow 0.3s;
+    padding: 1rem;
+}
+.list-group-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* IMAGE PRODUIT */
+.list-group-item img {
+    border-radius: 12px;
+}
+
+/* NOM ET QUANTITÉ */
+.list-group-item h6 {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+.list-group-item small {
+    color: var(--text-muted);
+}
+
+/* PRIX */
+.list-group-item .fw-bold {
+    font-size: 1rem;
+}
+
+/* BOUTONS SUPPRIMER */
+.btn-outline-danger {
+    border-radius: 50px;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.9rem;
+    transition: all 0.3s;
+}
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: var(--bg-white);
+    border-color: #dc3545;
+}
+
+/* TOTAL */
+.total-section h5 {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* BOUTONS PAIEMENT */
+.btn-success {
+    background-color: var(--primary-yellow);
+    border-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-radius: 50px;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s;
+}
+.btn-success:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: var(--primary-blue);
+}
+</style>
+
 <section class="container my-5">
   {% if messages %}
     {% for message in messages %}
@@ -14,10 +116,10 @@
     {% endfor %}
   {% endif %}
 
-  <h2 class="mb-4">Votre Panier</h2>
+  <h2 class="mb-4 text-center">Votre Panier</h2>
 
-  <div class="row">
-    <div class="col-lg-8 mb-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
       {% if panier %}
       <div class="list-group">
         {% for produit_id, item in panier.items %}
@@ -25,7 +127,7 @@
           <div class="d-flex align-items-center mb-2 mb-sm-0">
             <img src="{{ item.image }}" alt="{{ item.nom }}" class="me-3" style="width:80px; aspect-ratio:1/1; object-fit:cover;">
             <div>
-              <h6 class="mb-1">{{ item.nom }}</h6>
+              <h6>{{ item.nom }}</h6>
               <small class="text-muted">Quantité: {{ item.quantite }}</small>
             </div>
           </div>
@@ -34,14 +136,14 @@
             <form method="POST">
               {% csrf_token %}
               <input type="hidden" name="remove_id" value="{{ produit_id }}">
-              <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+              <button type="submit" class="btn btn-outline-danger">Supprimer</button>
             </form>
           </div>
         </div>
         {% endfor %}
       </div>
 
-      <div class="mt-4 d-flex justify-content-end">
+      <div class="mt-4 d-flex justify-content-end total-section">
         <h5>Total: <span class="text-danger">{{ total|intcomma }} Ar</span></h5>
       </div>
       {% else %}
