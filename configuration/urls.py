@@ -2,15 +2,19 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # ---------------- Users ----------------
     path("users/", views.user_list, name="user_list"),
     path("users/<int:user_id>/edit/", views.edit_user, name="edit_user"),
+    path("users/<int:user_id>/delete/", views.delete_user, name="delete_user"),
 
+    # ---------------- Produits ----------------
     path("produits/", views.produit_list, name="produit_list"),
     path("produits/add/", views.produit_add, name="produit_add"),
     path("produits/<int:produit_id>/detail/", views.produit_detail, name="produit_detail"),
     path("produits/<int:produit_id>/edit/", views.produit_edit, name="produit_edit"),
     path("produits/<int:produit_id>/delete/", views.produit_delete, name="produit_delete"),
 
+    # ---------------- Catégories ----------------
     path('categories/', views.categorie_list, name='categorie_list'),
     path('categories/add/', views.categorie_add, name='categorie_add'),
     path('categories/edit/<int:categorie_id>/', views.categorie_edit, name='categorie_edit'),
@@ -22,11 +26,13 @@ urlpatterns = [
     path('caracteristiques/edit/<int:caracteristique_id>/', views.caracteristique_edit, name='caracteristique_edit'),
     path('caracteristiques/delete/<int:caracteristique_id>/', views.caracteristique_delete, name='caracteristique_delete'),
 
+    # ---------------- Appareils ----------------
     path("appareils/", views.appareil_list, name="appareil_list"),
     path("appareils/add/", views.appareil_add, name="appareil_add"),
     path("appareils/<int:appareil_id>/edit/", views.appareil_edit, name="appareil_edit"),
     path("appareils/<int:appareil_id>/delete/", views.appareil_delete, name="appareil_delete"),
 
+    # ---------------- Services ----------------
     path('services/', views.service_list, name='service_list'),
     path('services/add/', views.service_add, name='service_add'),
     path('services/<int:service_id>/edit/', views.service_edit, name='service_edit'),

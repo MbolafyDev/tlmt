@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmer la suppression - Zara Store{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+
+  .container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  h3 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+
+  .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+  }
+
+  .btn-danger:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+  }
+
+  .d-flex.gap-2 {
+    gap: 10px;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container py-4">
+    <h3>Confirmer la suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer l’utilisateur <strong>{{ user.username }}</strong> ?</p>
+
+    <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <a href="{% url 'user_list' %}" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+    </form>
+</div>
+{% endblock %}

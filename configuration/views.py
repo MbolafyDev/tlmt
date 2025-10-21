@@ -33,6 +33,16 @@ def edit_user(request, user_id):
         form = UserValidationForm(instance=user)
     return render(request, "configuration/edit_user.html", {"form": form, "user": user})
 
+# ---------------- Users ----------------
+@admin_required
+def delete_user(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    if request.method == "POST":
+        user.delete()
+        messages.success(request, f"L’utilisateur {user.username} a été supprimé avec succès.")
+        return redirect("user_list")
+    return render(request, "configuration/includes/user_confirm_delete.html", {"user": user})
+
 
 # ---------------- Articles ----------------
 @admin_required
