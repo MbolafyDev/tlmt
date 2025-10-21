@@ -1,262 +1,269 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-
 <!-- ================= CAROUSEL PRINCIPAL ================= -->
 {% include 'includes/carousel.html' %}
 
 <!-- ================= STYLES MODERNES ================= -->
 <style>
 :root {
-    --primary-yellow: #ffc107;
-    --primary-blue: #0d1b2a;
-    --bg-white: #ffffff;
-    --bg-light-gray: #f8f9fa;
-    --text-dark: #1a1a2e;
-    --text-muted: #6c757d;
-    --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
-    --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+  --primary-yellow: #ffc107;
+  --primary-blue: #0d1b2a;
+  --bg-white: #ffffff;
+  --bg-light-gray: #f8f9fa;
+  --text-dark: #1a1a2e;
+  --text-muted: #6c757d;
+  --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
 }
 
 /* BODY */
 body {
-    background-color: var(--bg-light-gray);
-    color: var(--text-dark);
-    font-family: "Poppins", sans-serif;
+  background-color: var(--bg-light-gray);
+  color: var(--text-dark);
+  font-family: "Poppins", sans-serif;
 }
 
 /* TITRES SECTION */
 h3 {
-    font-weight: 700;
-    border-left: 4px solid var(--primary-yellow);
-    padding-left: 12px;
-    margin-bottom: 2rem;
-    color: var(--primary-blue);
-    font-size: 1.8rem;
+  font-weight: 700;
+  border-left: 4px solid var(--primary-yellow);
+  padding-left: 12px;
+  margin-bottom: 2rem;
+  color: var(--primary-blue);
+  font-size: 1.8rem;
 }
 
 /* CARDS SERVICE */
 .service-card {
-    border-radius: 16px;
-    overflow: hidden;
-    background-color: var(--bg-white);
-    box-shadow: var(--shadow-light);
-    transition: transform 0.3s, box-shadow 0.3s;
-    padding: 0;
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: var(--bg-white);
+  box-shadow: var(--shadow-light);
+  transition: transform 0.3s, box-shadow 0.3s;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
 }
 .service-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-bottom: 3px solid var(--primary-yellow);
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 3px solid var(--primary-yellow);
 }
 .card-body {
-    padding: 1rem 1rem 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  padding: 1rem 1rem 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .card-title {
-    color: var(--primary-blue);
-    font-weight: 600;
-    font-size: 1.1rem;
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 .card-text {
-    font-size: 0.9rem;
-    color: var(--text-muted);
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 .card-text a.voir-plus-service {
-    color: var(--primary-yellow);
-    font-weight: 500;
-    text-decoration: none;
+  color: var(--primary-yellow);
+  font-weight: 500;
+  text-decoration: none;
 }
 .card-text a.voir-plus-service:hover {
-    color: #e0a800;
+  color: #e0a800;
 }
 
 /* BADGES */
 .badge {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.35em 0.6em;
-    border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35em 0.6em;
+  border-radius: 12px;
 }
 
 /* BOUTONS */
 .btn-like, .btn-comment {
-    font-size: 0.85rem;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0.3rem 0.75rem;
-    transition: all 0.3s;
+  font-size: 0.85rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.3rem 0.75rem;
+  transition: all 0.3s;
 }
 .btn-like {
-    border: 1px solid var(--primary-blue);
-    color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+  color: var(--primary-blue);
 }
 .btn-like:hover {
-    background-color: var(--primary-blue);
-    color: var(--bg-white);
+  background-color: var(--primary-blue);
+  color: var(--bg-white);
 }
 .btn-comment {
-    border: 1px solid var(--text-muted);
-    color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
 }
 .btn-comment:hover {
-    background-color: var(--text-muted);
-    color: var(--bg-white);
+  background-color: var(--text-muted);
+  color: var(--bg-white);
 }
 
 /* PRODUITS */
 .card.text-center {
-    border-radius: 16px;
-    padding: 0.75rem;
-    margin-bottom: 1.5rem;
-    background-color: var(--bg-white);
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  border-radius: 16px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: var(--bg-white);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .card.text-center:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
 }
 .card.text-center img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 12px;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 /* BOUTONS PRODUITS */
 .btn-success {
-    background-color: var(--primary-yellow);
-    border-color: var(--primary-yellow);
-    color: var(--primary-blue);
-    border-radius: 50px;
-    font-size: 0.85rem;
-    padding: 0.35rem 0.9rem;
+  background-color: var(--primary-yellow);
+  border-color: var(--primary-yellow);
+  color: var(--primary-blue);
+  border-radius: 50px;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
 }
 .btn-success:hover {
-    background-color: #e0a800;
-    border-color: #e0a800;
-    color: var(--primary-blue);
+  background-color: #e0a800;
+  border-color: #e0a800;
+  color: var(--primary-blue);
 }
 .btn-info {
-    background-color: var(--primary-blue);
-    border-color: var(--primary-blue);
-    color: var(--bg-white);
-    border-radius: 50px;
-    font-size: 0.85rem;
-    padding: 0.35rem 0.9rem;
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: var(--bg-white);
+  border-radius: 50px;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
 }
 .btn-info:hover {
-    background-color: #081224;
-    border-color: #081224;
+  background-color: #081224;
+  border-color: #081224;
 }
 
 /* MODAL COMMENTAIRE STYLE FACEBOOK */
 .modal-content {
-    border-radius: 16px;
-    overflow: hidden;
+  border-radius: 16px;
+  overflow: hidden;
 }
 .modal-header {
-    background-color: var(--primary-yellow);
-    border-bottom: none;
+  background-color: var(--primary-yellow);
+  border-bottom: none;
 }
 .modal-title {
-    color: var(--primary-blue);
-    font-weight: 700;
+  color: var(--primary-blue);
+  font-weight: 700;
 }
 #comments-container {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 5px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 /* Commentaires style Facebook */
 #comments-container .comment-item {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--bg-white);
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow-light);
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-white);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-light);
+  position: relative;
 }
 #comments-container .comment-item::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 12px;
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 8px solid var(--bg-white);
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--bg-white);
 }
 #comments-container .comment-item strong {
-    color: var(--primary-blue);
-    margin-bottom: 0.2rem;
+  color: var(--primary-blue);
+  margin-bottom: 0.2rem;
+}
+
+/* Avatar */
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
 }
 
 /* Réponse petite comme Facebook */
 .btn-reply {
-    background: none;
-    border: none;
-    color: var(--primary-blue);
-    font-size: 0.85rem;
-    padding: 0;
-    cursor: pointer;
-    align-self: flex-end;
-    margin-top: 4px;
+  background: none;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 0.85rem;
+  padding: 0;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-top: 4px;
 }
 
 /* Container réponses */
 .reply-container {
-    margin-left: 3rem;
-    margin-top: 0.5rem;
-    background-color: #f0f2f5;
-    padding: 0.5rem 0.75rem;
-    border-radius: 18px;
-    box-shadow: var(--shadow-light);
+  margin-left: 3rem;
+  margin-top: 0.5rem;
+  background-color: #f0f2f5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 18px;
+  box-shadow: var(--shadow-light);
 }
 .reply-container strong {
-    color: var(--primary-blue);
+  color: var(--primary-blue);
 }
 
 /* INPUTS */
 .reply-input, #new-comment-input {
-    width: 100%;
-    border-radius: 50px;
+  width: 100%;
+  border-radius: 50px;
 }
 .reply-input-container {
-    display: flex;
-    gap: 4px;
-    align-items: center;
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 .reply-input-container button {
-    border-radius: 50%;
-    padding: 0.35rem 0.5rem;
+  border-radius: 50%;
+  padding: 0.35rem 0.5rem;
 }
 #submit-comment {
-    border-radius: 50px;
-    padding: 0.35rem 1rem;
+  border-radius: 50px;
+  padding: 0.35rem 1rem;
 }
 </style>
 
@@ -268,24 +275,31 @@ h3 {
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="service-card shadow-sm">
         {% if service.images.exists %}
-        <img src="{{ service.images.first.image.url }}" alt="{{ service.titre }}">
+          <img src="{{ service.images.first.image.url }}" alt="{{ service.titre }}">
         {% else %}
-        <img src="{% static 'images/default.png' %}" alt="{{ service.titre }}">
+          <img src="{% static 'images/default.png' %}" alt="{{ service.titre }}">
         {% endif %}
         <div class="card-body d-flex flex-column justify-content-between">
           {% with statut_display=service.get_statut_display %}
-          {% if statut_display %}
-            {% if statut_display == "Planifié" %}<span class="badge bg-warning">{{ statut_display }}</span>
-            {% elif statut_display == "En cours" %}<span class="badge bg-secondary">{{ statut_display }}</span>
-            {% elif statut_display == "Terminé" %}<span class="badge bg-success">{{ statut_display }}</span>
+            {% if statut_display %}
+              {% if statut_display == "Planifié" %}
+                <span class="badge bg-warning">{{ statut_display }}</span>
+              {% elif statut_display == "En cours" %}
+                <span class="badge bg-secondary">{{ statut_display }}</span>
+              {% elif statut_display == "Terminé" %}
+                <span class="badge bg-success">{{ statut_display }}</span>
+              {% endif %}
             {% endif %}
-          {% endif %}
           {% endwith %}
 
           <h5 class="card-title mt-2">{{ service.titre }}</h5>
           <p class="card-text">
             {% if service.description %}
-              {% if service.description|length > 50 %}{{ service.description|slice:":50" }}...{% else %}{{ service.description }}{% endif %}
+              {% if service.description|length > 50 %}
+                {{ service.description|slice:":50" }}...
+              {% else %}
+                {{ service.description }}
+              {% endif %}
               <a href="#" class="voir-plus-service" data-service-id="{{ service.id }}">Voir plus</a>
             {% else %}
               Aucune description disponible.
@@ -295,10 +309,13 @@ h3 {
           {% if user.is_authenticated %}
           <div class="d-flex gap-2 mt-2">
             <button class="btn btn-like btn-sm" data-service-id="{{ service.id }}">
-              <i class="fas fa-thumbs-up"></i> <span class="like-count">{{ service.likes_count }}</span>
+              <i class="fas fa-thumbs-up"></i>
+              <span class="like-count">{{ service.likes_count }}</span>
             </button>
+
             <button class="btn btn-comment btn-sm" data-service-id="{{ service.id }}" data-bs-toggle="modal" data-bs-target="#commentModal">
-              <i class="fas fa-comment"></i> <span class="comment-count">{{ service.comments_count }}</span>
+              <i class="fas fa-comment"></i>
+              <span class="comment-count">{{ service.comments_count }}</span>
             </button>
           </div>
           {% endif %}
@@ -317,9 +334,9 @@ h3 {
     <div class="col-6 col-md-3">
       <div class="card text-center shadow-sm p-2">
         {% if produit.images.exists %}
-        <img src="{{ produit.images.first.image.url }}" alt="{{ produit.nom }}">
+          <img src="{{ produit.images.first.image.url }}" alt="{{ produit.nom }}">
         {% else %}
-        <img src="{% static 'images/default.png' %}" alt="{{ produit.nom }}">
+          <img src="{% static 'images/default.png' %}" alt="{{ produit.nom }}">
         {% endif %}
         <p class="mt-2 mb-1 fw-bold">{{ produit.nom }}</p>
         <p class="mb-1 text-danger fw-bold">{{ produit.prix }} Ar</p>
@@ -356,6 +373,7 @@ h3 {
       </div>
       <div class="modal-body">
         <div id="comments-container"></div>
+
         {% if user.is_authenticated %}
         <div class="mt-3 d-flex gap-2">
           <input type="text" class="form-control" id="new-comment-input" placeholder="Écrire un commentaire...">
@@ -370,221 +388,266 @@ h3 {
 <!-- ================= JS ================= -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const serviceModal = new bootstrap.Modal(document.getElementById('serviceModal'));
-
-    // ================= AJOUT AU PANIER =================
-    document.querySelectorAll('.btn-add-cart').forEach(button => {
-        button.addEventListener('click', function(e){
-            e.preventDefault();
-            const produitId = this.dataset.id;
-            const qtyInput = this.closest('.d-flex').querySelector('.qty-input');
-            const quantite = qtyInput ? parseInt(qtyInput.value) : 1;
-
-            fetch("{% url 'ajouter_au_panier' %}", {
-                method: "POST",
-                credentials: 'same-origin',
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: new URLSearchParams({
-                    'produit_id': produitId,
-                    'quantite': quantite
-                })
-            })
-            .then(resp => resp.json())
-            .then(data => {
-                if(data.success){
-                    const cartDesktop = document.getElementById('cart-badge');
-                    const cartMobile = document.getElementById('cart-badge-mobile');
-                    if(cartDesktop) cartDesktop.textContent = data.total_items;
-                    if(cartMobile) cartMobile.textContent = data.total_items;
-                } else if(data.redirect){
-                    window.location.href = data.login_url;
-                }
-            });
-        });
-    });
-
-    // ================= MODAL VOIR PLUS SERVICE =================
-    document.querySelectorAll('.voir-plus-service').forEach(link => {
-        link.addEventListener('click', function(e){
-            e.preventDefault();
-            const serviceId = this.dataset.serviceId;
-            const url = "{% url 'voir_plus_service' service_id=0 %}".replace('0', serviceId);
-            fetch(url)
-            .then(resp => resp.json())
-            .then(data => {
-                document.querySelector('#serviceModal .modal-content-container').innerHTML = data.html;
-                serviceModal.show();
-            });
-        });
-    });
-
-    // ================= LIKE =================
-    document.querySelectorAll('.btn-like').forEach(btn => {
-        btn.addEventListener('click', function(){
-            const serviceId = this.dataset.serviceId;
-            fetch("{% url 'like_service' %}", {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: new URLSearchParams({'service_id': serviceId})
-            })
-            .then(resp => resp.json())
-            .then(data => {
-                this.querySelector('.like-count').textContent = data.likes_count;
-            });
-        });
-    });
-
-    // ================= COMMENTAIRES =================
-    let currentServiceId = null;
-
-    function renderComment(comment, container){
-        const div = document.createElement('div');
-        div.classList.add('comment-item');
-        div.dataset.commentId = comment.id;
-        div.innerHTML = `<strong>${comment.username}</strong> : <span>${comment.content}</span>
-                         <button class="btn-reply" data-username="${comment.username}" data-comment-id="${comment.id}">Répondre</button>`;
-        container.appendChild(div);
-
-        if(comment.replies){
-            comment.replies.forEach(rep => {
-                const replyDiv = document.createElement('div');
-                replyDiv.classList.add('reply-container');
-                replyDiv.innerHTML = `<strong>${rep.username}</strong> : ${rep.content}`;
-                div.appendChild(replyDiv);
-            });
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
+      }
     }
+    return cookieValue;
+  }
+  const csrftokenFromTemplate = '{{ csrf_token }}';
+  const csrftoken = (csrftokenFromTemplate && csrftokenFromTemplate !== 'None') ? csrftokenFromTemplate : getCookie('csrftoken');
 
-    document.querySelectorAll('.btn-comment').forEach(btn => {
-        btn.addEventListener('click', function(){
-            currentServiceId = this.dataset.serviceId;
-            const url = "{% url 'get_comments_service' service_id=0 %}".replace('0', currentServiceId);
-            fetch(url)
-            .then(resp => resp.json())
-            .then(data => {
-                const container = document.getElementById('comments-container');
-                container.innerHTML = '';
-                if(data.comments.length === 0){
-                    container.innerHTML = '<p>Aucun commentaire pour le moment.</p>';
-                } else {
-                    data.comments.forEach(comment => renderComment(comment, container));
-                }
-                const input = document.getElementById('new-comment-input');
-                if(input) input.value = '';
-            });
-        });
+  const serviceModal = new bootstrap.Modal(document.getElementById('serviceModal'));
+
+  // ================= AJOUT AU PANIER =================
+  document.querySelectorAll('.btn-add-cart').forEach(button => {
+    button.addEventListener('click', function(e){
+      e.preventDefault();
+      const produitId = this.dataset.id;
+      const qtyInput = this.closest('.d-flex').querySelector('.qty-input');
+      const quantite = qtyInput ? parseInt(qtyInput.value) : 1;
+
+      fetch("{% url 'ajouter_au_panier' %}", {
+        method: "POST",
+        credentials: 'same-origin',
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": csrftoken,
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: new URLSearchParams({ 'produit_id': produitId, 'quantite': quantite })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data.success){
+          const cartDesktop = document.getElementById('cart-badge');
+          const cartMobile = document.getElementById('cart-badge-mobile');
+          if(cartDesktop) cartDesktop.textContent = data.total_items;
+          if(cartMobile) cartMobile.textContent = data.total_items;
+        } else if(data.redirect){
+          window.location.href = data.login_url;
+        }
+      }).catch(err => console.error(err));
     });
+  });
 
-    // ================= NOUVEAU COMMENTAIRE =================
-    const submitBtn = document.getElementById('submit-comment');
-    if(submitBtn){
-        submitBtn.addEventListener('click', function(){
-            const content = document.getElementById('new-comment-input').value.trim();
-            if(!content) return alert('Le commentaire ne peut pas être vide.');
-            fetch("{% url 'comment_service' %}", {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: new URLSearchParams({
-                    'service_id': currentServiceId,
-                    'content': content
-                })
-            })
-            .then(resp => resp.json())
-            .then(data => {
-                if(data.success){
-                    const container = document.getElementById('comments-container');
-                    renderComment({
-                        id: data.comment_id,
-                        username: data.username,
-                        content: data.content,
-                        replies: []
-                    }, container);
-                    document.getElementById('new-comment-input').value = '';
+  // ================= MODAL VOIR PLUS SERVICE =================
+  document.querySelectorAll('.voir-plus-service').forEach(link => {
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      const serviceId = this.dataset.serviceId;
+      const url = "{% url 'voir_plus_service' service_id=0 %}".replace('0', serviceId);
+      fetch(url)
+        .then(resp => resp.json())
+        .then(data => {
+          document.querySelector('#serviceModal .modal-content-container').innerHTML = data.html;
+          serviceModal.show();
+        }).catch(err => console.error(err));
+    });
+  });
 
-                    const countSpan = document.querySelector(`.btn-comment[data-service-id="${currentServiceId}"] .comment-count`);
-                    if(countSpan) countSpan.textContent = data.comments_count;
-                } else {
-                    alert(data.error);
-                }
-            });
-        });
+  // ================= LIKE =================
+  document.querySelectorAll('.btn-like').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const serviceId = this.dataset.serviceId;
+      fetch("{% url 'like_service' %}", {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrftoken
+        },
+        body: new URLSearchParams({'service_id': serviceId})
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.likes_count !== undefined) {
+          this.querySelector('.like-count').textContent = data.likes_count;
+        }
+      }).catch(err => console.error(err));
+    });
+  });
+
+  // ================= COMMENTAIRES =================
+  let currentServiceId = null;
+
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function renderComment(comment, container){
+    const div = document.createElement('div');
+    div.classList.add('comment-item');
+    div.dataset.commentId = comment.id;
+
+    const username = escapeHtml(comment.username || 'Utilisateur');
+    const content = escapeHtml(comment.content || '');
+    const avatar = comment.avatar_url || '{% static "images/default.png" %}';
+
+    div.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <img src="${avatar}" class="comment-avatar">
+        <div>
+          <strong>${username}</strong> : <span>${content}</span>
+          <button class="btn-reply" data-username="${username}" data-comment-id="${comment.id}">Répondre</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+
+    if(comment.replies && comment.replies.length){
+      comment.replies.forEach(rep => {
+        const replyDiv = document.createElement('div');
+        replyDiv.classList.add('reply-container');
+        const ruser = escapeHtml(rep.username || 'Utilisateur');
+        const rcontent = escapeHtml(rep.content || '');
+        const ravatar = rep.avatar_url || '{% static "images/default.png" %}';
+        replyDiv.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="${ravatar}" class="comment-avatar" style="width:30px;height:30px;">
+            <div><strong>${ruser}</strong> : ${rcontent}</div>
+          </div>
+        `;
+        div.appendChild(replyDiv);
+      });
     }
+  }
 
-    // ================= RÉPONSES AVEC BOUTON SEND =================
-    document.addEventListener('click', function(e){
-        if(e.target && e.target.classList.contains('btn-reply')){
-            const commentId = e.target.dataset.commentId;
-            const username = e.target.dataset.username;
+  document.querySelectorAll('.btn-comment').forEach(btn => {
+    btn.addEventListener('click', function(){
+      currentServiceId = this.dataset.serviceId;
+      const url = "{% url 'get_comments_service' service_id=0 %}".replace('0', currentServiceId);
+      fetch(url)
+        .then(resp => resp.json())
+        .then(data => {
+          const container = document.getElementById('comments-container');
+          container.innerHTML = '';
+          if(!data.comments || data.comments.length === 0){
+            container.innerHTML = '<p>Aucun commentaire pour le moment.</p>';
+          } else {
+            data.comments.forEach(comment => renderComment(comment, container));
+          }
+          const input = document.getElementById('new-comment-input');
+          if(input) input.value = '';
+        }).catch(err => console.error(err));
+    });
+  });
 
-            const prevInputContainer = e.target.parentNode.querySelector('.reply-input-container');
-            if(prevInputContainer) prevInputContainer.remove();
+  // ================= NOUVEAU COMMENTAIRE =================
+  const submitBtn = document.getElementById('submit-comment');
+  if(submitBtn){
+    submitBtn.addEventListener('click', function(){
+      const contentInput = document.getElementById('new-comment-input');
+      const content = contentInput ? contentInput.value.trim() : '';
+      if(!content) return alert('Le commentaire ne peut pas être vide.');
 
-            const containerDiv = document.createElement('div');
-            containerDiv.className = 'reply-input-container mt-2';
+      fetch("{% url 'comment_service' %}", {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrftoken
+        },
+        body: new URLSearchParams({ 'service_id': currentServiceId, 'content': content })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data.success){
+          const container = document.getElementById('comments-container');
+          renderComment({ id: data.comment_id, username: data.username, content: data.content, replies: [], avatar_url: data.avatar_url }, container);
+          if(contentInput) contentInput.value = '';
+          const countSpan = document.querySelector(`.btn-comment[data-service-id="${currentServiceId}"] .comment-count`);
+          if(countSpan && data.comments_count !== undefined) countSpan.textContent = data.comments_count;
+        } else {
+          alert(data.error || 'Erreur lors de l\'envoi du commentaire.');
+        }
+      }).catch(err => console.error(err));
+    });
+  }
 
-            const replyInput = document.createElement('input');
-            replyInput.className = 'form-control reply-input';
-            replyInput.placeholder = `Répondre à ${username}...`;
+  // ================= RÉPONSES AVEC BOUTON SEND =================
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.classList.contains('btn-reply')){
+      const commentId = e.target.dataset.commentId;
+      const username = e.target.dataset.username;
 
-            const sendBtn = document.createElement('button');
-            sendBtn.className = 'btn btn-primary';
-            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      const prevInputContainer = e.target.parentNode.querySelector('.reply-input-container');
+      if(prevInputContainer) prevInputContainer.remove();
 
-            containerDiv.appendChild(replyInput);
-            containerDiv.appendChild(sendBtn);
-            e.target.parentNode.appendChild(containerDiv);
+      const containerDiv = document.createElement('div');
+      containerDiv.className = 'reply-input-container mt-2';
 
-            // Submit via bouton ou Entrée sur desktop
-            function sendReply(){
-                const content = replyInput.value.trim();
-                if(!content) return alert('Le message ne peut pas être vide.');
-                fetch("{% url 'reply_comment_service' %}", {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: new URLSearchParams({
-                        'comment_id': commentId,
-                        'content': content
-                    })
-                })
-                .then(resp => resp.json())
-                .then(data => {
-                    if(data.success){
-                        const newReply = document.createElement('div');
-                        newReply.classList.add('reply-container');
-                        newReply.innerHTML = `<strong>${data.username}</strong> : ${data.content}`;
-                        containerDiv.parentNode.appendChild(newReply);
-                        containerDiv.remove();
-                    } else {
-                        alert(data.error);
-                    }
-                });
+      const replyInput = document.createElement('input');
+      replyInput.className = 'form-control reply-input';
+      replyInput.placeholder = `Répondre à ${username}...`;
+
+      const sendBtn = document.createElement('button');
+      sendBtn.className = 'btn btn-primary';
+      sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+
+      containerDiv.appendChild(replyInput);
+      containerDiv.appendChild(sendBtn);
+      e.target.parentNode.appendChild(containerDiv);
+
+      function sendReply(){
+        const content = replyInput.value.trim();
+        if(!content) return alert('Le message ne peut pas être vide.');
+
+        fetch("{% url 'reply_comment_service' %}", {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken
+          },
+          body: new URLSearchParams({ 'comment_id': commentId, 'content': content })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if(data.success){
+            const newReply = document.createElement('div');
+            newReply.classList.add('reply-container');
+            const avatar = data.avatar_url || '{% static "images/default.png" %}';
+            newReply.innerHTML = `
+              <div style="display:flex; align-items:center; gap:8px;">
+                <img src="${avatar}" class="comment-avatar" style="width:30px;height:30px;">
+                <div><strong>${escapeHtml(data.username)}</strong> : ${escapeHtml(data.content)}</div>
+              </div>
+            `;
+            containerDiv.parentNode.appendChild(newReply);
+            containerDiv.remove();
+
+            if(data.comments_count !== undefined && currentServiceId){
+              const countSpan = document.querySelector(`.btn-comment[data-service-id="${currentServiceId}"] .comment-count`);
+              if(countSpan) countSpan.textContent = data.comments_count;
             }
+          } else {
+            alert(data.error || 'Erreur lors de l\'envoi de la réponse.');
+          }
+        }).catch(err => console.error(err));
+      }
 
-            sendBtn.addEventListener('click', sendReply);
-            replyInput.addEventListener('keypress', function(ev){
-                if(ev.key === 'Enter' && window.innerWidth > 576){ // Enter sur desktop seulement
-                    sendReply();
-                }
-            });
+      sendBtn.addEventListener('click', sendReply);
+      replyInput.addEventListener('keypress', function(ev){
+        if(ev.key === 'Enter' && window.innerWidth > 576){
+          sendReply();
         }
-    });
+      });
+    }
+  });
 });
 </script>
-
 {% endblock %}

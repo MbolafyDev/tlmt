@@ -210,28 +210,19 @@ def like_service(request):
     else: liked=True
     return JsonResponse({'liked': liked, 'likes_count': service.likes_count})
 
-@login_required
-@require_POST
-def comment_service(request):
-    service = get_object_or_404(Service, id=request.POST.get('service_id'))
-    content = request.POST.get('content')
-    if not content.strip(): return JsonResponse({'success': False, 'error': 'Le commentaire ne peut pas être vide.'})
-    comment = ServiceComment.objects.create(user=request.user, service=service, content=content)
-    return JsonResponse({'success': True, 'comment_id': comment.id, 'username': comment.user.username, 'content': comment.content, 'comments_count': service.comments_count})
 
 @login_required
 def get_comments_service(request, service_id):
     service = get_object_or_404(Service, id=service_id)
     comments_data = []
 
-    # On ne récupère que les commentaires parent (sans parent)
     parent_comments = service.comments.filter(parent__isnull=True).select_related('user').order_by('created_at')
     for c in parent_comments:
-        # Récupérer les réponses du commentaire
         replies = [{
             'username': r.user.username,
             'content': r.content,
-            'created_at': r.created_at.strftime("%d/%m/%Y %H:%M")
+            'created_at': r.created_at.strftime("%d/%m/%Y %H:%M"),
+            'avatar_url': r.user.image.url if r.user.image else '/static/images/default.png'
         } for r in service.comments.filter(parent=c).select_related('user').order_by('created_at')]
 
         comments_data.append({
@@ -239,16 +230,48 @@ def get_comments_service(request, service_id):
             'username': c.user.username,
             'content': c.content,
             'created_at': c.created_at.strftime("%d/%m/%Y %H:%M"),
+            'avatar_url': c.user.image.url if c.user.image else '/static/images/default.png',
             'replies': replies
         })
 
     return JsonResponse({'comments': comments_data})
+
+
+@login_required
+@require_POST
+def comment_service(request):
+    service = get_object_or_404(Service, id=request.POST.get('service_id'))
+    content = request.POST.get('content')
+    if not content.strip():
+        return JsonResponse({'success': False, 'error': 'Le commentaire ne peut pas être vide.'})
+    
+    comment = ServiceComment.objects.create(user=request.user, service=service, content=content)
+    avatar_url = request.user.image.url if request.user.image else '/static/images/default.png'
+    
+    return JsonResponse({
+        'success': True,
+        'comment_id': comment.id,
+        'username': comment.user.username,
+        'content': comment.content,
+        'avatar_url': avatar_url,
+        'comments_count': service.comments_count
+    })
 
 @login_required
 @require_POST
 def reply_comment_service(request):
     parent_comment = get_object_or_404(ServiceComment, id=request.POST.get('comment_id'))
     content = request.POST.get('content')
-    if not content.strip(): return JsonResponse({'success': False, 'error': 'Le message ne peut pas être vide.'})
+    if not content.strip():
+        return JsonResponse({'success': False, 'error': 'Le message ne peut pas être vide.'})
+    
     reply = ServiceComment.objects.create(user=request.user, service=parent_comment.service, content=content, parent=parent_comment)
-    return JsonResponse({'success': True, 'username': reply.user.username, 'content': reply.content})
+    avatar_url = reply.user.image.url if reply.user.image else '/static/images/default.png'
+    
+    return JsonResponse({
+        'success': True,
+        'username': reply.user.username,
+        'content': reply.content,
+        'avatar_url': avatar_url
+    })
+
