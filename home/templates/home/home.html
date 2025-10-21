@@ -373,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch("{% url 'ajouter_au_panier' %}", {
                 method: "POST",
+                credentials: 'same-origin',
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                     "X-CSRFToken": "{{ csrf_token }}",
@@ -402,7 +403,8 @@ document.addEventListener('DOMContentLoaded', function() {
         link.addEventListener('click', function(e){
             e.preventDefault();
             const serviceId = this.dataset.serviceId;
-            fetch(`/service/voir-plus/${serviceId}/`)
+            const url = "{% url 'voir_plus_service' service_id=0 %}".replace('0', serviceId);
+            fetch(url)
             .then(resp => resp.json())
             .then(data => {
                 document.querySelector('#serviceModal .modal-content-container').innerHTML = data.html;
@@ -417,6 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const serviceId = this.dataset.serviceId;
             fetch("{% url 'like_service' %}", {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -454,7 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-comment').forEach(btn => {
         btn.addEventListener('click', function(){
             currentServiceId = this.dataset.serviceId;
-            fetch(`/service/comments/${currentServiceId}/`)
+            const url = "{% url 'get_comments_service' service_id=0 %}".replace('0', currentServiceId);
+            fetch(url)
             .then(resp => resp.json())
             .then(data => {
                 const container = document.getElementById('comments-container');
@@ -464,7 +468,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     data.comments.forEach(comment => renderComment(comment, container));
                 }
-                document.getElementById('new-comment-input').value = '';
+                const input = document.getElementById('new-comment-input');
+                if(input) input.value = '';
             });
         });
     });
@@ -477,6 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!content) return alert('Le commentaire ne peut pas être vide.');
             fetch("{% url 'comment_service' %}", {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -528,6 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     fetch("{% url 'reply_comment_service' %}", {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'X-CSRFToken': '{{ csrf_token }}'
