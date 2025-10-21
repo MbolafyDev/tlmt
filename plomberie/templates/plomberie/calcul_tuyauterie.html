@@ -1,37 +1,150 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Calcul de dimensionnement - Zara Store{% endblock %}
+
 {% block content %}
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+
+  .container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  h2.fw-bold {
+    color: var(--primary-blue);
+  }
+
+  .form-control, .form-select {
+    border-radius: var(--radius);
+    border: 1px solid #dcdfe6;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 0.15rem rgba(255, 204, 0, 0.25);
+  }
+
+  button.btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-outline-danger {
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .btn-success {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-success:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+
+  .table-bordered th, .table-bordered td {
+    vertical-align: middle !important;
+  }
+
+  .badge {
+    font-size: 0.85rem;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+  }
+
+  h4, h5 {
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1 1 auto;
+    }
+  }
+</style>
+
 <div class="container py-4">
-  <h2 class="mb-3">Calcul de dimensionnement des tuyauteries sanitaires</h2>
+  <h2 class="mb-4 fw-bold">Calcul de dimensionnement des tuyauteries sanitaires</h2>
 
   <form method="post" action="{% url 'calcul_tuyauterie' %}">
     {% csrf_token %}
 
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-4">
       <div class="col-md-4">
-        <label class="form-label">Nom *</label>
-        <input type="text" name="nom" class="form-control" required placeholder="Nom de l’utilisateur">
+        <label class="form-label fw-semibold">Nom *</label>
+        <input type="text" name="nom" class="form-control shadow-sm" required placeholder="Nom de l’utilisateur">
       </div>
       <div class="col-md-4">
-        <label class="form-label">Email *</label>
-        <input type="email" name="email" class="form-control" required placeholder="ex: nom@gmail.com">
+        <label class="form-label fw-semibold">Email *</label>
+        <input type="email" name="email" class="form-control shadow-sm" required placeholder="ex: nom@gmail.com">
       </div>
       <div class="col-md-4">
-        <label class="form-label">Téléphone</label>
-        <input type="text" name="telephone" class="form-control" placeholder="+261...">
+        <label class="form-label fw-semibold">Téléphone</label>
+        <input type="text" name="telephone" class="form-control shadow-sm" placeholder="+261...">
       </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h5 class="mb-0">Appareils sanitaires</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0 fw-semibold">Appareils sanitaires</h5>
       <div class="d-flex gap-2">
-        <button type="button" id="btnAddRow" class="btn btn-sm btn-primary">+ Ajouter un appareil</button>
-        <button type="button" id="btnClearRows" class="btn btn-sm btn-outline-danger">Effacer tout</button>
+        <button type="button" id="btnAddRow" class="btn btn-sm btn-primary shadow-sm">+ Ajouter un appareil</button>
+        <button type="button" id="btnClearRows" class="btn btn-sm btn-outline-danger shadow-sm">Effacer tout</button>
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive shadow-sm rounded">
       <table class="table table-bordered align-middle mb-0" id="tableAppareils">
         <thead class="table-light text-center">
           <tr>
@@ -50,22 +163,22 @@
     </div>
 
     <div class="mt-4">
-      <button type="submit" class="btn btn-success">Calculer le diamètre</button>
+      <button type="submit" class="btn btn-success btn-lg shadow-sm">Calculer le diamètre</button>
     </div>
   </form>
 
   {% if resultats %}
-  <hr class="my-4">
-  <div class="card shadow-sm">
+  <hr class="my-5">
+  <div class="card shadow-sm rounded">
     <div class="card-body">
-      <h5 class="card-title mb-3">Résultats du calcul</h5>
+      <h5 class="card-title mb-3 fw-bold">Résultats du calcul</h5>
       <ul class="list-group list-group-flush">
         <li class="list-group-item">💧 Débit brut total (eau froide) : <strong>{{ resultats.Qb_total_froide }} L/s</strong></li>
         <li class="list-group-item">⚙️ Débit probable (eau froide) : <strong>{{ resultats.Qr_froide }} L/s</strong></li>
         <li class="list-group-item">📏 Diamètre calculé (eau froide) : <strong>{{ resultats.diametre_calcule_froide }} mm</strong></li>
         <li class="list-group-item">✅ Diamètre recommandé (eau froide) : <strong>{{ resultats.diametre_recommande_froide }} mm</strong></li>
         {% if resultats.diametre_recommande_chaude %}
-          <li class="list-group-item text-danger">🔥 Diamètre eau chaude : <strong>{{ resultats.diametre_recommande_chaude }} mm</strong></li>
+          <li class="list-group-item text-danger fw-semibold">🔥 Diamètre eau chaude : <strong>{{ resultats.diametre_recommande_chaude }} mm</strong></li>
         {% endif %}
       </ul>
     </div>
@@ -79,7 +192,6 @@
   const btnClearRows = document.getElementById('btnClearRows');
   const tbody = document.getElementById('tbodyAppareils');
 
-  // Données appareils venant de Django
   const appareilsData = [
     {% for a in appareils %}
       {id: '{{ a.id }}', nom: '{{ a.nom }}', debit: '{{ a.debit_brut }}', eauchaude: '{{ a.eau_chaude|yesno:"Oui,Non" }}', image: '{% if a.image %}{{ a.image.url }}{% endif %}'},
@@ -123,7 +235,6 @@
     const select = createSelect();
     nameCell.appendChild(select);
 
-    // Mettre à jour les données à la sélection
     select.addEventListener('change', function(){
       const selected = this.selectedOptions[0];
       tr.querySelector('.debitCell').textContent = selected.dataset.debit;
@@ -135,10 +246,8 @@
     tbody.appendChild(tr);
   }
 
-  // Ajouter une ligne au clic
   btnAddRow.addEventListener('click', addRow);
 
-  // Supprimer une ligne
   document.addEventListener('click', (e)=>{
     const btn = e.target.closest('.btnRemoveRow');
     if(!btn) return;
@@ -146,7 +255,6 @@
     if(tr) tr.remove();
   });
 
-  // Effacer tout le tableau
   btnClearRows.addEventListener('click', ()=>{ tbody.innerHTML = ''; });
 
 })();

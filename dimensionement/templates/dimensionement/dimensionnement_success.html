@@ -1,17 +1,133 @@
+{# tlmt/dimensionnement/templates/dimensionnement_success.html #}
+
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container py-4">
-  <h2 class="mb-3">Dimensionnement enregistré ✅</h2>
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
 
-  <div class="mb-3">
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+
+  h5 {
+    color: var(--primary-blue);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  ul li {
+    margin-bottom: 6px;
+    padding-left: 8px;
+    position: relative;
+  }
+
+  ul li::before {
+    content: "•";
+    color: var(--primary-yellow);
+    position: absolute;
+    left: 0;
+  }
+
+  .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-outline-secondary {
+    border-radius: var(--radius);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .btn-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+  }
+
+  .btn-link:hover {
+    text-decoration: underline;
+  }
+
+  .d-flex.gap-2 {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .info p {
+    margin-bottom: 6px;
+  }
+
+  .alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+    border-radius: var(--radius);
+    padding: 10px 15px;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container py-4">
+  <h2>Dimensionnement enregistré ✅</h2>
+
+  <div class="card info">
     <p><b>Client :</b> {{ demande.nom }} — {{ demande.email }}{% if demande.telephone %} — {{ demande.telephone }}{% endif %}</p>
-    <p class="mb-1"><b>Énergie journalière :</b> {{ demande.energie_journaliere|floatformat:2 }} Wh/j</p>
-    <p class="mb-1"><b>Tension système :</b> {{ demande.tension_systeme|floatformat:0 }} VDC</p>
-    <p class="mb-1"><b>Puissance onduleur :</b> {{ demande.puissance_onduleur|floatformat:2 }} VA</p>
+    <p><b>Énergie journalière :</b> {{ demande.energie_journaliere|floatformat:2 }} Wh/j</p>
+    <p><b>Tension système :</b> {{ demande.tension_systeme|floatformat:0 }} VDC</p>
+    <p><b>Puissance onduleur :</b> {{ demande.puissance_onduleur|floatformat:2 }} VA</p>
   </div>
 
-  <div class="mb-3">
+  <div class="card">
     <h5>Propositions de panneaux</h5>
     <ul>
       {% for p in propositions_pv %}
@@ -20,7 +136,7 @@
     </ul>
   </div>
 
-  <div class="mb-3">
+  <div class="card">
     <h5>Propositions de batteries</h5>
     <ul>
       {% for b in propositions_batt %}
@@ -31,10 +147,9 @@
 
   <div class="d-flex gap-2">
     {% if demande.pdf %}
-    <button class="btn btn-primary" onclick="telechargerPDF('{% url 'telecharger_pdf' demande.id %}', 'dimensionnement_{{ demande.id }}.pdf')">
-      ⬇️ Télécharger le PDF
-    </button>
-
+      <button class="btn btn-primary" onclick="telechargerPDF('{% url 'telecharger_pdf' demande.id %}', 'dimensionnement_{{ demande.id }}.pdf')">
+        ⬇️ Télécharger le PDF
+      </button>
       <a class="btn btn-outline-secondary" href="{% url 'voir_pdf' demande.id %}" target="_blank">👁️ Voir en ligne</a>
     {% else %}
       <div class="alert alert-warning">Le PDF n’est pas disponible.</div>
@@ -42,16 +157,17 @@
     <a class="btn btn-link" href="{% url 'demande_dimensionnement' %}">← Nouvelle demande</a>
   </div>
 </div>
+
 {% if demande.pdf %}
-  <script>
-    async function telechargerPDF(url, filename) {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-    }
-  </script>
+<script>
+  async function telechargerPDF(url, filename) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }
+</script>
 {% endif %}
 {% endblock %}

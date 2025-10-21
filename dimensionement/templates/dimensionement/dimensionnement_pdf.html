@@ -1,3 +1,5 @@
+{# tlmt/dimensionnement/templates/dimensionnement_pdf.html #}
+
 <!doctype html>
 <html lang="fr">
 <head>
@@ -5,189 +7,186 @@
   <title>Rapport de dimensionnement PV</title>
   {% load static %}
   <style>
-    /* ===========
-   Base & thèmes
-   =========== */
-:root{
-  --ink:#1f2937;           /* gris-ardoise */
-  --muted:#6b7280;         /* gris moyen */
-  --line:#e5e7eb;          /* gris clair */
-  --brand:#0ea5e9;         /* bleu azur doux */
-  --brand-ink:#0369a1;
-  --card:#ffffff;          /* fond carte */
-  --bg:#f8fafc;            /* fond page */
+    /* =================
+       Couleurs & Thème
+       ================= */
+:root {
+  --primary-yellow: #ffcc00;
+  --primary-blue: #1a2b4c;
+  --bg-light: #f8f9fb;
+  --text-dark: #333;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --card: #ffffff;
+  --radius: 12px;
 }
 
-@page{
+/* =================
+   Page & Texte
+   ================= */
+@page {
   size: A4;
   margin: 18mm 16mm 20mm 16mm;
 }
 
-html, body{
-  padding:0; margin:0;
-  background: var(--bg);
-  color: var(--ink);
-  font: 13px/1.45 "Arial", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+html, body {
+  margin: 0;
+  padding: 0;
+  font: 13px/1.5 "Poppins", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 
-h1,h2,h3{
-  margin:0 0 6px 0;
-  font-weight:700;
-  line-height:1.2;
-  color: var(--brand-ink);
+h1,h2,h3 {
+  margin: 0 0 6px 0;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--primary-blue);
 }
 
-h1.title{
-  font-size: 20px;
+h1.title {
+  font-size: 22px;
 }
-h2.section-title{
+
+h2.section-title {
   font-size: 15px;
   margin-bottom: 8px;
   padding-left: 10px;
-  border-left: 3px solid var(--brand);
+  border-left: 4px solid var(--primary-yellow);
 }
 
-/* ===========
+/* =================
    Header
-   =========== */
-.doc-header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
+   ================= */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-.header-left .subtitle{
-  margin:6px 0 2px 0;
+.header-left .subtitle {
+  margin: 6px 0 2px 0;
 }
-.muted{ color: var(--muted); }
-.small{ font-size: 12px; }
 
-.header-right .logo{
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+
+.header-right .logo {
   height: 50px;
   object-fit: contain;
 }
 
-.divider{
+.divider {
   height: 1px;
   border: 0;
   background: var(--line);
   margin: 10px 0 14px 0;
 }
 
-/* ===========
-   Sections & cartes
-   =========== */
-.section{
+/* =================
+   Sections & Cards
+   ================= */
+.section {
   margin-bottom: 14px;
 }
 
-.card{
+.card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
-/* ===========
-   Tables
-   =========== */
-.table{
+/* =================
+   Tables Modernes
+   ================= */
+.table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.table thead th{
-  background: #f3f4f6;
-  color: #111827;
+.table thead th {
+  background: var(--primary-blue);
+  color: #fff;
   font-weight: 600;
-  font-size: 12.5px;
+  font-size: 13px;
   text-align: center;
-  border-bottom: 1px solid var(--line);
-  padding: 7px 6px;
+  border-bottom: 2px solid var(--primary-yellow);
+  padding: 8px 6px;
+  border-radius: var(--radius)  var(--radius) 0 0;
 }
 
 .table tbody td,
-.table tbody th{
+.table tbody th {
   border-top: 1px solid var(--line);
-  padding: 7px 6px;
+  padding: 8px 6px;
   text-align: center;
   vertical-align: middle;
   font-size: 12.5px;
 }
 
-.table .left{ text-align: left; }
+.table .left { text-align: left; }
 
-/* tableau "key-value" (2 colonnes ou entête réduite) */
-.table-kv th{
+.table-kv th {
   width: 50%;
   text-align: left;
-  background: #f9fafb;
+  background: #f3f4f6;
 }
-.table-kv td{
+
+.table-kv td {
   text-align: left;
 }
 
-/* tableaux avec zébrage léger */
-.table-lined tbody tr:nth-child(even){
+.table-lined tbody tr:nth-child(even) {
   background: #fafafa;
 }
 
-.table-compact thead th,
-.table-compact tbody td{
-  padding-top: 6px; padding-bottom: 6px;
-}
-
-/* ===========
-   Badges
-   =========== */
-.badge{
+.badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
-  border: 1px solid var(--brand);
-  color: var(--brand-ink);
-  background: #e0f2fe; /* bleu très clair */
+  border: 1px solid var(--primary-blue);
+  color: var(--primary-blue);
+  background: #e0f2fe;
   font-weight: 600;
   font-size: 12.5px;
 }
 
-/* ===========
+/* =================
    Footer
-   =========== */
-.doc-footer{
-  display:flex;
+   ================= */
+.doc-footer {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   border-top: 1px solid var(--line);
-  margin-top: 10px;
+  margin-top: 14px;
   padding-top: 8px;
   font-size: 12px;
   color: var(--muted);
 }
 
-/* Pagination CSS-only (WeasyPrint gère counter(page)) */
-.page-number .page::after{
+.page-number .page::after {
   content: counter(page);
 }
-.page-number .pages::after{
+.page-number .pages::after {
   content: counter(pages);
 }
 
-/* ===========
-   Utilitaires
-   =========== */
-.label{ color:#111827; }
+/* Impression */
 @media print {
-    * {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color-adjust: exact !important;
-    }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
+}
   </style>
 </head>
 <body>
@@ -205,7 +204,6 @@ h2.section-title{
       <p class="muted small">Généré le {{ demande.created_at|date:"d/m/Y H:i" }}</p>
     </div>
     <div class="header-right">
-      <!-- Utilise le chemin absolu file:// pour le rendu PDF -->
       <img src="file://{{ logo_path }}" alt="Logo" class="logo">
     </div>
   </header>

@@ -1,4 +1,4 @@
-{# templates/facture.html #}
+{% comment %} templates/facture.html {% endcomment %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,206 +6,255 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Facture — {{ commande.numero_facture }}</title>
 
-  <!-- Bootstrap (CDN) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
-    /* facture.css */
-:root{
-  --accent:#1f6feb;
-  --muted:#6b7280;
-  --card-bg:#ffffff;
-  --paper:#f8fafc;
-  --radius:14px;
+/* =================
+   Couleurs & Thème
+   ================= */
+body {
+  margin: 0;
+  padding: 0;
+  font: 14px/1.5 "Poppins", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #f8f9fb; /* var(--bg-light) */
+  color: #111827; /* var(--text-dark) */
 }
 
-/* Page */
-body{
-  background: linear-gradient(180deg, var(--paper) 0%, #fff 40%);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color:#111827;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+h1,h2,h3,h4,h5,h6 {
+  margin: 0 0 6px 0;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a2b4c; /* var(--primary-blue) */
 }
 
-/* Wrapper */
-.invoice-wrapper{ max-width:920px; }
-.invoice { border-radius: var(--radius); overflow:hidden; }
+.invoice-wrapper {
+  max-width: 920px;
+  margin: 20px auto;
+}
 
-/* Header */
-.invoice-logo{ width:72px; height:72px; object-fit:contain; border-radius:8px; box-shadow:0 6px 18px rgba(15,23,42,0.06); background:#fff; padding:8px; }
-.logo-placeholder{ width:72px; height:72px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#111827,#1f6feb); color:#fff; font-weight:700; border-radius:8px; font-size:20px; }
+.invoice {
+  background: #ffffff; /* var(--card) */
+  border-radius: 12px; /* var(--radius) */
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
 
-/* Titles */
-.site-title{ font-size:18px; letter-spacing:0.2px; }
-.invoice-title{ color:var(--accent); letter-spacing:0.6px; }
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
 
-/* Table */
-.invoice-table thead th{ border-bottom: none; padding-top:0.8rem; padding-bottom:0.5rem; }
-.invoice-table tbody td{ padding:0.65rem 0.5rem; border-top:1px dashed #eee; vertical-align:middle; }
-.invoice-table tbody tr:last-child td{ border-bottom:none; }
+.invoice-logo {
+  height: 60px;
+  width: 60px;
+  object-fit: contain;
+  border-radius: 12px; /* var(--radius) */
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
 
-/* Totals */
-.invoice .h5{ margin:0; }
-.invoice .fw-semibold{ font-weight:600; }
+.header-left .subtitle,
+.header-left .muted {
+  font-size: 13px;
+  color: #6b7280; /* var(--muted) */
+}
+
+.text-end {
+  text-align: right;
+}
+
+/* Tables Modernes */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+}
+
+.table thead th {
+  background: #1a2b4c; /* var(--primary-blue) */
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 2px solid #ffcc00; /* var(--primary-yellow) */
+  padding: 8px 6px;
+}
+
+.table tbody td {
+  border-top: 1px solid #e5e7eb; /* var(--line) */
+  padding: 8px 6px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.table .left { text-align: left; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid #1a2b4c; /* var(--primary-blue) */
+  color: #1a2b4c; /* var(--primary-blue) */
+  background: #e0f2fe;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Totaux */
+.totals-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.totals-row div {
+  display: flex;
+  justify-content: space-between;
+  width: 220px;
+  font-size: 14px;
+}
+
+.totals-row .total {
+  font-weight: 700;
+  color: #1a2b4c; /* var(--primary-blue) */
+  font-size: 16px;
+}
 
 /* Note & footer */
-.invoice-note{ background:#fbfbff; padding:12px; border-radius:8px; border:1px solid #f0f4ff; }
-.invoice-footer{ font-size:13px; opacity:0.85; }
+.invoice-note {
+  background: #fbfbff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #f0f4ff;
+  font-size: 13px;
+  color: #6b7280; /* var(--muted) */
+  margin-top: 12px;
+}
 
-/* Print styles */
-@media print{
-  body{ background:#fff; }
-  .print-fab{ display:none !important; }
+.invoice-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280; /* var(--muted) */
+  margin-top: 14px;
+  border-top: 1px solid #e5e7eb; /* var(--line) */
+  padding-top: 8px;
+}
+
+/* Impression */
+@media print {
+  body { background:#fff; }
   .invoice { box-shadow:none; border-radius:0; }
-  a[href]:after { content: ""; } /* remove link URLs when printing */
+  a[href]:after { content: ""; }
 }
+</style>
 
-/* Responsive tweaks */
-@media (max-width:767px){
-  .invoice-wrapper{ padding:0 12px; }
-  .invoice-logo{ width:56px; height:56px; }
-  .table-responsive{ overflow-x:auto; }
-}
-
-  </style>
 </head>
 <body>
-  <div class="invoice-wrapper container my-4">
-    <div class="invoice card shadow-sm">
-      <div class="card-body p-4">
+  <div class="invoice-wrapper">
+    <div class="invoice">
 
-        <!-- Header : logo + infos entreprise et facture -->
-        <div class="d-flex justify-content-between align-items-start mb-4">
-          <div class="d-flex align-items-center gap-3">
-            {% if entreprise.logo_url %}
-              <img src="{{ entreprise.logo_url }}" alt="Logo" class="invoice-logo me-2">
-            {% else %}
-              <div class="logo-placeholder">ZARA</div>
-            {% endif %}
-            <div>
-              <h4 class="mb-0 site-title">{{ entreprise.nom }}</h4>
-              <small class="text-muted d-block">{{ entreprise.adresse }}</small>
-              <small class="text-muted d-block">T: {{ entreprise.telephone }}</small>
-            </div>
-          </div>
-
-          <div class="text-end">
-            <h5 class="mb-1 invoice-title">FACTURE</h5>
-            <div class="fw-semibold">N° {{ commande.numero_facture }}</div>
-            <div class="text-muted small">Date : {{ commande.date_commande }}</div>
-            {% if commande.echeance %}
-              <div class="text-muted small">Échéance : {{ commande.echeance }}</div>
-            {% endif %}
-          </div>
-        </div>
-
-        <hr>
-
-        <!-- Info client et résumé -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h6 class="mb-1">Facturer à :</h6>
-            <div class="fw-semibold">{{ commande.client.nom }}</div>
-            <div class="text-muted small">{{ commande.client.adresse }}</div>
-            <div class="text-muted small">T: {{ commande.client.telephone }}</div>
-            {% if commande.client.email %}
-              <div class="text-muted small">{{ commande.client.email }}</div>
-            {% endif %}
-          </div>
-
-          <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <h6 class="mb-1">Résumé</h6>
-            <div>Mode paiement : <span class="fw-semibold">{{ commande.mode_paiement|default:"—" }}</span></div>
-            <div>Statut : <span class="badge bg-{{ "success" if commande.statut == "Payée" else "warning" if commande.statut == "En attente" else "secondary" }}">{{ commande.statut }}</span></div>
-          </div>
-        </div>
-
-        <!-- Table lignes -->
-        <div class="table-responsive mb-3">
-          <table class="table table-borderless align-middle invoice-table">
-            <thead class="table-light small text-muted">
-              <tr>
-                <th style="min-width: 50px;">#</th>
-                <th>Désignation</th>
-                <th class="text-end">Qté</th>
-                <th class="text-end">PU</th>
-                <th class="text-end">Remise</th>
-                <th class="text-end">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for i, ligne in lignes.items %}
-                <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td>
-                    <div class="fw-semibold">{{ ligne.article.nom }}</div>
-                    {% if ligne.description %}
-                      <small class="text-muted d-block">{{ ligne.description }}</small>
-                    {% endif %}
-                  </td>
-                  <td class="text-end">{{ ligne.quantite }}</td>
-                  <td class="text-end">{{ ligne.prix_unitaire|floatformat:2 }}</td>
-                  <td class="text-end">{{ ligne.remise|default:"0" }}{% if ligne.remise %}%{% endif %}</td>
-                  <td class="text-end fw-semibold">{{ ligne.total_ligne|floatformat:2 }}</td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">Aucune ligne</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Totaux -->
-        <div class="row justify-content-end">
-          <div class="col-md-5">
-            <div class="d-flex justify-content-between small text-muted mb-2">
-              <div>Sous-total</div>
-              <div class="fw-semibold">{{ total.sous_total|floatformat:2 }}</div>
-            </div>
-            <div class="d-flex justify-content-between small text-muted mb-2">
-              <div>Taxe ({{ total.taxe_label|default:"TVA" }})</div>
-              <div class="fw-semibold">{{ total.taxe|floatformat:2 }}</div>
-            </div>
-            {% if total.remise and total.remise > 0 %}
-              <div class="d-flex justify-content-between small text-muted mb-2">
-                <div>Remise</div>
-                <div class="fw-semibold">- {{ total.remise|floatformat:2 }}</div>
-              </div>
-            {% endif %}
-            <hr class="my-2">
-            <div class="d-flex justify-content-between h5">
-              <div>Total à payer</div>
-              <div class="h5 fw-bold">{{ total.net_a_payer|floatformat:2 }} {{ total.devise|default:"Ar" }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Note & footer -->
-        <div class="invoice-note mt-4">
-          {% if commande.note %}
-            <div class="small text-muted mb-2">{{ commande.note }}</div>
+      <!-- Header : logo + infos entreprise et facture -->
+      <div class="invoice-header">
+        <div class="header-left">
+          {% if entreprise and entreprise.logo_url %}
+            <img src="{{ entreprise.logo_url }}" alt="Logo" class="invoice-logo">
+          {% else %}
+            <div class="invoice-logo" style="display:flex;align-items:center;justify-content:center;background:var(--primary-blue);color:#fff;font-weight:700;font-size:20px;">ZARA</div>
           {% endif %}
-          <div class="small text-muted">Merci pour votre confiance.</div>
+          <h1 class="invoice-title">FACTURE</h1>
+          <div class="subtitle">{{ entreprise.nom|default:"Zara Store" }}</div>
+          <div class="subtitle">{{ entreprise.adresse|default:"Adresse de l'entreprise" }}</div>
+          <div class="subtitle">T: {{ entreprise.telephone|default:"—" }}</div>
         </div>
 
-        <div class="invoice-footer mt-4 pt-3 border-top small text-muted d-flex justify-content-between">
-          <div>Émis par : {{ request.user.get_full_name|default:entreprise.nom }}</div>
-          <div class="text-end">Contact : {{ entreprise.email or entreprise.telephone }}</div>
-        </div>
+        <div class="text-end">
+          <div class="fw-semibold">N° {{ commande.numero_facture }}</div>
+          <div class="subtitle">Date : {{ commande.date_commande }}</div>
+          {% if commande.echeance %}
+            <div class="subtitle">Échéance : {{ commande.echeance }}</div>
+          {% endif %}
 
+          {% if commande.statut == "Payée" %}
+            <div class="badge bg-success">{{ commande.statut }}</div>
+          {% elif commande.statut == "En attente" %}
+            <div class="badge bg-warning">{{ commande.statut }}</div>
+          {% else %}
+            <div class="badge bg-secondary">{{ commande.statut }}</div>
+          {% endif %}
+        </div>
       </div>
+
+      <hr>
+
+      <!-- Client & résumé -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h6 class="section-title">Facturer à :</h6>
+          <div class="fw-semibold">{{ commande.client.nom }}</div>
+          <div class="muted">{{ commande.client.adresse }}</div>
+          <div class="muted">T: {{ commande.client.telephone }}</div>
+          {% if commande.client.email %}
+            <div class="muted">{{ commande.client.email }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6 text-end mt-3 mt-md-0">
+          <h6 class="section-title">Résumé</h6>
+          <div>Mode paiement : <strong>{{ commande.mode_paiement|default:"—" }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Table lignes -->
+      <div class="table-responsive mb-3">
+        <table class="table table-borderless align-middle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Désignation</th>
+              <th>Qté</th>
+              <th>PU</th>
+              <th>Remise</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ligne in items %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="left">
+                  <div class="fw-semibold">{{ ligne.produit.nom }}</div>
+                </td>
+                <td>{{ ligne.quantite }}</td>
+                <td>{{ ligne.prix_unitaire|floatformat:2 }}</td>
+                <td>0</td>
+                <td class="fw-semibold">{{ ligne.prix_unitaire|floatformat:2|floatformat:"2" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-center muted py-4">Aucune ligne</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totals-row flex-column align-items-end">
+        <div class="total"><span>Total à payer</span><span>{{ total|floatformat:2 }} Ar</span></div>
+      </div>
+
+      <div class="invoice-note mt-4">
+        <div class="muted">Merci pour votre confiance.</div>
+      </div>
+
+      <div class="invoice-footer mt-4">
+        <div>Émis par : {{ request.user.get_full_name|default:"TLMT Services" }}</div>
+        <div>Contact : {{ entreprise.email|default_if_none:entreprise.telephone|default:"033 60 361 71" }}</div>
+      </div>
+
     </div>
   </div>
-
-  <!-- Optional: bouton impression -->
-  <div class="print-fab position-fixed" style="right:20px;bottom:20px;">
-    <button class="btn btn-primary btn-lg rounded-circle" onclick="window.print()" title="Imprimer la facture">
-      <i class="bi bi-printer"></i>
-    </button>
-  </div>
-
-  <!-- Bootstrap Icons CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </body>
 </html>

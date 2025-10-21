@@ -1,60 +1,162 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Demande de dimensionnement photovoltaïque - Zara Store{% endblock %}
+
 {% block content %}
+<style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+
+  .container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  h2.fw-bold, h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+  }
+
+  .form-control {
+    border-radius: var(--radius);
+    border: 1px solid #dcdfe6;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 0.15rem rgba(255, 204, 0, 0.25);
+  }
+
+  .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-outline-danger {
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .btn-success {
+    background-color: var(--primary-blue);
+    border: none;
+  }
+
+  .btn-success:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+
+  .table-bordered th, .table-bordered td {
+    vertical-align: middle !important;
+  }
+
+  .d-flex.gap-2 {
+    gap: 10px;
+  }
+
+  @media (max-width: 576px) {
+    .d-flex.gap-2 {
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1 1 auto;
+    }
+  }
+</style>
+
 <div class="container py-4">
-  <h2 class="mb-3">Demande de dimensionnement photovoltaïque</h2>
+  <h2 class="mb-4 fw-bold">Demande de dimensionnement photovoltaïque</h2>
 
   <form method="post" action="{% url 'demande_dimensionnement' %}">
     {% csrf_token %}
-
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
       <div class="col-md-4">
-        <label class="form-label">Nom *</label>
-        <input type="text" name="nom" class="form-control" required>
+        <label class="form-label fw-semibold">Nom *</label>
+        <input type="text" name="nom" class="form-control shadow-sm" required>
       </div>
       <div class="col-md-4">
-        <label class="form-label">Email *</label>
-        <input type="email" name="email" class="form-control" required>
+        <label class="form-label fw-semibold">Email *</label>
+        <input type="email" name="email" class="form-control shadow-sm" required>
       </div>
       <div class="col-md-4">
-        <label class="form-label">Téléphone</label>
-        <input type="text" name="telephone" class="form-control">
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">Jours d’autonomie *</label>
-        <input type="number" name="jours_autonomie" class="form-control" min="1" step="1" value="3" required>
+        <label class="form-label fw-semibold">Téléphone</label>
+        <input type="text" name="telephone" class="form-control shadow-sm">
       </div>
       <div class="col-md-4">
-        <label class="form-label">Irradiation (kWh/m².j) *</label>
-        <input type="number" name="irradiation" class="form-control" step="0.01" min="0" value="2.4" required>
+        <label class="form-label fw-semibold">Jours d’autonomie *</label>
+        <input type="number" name="jours_autonomie" class="form-control shadow-sm" min="1" step="1" value="3" required>
       </div>
       <div class="col-md-4">
-        <label class="form-label">Coefficient K (rendement) *</label>
-        <input type="number" name="rendement_k" class="form-control" step="0.01" min="0" max="1" value="0.65" required>
+        <label class="form-label fw-semibold">Irradiation (kWh/m².j) *</label>
+        <input type="number" name="irradiation" class="form-control shadow-sm" step="0.01" min="0" value="2.4" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Coefficient K (rendement) *</label>
+        <input type="number" name="rendement_k" class="form-control shadow-sm" step="0.01" min="0" max="1" value="0.65" required>
       </div>
     </div>
 
     <hr class="my-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h5 class="mb-0">Appareils (saisies numériques)</h5>
-      <div class="d-flex flex-column flex-sm-row gap-2 w-50 w-sm-auto">
-        <button type="button" id="btnAddRow" class="btn btn-sm btn-primary w-100 w-sm-auto">+ Ajouter une ligne</button>
-        <button type="button" id="btnClearRows" class="btn btn-sm btn-outline-danger w-100 w-sm-auto">Effacer tout</button>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0 fw-semibold">Appareils (saisies numériques)</h5>
+      <div class="d-flex gap-2">
+        <button type="button" id="btnAddRow" class="btn btn-sm btn-primary shadow-sm">+ Ajouter une ligne</button>
+        <button type="button" id="btnClearRows" class="btn btn-sm btn-outline-danger shadow-sm">Effacer tout</button>
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive shadow-sm rounded">
       <table class="table table-bordered align-middle mb-0">
-        <thead>
-          <tr class="text-center">
-            <th style="width: 40%;">Nom (facultatif)</th>
-            <th style="width: 20%;">Puissance (W) *</th>
-            <th style="width: 20%;">Durée (h/j) *</th>
-            <th style="width: 15%;">Quantité *</th>
-            <th style="width: 5%;">—</th>
+        <thead class="table-light text-center">
+          <tr>
+            <th>Nom (facultatif)</th>
+            <th>Puissance (W) *</th>
+            <th>Durée (h/j) *</th>
+            <th>Quantité *</th>
+            <th>—</th>
           </tr>
         </thead>
         <tbody id="appareilRows">
@@ -64,56 +166,48 @@
             <td><input type="number" class="form-control" name="durees[]" step="0.1" min="0" required></td>
             <td><input type="number" class="form-control" name="quantites[]" step="1" min="1" value="1" required></td>
             <td class="text-center">
-              <button type="button" class="btn btn-sm btn-outline-secondary btnRemoveRow" title="Supprimer la ligne">×</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary btnRemoveRow">×</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <input type="hidden" name="appareils" value="">
-
     <div class="mt-4">
-      <button type="submit" class="btn btn-success">Calculer & enregistrer le PDF</button>
+      <button type="submit" class="btn btn-success btn-lg shadow-sm">Calculer & enregistrer le PDF</button>
     </div>
   </form>
 </div>
 
 <script>
-(function(){
-  const tbody = document.getElementById('appareilRows');
-  const btnAdd = document.getElementById('btnAddRow');
-  const btnClear = document.getElementById('btnClearRows');
+  (function(){
+    const tbody = document.getElementById('appareilRows');
+    const btnAdd = document.getElementById('btnAddRow');
+    const btnClear = document.getElementById('btnClearRows');
 
-  function makeRow(){
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="text" class="form-control" name="noms_appareil[]" placeholder="Ex: Réfrigérateur..."></td>
-      <td><input type="number" class="form-control" name="puissances[]" step="0.1" min="0" required></td>
-      <td><input type="number" class="form-control" name="durees[]" step="0.1" min="0" required></td>
-      <td><input type="number" class="form-control" name="quantites[]" step="1" min="1" value="1" required></td>
-      <td class="text-center">
-        <button type="button" class="btn btn-sm btn-outline-secondary btnRemoveRow" title="Supprimer la ligne">×</button>
-      </td>
-    `;
-    return tr;
-  }
+    function makeRow(){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="form-control" name="noms_appareil[]" placeholder="Ex: Réfrigérateur..."></td>
+        <td><input type="number" class="form-control" name="puissances[]" step="0.1" min="0" required></td>
+        <td><input type="number" class="form-control" name="durees[]" step="0.1" min="0" required></td>
+        <td><input type="number" class="form-control" name="quantites[]" step="1" min="1" value="1" required></td>
+        <td class="text-center">
+          <button type="button" class="btn btn-sm btn-outline-secondary btnRemoveRow">×</button>
+        </td>
+      `;
+      return tr;
+    }
 
-  btnAdd.addEventListener('click', () => {
-    tbody.appendChild(makeRow());
-  });
+    btnAdd.addEventListener('click', () => { tbody.appendChild(makeRow()); });
+    btnClear.addEventListener('click', () => { tbody.innerHTML = ''; tbody.appendChild(makeRow()); });
 
-  btnClear.addEventListener('click', () => {
-    tbody.innerHTML = '';
-    tbody.appendChild(makeRow());
-  });
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btnRemoveRow');
-    if (!btn) return;
-    const tr = btn.closest('tr');
-    if (tr && tbody.rows.length > 1) tr.remove();
-  });
-})();
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btnRemoveRow');
+      if (!btn) return;
+      const tr = btn.closest('tr');
+      if (tr && tbody.rows.length > 1) tr.remove();
+    });
+  })();
 </script>
 {% endblock %}

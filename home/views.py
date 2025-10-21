@@ -237,7 +237,18 @@ def checkout(request):
                     )
 
                 # Générer facture PDF
-                context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
+                context_pdf = {
+                    'commande': commande,
+                    'items': commande.items.all(),
+                    'user': request.user,
+                    'entreprise': {
+                        'nom': "Zara Store",
+                        'adresse': "Adresse de l'entreprise",
+                        'telephone': "033 60 361 71",
+                        'email': "contact@tlmtstore.com",
+                        'logo_url': "/static/images/default_logo.png",
+                    }
+                }
                 pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
                 if pdf_bytes:
@@ -366,7 +377,18 @@ def checkout(request):
                 prix_unitaire=Decimal(str(item.get('prix', 0)))
             )
 
-        context_pdf = {'commande': commande, 'items': commande.items.all(), 'user': request.user}
+        context_pdf = {
+            'commande': commande,
+            'items': commande.items.all(),
+            'user': request.user,
+            'entreprise': {
+                'nom': "Zara Store",
+                'adresse': "Adresse de l'entreprise",
+                'telephone': "033 60 361 71",
+                'email': "contact@tlmtstore.com",
+                'logo_url': "/static/images/default_logo.png",
+            }
+        }
         pdf_bytes = render_to_pdf('home/includes/factures.html', context_pdf)
 
         if pdf_bytes:
@@ -390,8 +412,16 @@ def checkout(request):
         'panier': panier,
         'total': total,
         'total_items': total_items,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        'entreprise': {
+            'nom': "Zara Store",
+            'adresse': "Adresse de l'entreprise",
+            'telephone': "033 60 361 71",
+            'email': "contact@tlmtstore.com",
+            'logo_url': "/static/images/default_logo.png",
+        }
     })
+
 
 
 

@@ -1,3 +1,5 @@
+{# tlmt/home/templates/detail.html #}
+
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
@@ -6,31 +8,140 @@
 
 {% block content %}
 <style>
+  :root {
+    --primary-yellow: #ffcc00;
+    --primary-blue: #1a2b4c;
+    --bg-light: #f8f9fb;
+    --text-dark: #333;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+
+  .container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  h2.fw-bold {
+    color: var(--primary-blue);
+  }
+
+  .border {
+    border: 1px solid #e3e6ef !important;
+  }
+
+  .rounded {
+    border-radius: var(--radius) !important;
+  }
+
+  .shadow-sm {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .carousel-inner img {
+    border-radius: var(--radius);
+  }
+
+  .text-danger {
+    color: var(--primary-yellow) !important;
+  }
+
+  .btn-success {
+    background-color: var(--primary-blue) !important;
+    border: none !important;
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    background-color: var(--primary-yellow) !important;
+    color: var(--primary-blue) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-link {
+    color: var(--primary-blue);
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .btn-link:hover {
+    color: var(--primary-yellow);
+    text-decoration: none;
+  }
+
+  select.form-select {
+    border-radius: var(--radius);
+    box-shadow: none !important;
+    border-color: #dcdfe6;
+  }
+
+  select.form-select:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 0.15rem rgba(255, 204, 0, 0.25);
+  }
+
+  .input-group .btn-outline-secondary {
+    border-radius: var(--radius);
+    color: var(--primary-blue);
+    border-color: #ccc;
+    transition: all 0.3s ease;
+  }
+
+  .input-group .btn-outline-secondary:hover {
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border-color: var(--primary-yellow);
+  }
+
+  .input-group .form-control {
+    border-radius: var(--radius);
+    border: 1px solid #dcdfe6;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+  }
+
+  h4 {
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+
+  /* Responsive amélioré */
   @media (max-width: 576px) {
-  .card-produit .card-body .d-flex {
-    flex-wrap: wrap;           /* Les boutons passent à la ligne si manque de place */
-    justify-content: center;   /* Centrer les éléments */
-    gap: 6px;                  /* Espacement entre boutons */
-  }
+    .card-produit .card-body .d-flex {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
 
-  .card-produit .input-group {
-    width: 100% !important;    /* L'input s'étire sur la largeur dispo */
-    max-width: 150px;          /* mais reste raisonnable */
-    margin-bottom: 6px;
-  }
+    .card-produit .input-group {
+      width: 100% !important;
+      max-width: 150px;
+      margin-bottom: 6px;
+    }
 
-  .card-produit .btn {
-    flex: 1 1 auto;            /* Les boutons s’adaptent */
-    min-width: 45px;           /* taille minimum lisible */
+    .card-produit .btn {
+      flex: 1 1 auto;
+      min-width: 45px;
+    }
   }
-}
 </style>
-<div class="container my-5">
+
+<div class="container">
   <div class="row g-4">
 
     <!-- Images -->
     <div class="col-md-6">
-      <div class="border p-3 rounded shadow-sm">
+      <div class="border p-3 rounded shadow-sm bg-white">
         {% with images=produit.images.all %}
           {% if images|length %}
             <div id="carouselDetail{{ produit.pk }}" class="carousel slide" data-bs-ride="carousel">
@@ -55,7 +166,7 @@
               {% endif %}
             </div>
           {% else %}
-            <img src="{% static 'images/default.png' %}" class="img-fluid" alt="{{ produit.nom }}">
+            <img src="{% static 'images/default.png' %}" class="img-fluid rounded" alt="{{ produit.nom }}">
           {% endif %}
         {% endwith %}
       </div>
@@ -86,7 +197,7 @@
       {% with couleurs=produit.couleurs.all %}
         {% if couleurs|length %}
           <div class="mt-3">
-            <label for="color" class="form-label">Couleur :</label>
+            <label for="color" class="form-label fw-semibold">Couleur :</label>
             <select id="color" class="form-select w-50">
               {% for couleur in couleurs %}
                 <option>{{ couleur.nom }}</option>
