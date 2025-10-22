@@ -6,92 +6,103 @@
 {% block content %}
 
 <section class="container my-4">
+  <!-- BOUTON MOBILE -->
   <div class="d-md-none text-center mb-2">
-    <button id="toggleCategoriesBtn" class="btn btn-info">
-      <i class="fas fa-chevron-down me-1"></i> Catégories
+    <button id="toggleCategoriesBtn" class="btn btn-outline-primary rounded-pill shadow-sm px-4 py-2 fw-semibold">
+      <i class="fas fa-layer-group me-2"></i> Catégories
     </button>
   </div>
 
-  <!-- Liste des catégories desktop -->
-  <ul class="nav nav-tabs justify-content-center flex-wrap d-none d-md-flex" id="categoriesTab" role="tablist">
+  <!-- CATEGORIES DESKTOP -->
+  <ul class="nav justify-content-center flex-wrap gap-2 d-none d-md-flex" id="categoriesTab" role="tablist">
     <li class="nav-item">
-      <a href="{% url 'ventes' %}" class="nav-link {% if not slug %}active{% endif %}">Tous</a>
+      <a href="{% url 'ventes' %}" 
+         class="nav-link category-pill {% if not slug %}active{% endif %}">Tous</a>
     </li>
     {% for categorie_item in categories_menu %}
     <li class="nav-item">
       <a href="{% url 'ventes_categorie' slug=categorie_item.slug %}" 
-         class="nav-link {% if slug == categorie_item.slug %}active{% endif %}">
+         class="nav-link category-pill {% if slug == categorie_item.slug %}active{% endif %}">
         {{ categorie_item.nom }}
       </a>
     </li>
     {% endfor %}
   </ul>
 
-  <!-- Liste catégories mobile (toggle) -->
-  <ul class="nav flex-column d-md-none" id="categoriesTabMobile" style="display:none;">
+  <!-- CATEGORIES MOBILE -->
+  <ul class="nav flex-column d-md-none mt-3" id="categoriesTabMobile" style="display:none;">
     <li class="nav-item">
-      <a href="{% url 'ventes' %}" class="nav-link {% if not slug %}active{% endif %}">Tous</a>
+      <a href="{% url 'ventes' %}" 
+         class="nav-link category-pill {% if not slug %}active{% endif %}">Tous</a>
     </li>
     {% for categorie_item in categories_menu %}
     <li class="nav-item">
       <a href="{% url 'ventes_categorie' slug=categorie_item.slug %}" 
-         class="nav-link {% if slug == categorie_item.slug %}active{% endif %}">{{ categorie_item.nom }}</a>
+         class="nav-link category-pill {% if slug == categorie_item.slug %}active{% endif %}">
+         {{ categorie_item.nom }}
+      </a>
     </li>
     {% endfor %}
   </ul>
 </section>
 
+<!-- PRODUITS -->
 <section class="container my-5">
-  <h3 class="mb-3">Livrés chez vous en 48 heures</h3>
+  <h3 class="mb-4 text-center fw-bold text-primary position-relative">
+    Livrés chez vous en 48 heures
+  </h3>
+
   <div class="row g-4">
     {% for produit in produits %}
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card shadow-sm text-center card-produit" data-active="{{ produit.is_active|yesno:'true,false' }}">
+      <div class="card produit-card shadow-sm border-0 h-100 text-center position-relative" 
+           data-active="{{ produit.is_active|yesno:'true,false' }}">
+        {% if produit.reduction > 0 %}
+          <span class="badge reduction-badge">-{{ produit.reduction }}%</span>
+        {% endif %}
+
         {% if produit.images.all %}
         <div id="carouselProduit{{ produit.id }}" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             {% for image in produit.images.all %}
-              <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ image.image.url }}" class="d-block w-100 h-100 produit-img" alt="{{ produit.nom }}">
-              </div>
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ image.image.url }}" class="d-block w-100 produit-img" alt="{{ produit.nom }}">
+            </div>
             {% endfor %}
           </div>
           {% if produit.images.count > 1 %}
           <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduit{{ produit.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+            <span class="carousel-control-prev-icon"></span>
           </button>
           <button class="carousel-control-next" type="button" data-bs-target="#carouselProduit{{ produit.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+            <span class="carousel-control-next-icon"></span>
           </button>
           {% endif %}
         </div>
         {% else %}
-          <img src="{% static 'images/default.png' %}" class="card-img-top produit-img" alt="{{ produit.nom }}">
+        <img src="{% static 'images/default.png' %}" class="card-img-top produit-img" alt="{{ produit.nom }}">
         {% endif %}
 
         <div class="card-body d-flex flex-column justify-content-between">
-          {% if produit.reduction > 0 %}
-            <span class="badge bg-danger">-{{ produit.reduction }}%</span>
-          {% endif %}
-          <p class="card-text mt-2">{{ produit.description_courte|default:"Pas de description" }}</p>
-          <p class="text-primary fw-bold mb-1">{{ produit.nom }}</p>
+          <p class="text-primary fw-bold mb-1 produit-nom">{{ produit.nom }}</p>
+          <p class="card-text text-muted small mb-2">{{ produit.description_courte|default:"Pas de description" }}</p>
           <div class="mb-2 text-warning">★★★★☆</div>
-          <p class="mb-2">
-            <span class="text-decoration-line-through text-muted">{{ produit.prix_original }} Ar</span>
-            <span class="fw-bold text-danger ms-2">{{ produit.prix }} Ar</span>
-          </p>
-          <div class="d-flex justify-content-center align-items-center mt-auto">
-            <div class="input-group input-group-sm" style="width: 100px;">
+
+          <div class="mb-3">
+            <span class="text-decoration-line-through text-muted small">{{ produit.prix_original }} Ar</span>
+            <span class="fw-bold text-danger fs-6 ms-2">{{ produit.prix }} Ar</span>
+          </div>
+
+          <div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
+            <div class="input-group input-group-sm" style="width: 90px;">
               <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
               <input type="text" class="form-control text-center qty-input" value="1">
               <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
             </div>
-            <button class="btn btn-success btn-sm ms-2 btn-add-cart" data-id="{{ produit.id }}">
+            <button class="btn btn-success btn-sm btn-add-cart shadow-sm" data-id="{{ produit.id }}">
               <i class="fas fa-cart-arrow-down"></i>
             </button>
-            <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm ms-2">
+            <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-outline-info btn-sm shadow-sm">
               <i class="fas fa-eye"></i>
             </a>
           </div>
@@ -100,16 +111,73 @@
     </div>
     {% endfor %}
   </div>
+
   {% include 'includes/paginator.html' %}
 </section>
 
+<!-- STYLE -->
 <style>
-/* Categories mobile font-size auto */
+/* --- Catégories --- */
+.category-pill {
+  border: 1px solid #dee2e6;
+  border-radius: 50px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+  color: #0d6efd;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+}
+.category-pill:hover {
+  background: #0d6efd;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.category-pill.active {
+  background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(13,110,253,0.3);
+}
+
+/* --- Produits --- */
+.produit-card {
+  border-radius: 1rem;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  background: #fff;
+}
+.produit-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.produit-img {
+  height: 230px;
+  object-fit: cover;
+  border-bottom: 1px solid #f1f1f1;
+}
+.reduction-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ff4757;
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 50px;
+  padding: 0.4rem 0.7rem;
+  box-shadow: 0 2px 8px rgba(255,71,87,0.4);
+}
+.produit-nom {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+/* --- Responsive --- */
 @media (max-width: 576px) {
-    #categoriesTabMobile .nav-link { font-size: calc(12px + 0.5vw); }
+  #categoriesTabMobile .nav-link { font-size: calc(12px + 0.5vw); }
+  .produit-img { height: 180px; }
 }
 </style>
 
+<!-- JS -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Toggle catégories mobile
@@ -122,21 +190,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Masquer automatiquement les produits non actifs
-  const allProducts = Array.from(document.querySelectorAll('.card-produit'));
+  // Masquer les produits non actifs
+  const allProducts = Array.from(document.querySelectorAll('.produit-card'));
   allProducts.forEach(card => {
     if (!card.dataset.active || card.dataset.active === "false") {
       card.style.display = 'none';
     }
   });
 
-  // Ajout au panier AJAX sans popbox
+  // Ajout panier AJAX
   const addButtons = document.querySelectorAll('.btn-add-cart');
   addButtons.forEach(button => {
       button.addEventListener('click', function(e) {
           e.preventDefault();
           const produitId = this.dataset.id;
-          const parentCard = this.closest('.card-produit');
+          const parentCard = this.closest('.produit-card');
           const qtyInput = parentCard.querySelector('.qty-input');
           const quantite = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
 

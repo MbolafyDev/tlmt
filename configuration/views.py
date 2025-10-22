@@ -1,3 +1,5 @@
+# tlmt/configuration/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q
@@ -13,6 +15,9 @@ from home.forms import ServiceForm, ServiceImageFormSet
 from home.models import Service, ServiceImage
 from home.models import Commande, CommandeItem
 from django.contrib.admin.views.decorators import staff_member_required
+from contact.models import ContactMessage
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 
 # ---------------- Users ----------------
@@ -463,3 +468,57 @@ def journal_commandes(request):
         "q": q,
         "view_mode": view_mode,
     })
+
+# ---------------- Contact Messages ----------------
+@admin_required
+def contact_messages(request):
+    q = (request.GET.get("q") or "").strip()
+    view_mode = request.GET.get("view", "table")
+
+    qs = ContactMessage.objects.all().order_by('-date_envoi')
+    if q:
+        qs = qs.filter(
+            Q(nom__icontains=q) |
+            Q(email__icontains=q) |
+            Q(sujet__icontains=q) |
+            Q(message__icontains=q)
+        )
+
+    paginator = Paginator(qs, 15)
+    page = request.GET.get("page", 1)
+    try:
+        messages_page = paginator.page(page)
+    except PageNotAnInteger:
+        messages_page = paginator.page(1)
+    except EmptyPage:
+        messages_page = paginator.page(paginator.num_pages)
+
+    return render(request, "configuration/contact_message_list.html", {
+        "messages_page": messages_page,
+        "is_paginated": paginator.num_pages > 1,
+        "q": q,
+        "view_mode": view_mode,
+        "new_notifications_count": ContactMessage.objects.filter(is_read=False).count(),
+    })
+
+@admin_required
+@require_POST
+def contact_message_mark_read(request):
+    msg_id = request.POST.get("msg_id")
+    if not msg_id:
+        return JsonResponse({"success": False, "error": "ID manquant"})
+    try:
+        msg = ContactMessage.objects.get(id=msg_id)
+        msg.is_read = True
+        msg.save()
+        # retourne le nombre de messages non lus pour le badge
+        new_count = ContactMessage.objects.filter(is_read=False).count()
+        return JsonResponse({"success": True, "new_count": new_count})
+    except ContactMessage.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Message introuvable"})
+    
+@admin_required
+def get_new_messages_count(request):
+    """Retourne le nombre de nouveaux messages non lus pour le badge."""
+    count = ContactMessage.objects.filter(is_read=False).count()
+    return JsonResponse({"new_messages_count": count})

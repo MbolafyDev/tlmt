@@ -5,18 +5,100 @@
 {% block title %}Inscription{% endblock %}
 
 {% block content %}
+<style>
+  /* 🌈 STYLE MODERNE ET ÉLÉGANT (même cohérence avec login & password change) */
+  .register-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .register-section:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+  }
+
+  .register-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0d6efd;
+    font-size: 1.1rem;
+  }
+
+  .input-with-icon {
+    position: relative;
+  }
+
+  .input-with-icon input {
+    padding-left: 45px;
+    border-radius: 50px !important;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+
+  .input-with-icon input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 8px rgba(13,110,253,0.25);
+  }
+
+  .btn-custom {
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-custom:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(13,110,253,0.3);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .register-title {
+    color: #0d6efd;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .register-links a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .register-links a:hover {
+    text-decoration: underline;
+    color: #084298;
+  }
+
+  /* ✅ Message d’erreur / succès */
+  .alert {
+    border-radius: 50px;
+    font-weight: 500;
+  }
+</style>
+
 <section class="container my-5">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm p-4">
-        <h3 class="text-center mb-4">Créer un compte</h3>
+      <div class="register-section">
+        <h3 class="text-center mb-4 register-title">
+          <i class="bi bi-person-plus-fill me-2"></i>Créer un compte
+        </h3>
 
-        <!-- ✅ Messages Django ajoutés -->
+        <!-- ✅ Messages Django -->
         {% if messages %}
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }} text-center alert-dismissible fade show" role="alert">
               {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
           {% endfor %}
         {% endif %}
@@ -25,34 +107,42 @@
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           {% for field in form %}
-            <div class="mb-3">
-              <label class="form-label fw-semibold">{{ field.label }}</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light">
-                  {% if "password" in field.name %}
-                    <i class="fa fa-lock text-secondary"></i>
-                  {% elif "email" in field.name %}
-                    <i class="fa fa-envelope text-secondary"></i>
-                  {% elif "username" in field.name %}
-                    <i class="fa fa-user text-secondary"></i>
-                  {% else %}
-                    <i class="fa fa-pencil-alt text-secondary"></i>
-                  {% endif %}
-                </span>
-                {{ field|add_class:"form-control form-control-lg rounded-pill shadow-sm" }}
+            <div class="mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              <div class="input-with-icon">
+                {% if "password" in field.name %}
+                  <i class="bi bi-lock-fill register-icon"></i>
+                {% elif "email" in field.name %}
+                  <i class="bi bi-envelope-fill register-icon"></i>
+                {% elif "username" in field.name %}
+                  <i class="bi bi-person-circle register-icon"></i>
+                {% elif "contact" in field.name %}
+                  <i class="bi bi-telephone-fill register-icon"></i>
+                {% elif "adresse" in field.name %}
+                  <i class="bi bi-geo-alt-fill register-icon"></i>
+                {% else %}
+                  <i class="bi bi-pencil-fill register-icon"></i>
+                {% endif %}
+                {{ field|add_class:"form-control form-control-lg" }}
               </div>
               {% if field.errors %}
                 <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
               {% endif %}
             </div>
           {% endfor %}
-          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
-            <i class="fa fa-user-plus me-2"></i> S'inscrire
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 btn-custom">
+            <i class="bi bi-person-check-fill me-2"></i>S'inscrire
           </button>
         </form>
-        <p class="text-center mt-3 mb-0">
-          Déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a>
-        </p>
+
+        <div class="text-center mt-4 register-links">
+          <p>Déjà un compte ? 
+            <a href="{% url 'login' %}" class="fw-semibold">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Connectez-vous
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

@@ -5,53 +5,144 @@
 {% block title %}Connexion{% endblock %}
 
 {% block content %}
+<style>
+  /* 🌈 STYLE MODERNE ET ÉLÉGANT */
+  .login-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .login-section:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+  }
+
+  .login-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0d6efd;
+    font-size: 1.1rem;
+  }
+
+  .input-with-icon {
+    position: relative;
+  }
+
+  .input-with-icon input {
+    padding-left: 45px;
+    border-radius: 50px !important;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+
+  .input-with-icon input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 8px rgba(13,110,253,0.25);
+  }
+
+  .btn-custom {
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-custom:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(13,110,253,0.3);
+  }
+
+  .login-links a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .login-links a:hover {
+    text-decoration: underline;
+    color: #084298;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .login-title {
+    color: #0d6efd;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ✅ Message d’erreur / succès */
+  .alert {
+    border-radius: 50px;
+    font-weight: 500;
+  }
+</style>
+
 <section class="container my-5">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm p-4">
-        <h3 class="text-center mb-4">Connexion</h3>
+      <div class="login-section">
+        <h3 class="text-center mb-4 login-title">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Connexion
+        </h3>
 
-        <!-- ✅ Messages Django ajoutés -->
+        <!-- ✅ Messages Django -->
         {% if messages %}
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }} text-center alert-dismissible fade show" role="alert">
               {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
           {% endfor %}
         {% endif %}
-        <!-- ✅ Fin messages -->
-
         {% if error %}
           <div class="alert alert-danger text-center">{{ error }}</div>
         {% endif %}
+        <!-- ✅ Fin messages -->
 
         <form method="POST">
           {% csrf_token %}
           {% for field in form %}
-            <div class="mb-3">
-              <label class="form-label fw-semibold">{{ field.label }}</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light">
-                  {% if "password" in field.name %}
-                    <i class="fa fa-lock text-secondary"></i>
-                  {% else %}
-                    <i class="fa fa-envelope text-secondary"></i>
-                  {% endif %}
-                </span>
-                {{ field|add_class:"form-control form-control-lg rounded-pill shadow-sm" }}
+            <div class="mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              <div class="input-with-icon">
+                {% if "password" in field.name %}
+                  <i class="bi bi-lock-fill login-icon"></i>
+                {% else %}
+                  <i class="bi bi-person-circle login-icon"></i>
+                {% endif %}
+                {{ field|add_class:"form-control form-control-lg" }}
               </div>
               {% if field.errors %}
                 <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
               {% endif %}
             </div>
           {% endfor %}
-          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">Se connecter</button>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 btn-custom">
+            <i class="bi bi-door-open-fill me-2"></i> Se connecter
+          </button>
         </form>
-        <p class="text-center mt-3">
-          Pas encore de compte ? <a href="{% url 'register' %}">Inscrivez-vous</a><br>
-          <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a>
-        </p>
+
+        <div class="text-center mt-4 login-links">
+          <p>Pas encore de compte ? 
+            <a href="{% url 'register' %}" class="fw-semibold">
+              <i class="bi bi-person-plus-fill me-1"></i>Inscrivez-vous
+            </a>
+          </p>
+          <p>
+            <a href="{% url 'password_reset' %}">
+              <i class="bi bi-question-circle me-1"></i>Mot de passe oublié ?
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

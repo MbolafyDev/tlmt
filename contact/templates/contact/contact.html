@@ -1,36 +1,244 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Contactez-nous{% endblock %}
 
 {% block content %}
-<section class="container my-5">
-    <h2>Contactez-nous</h2>
-    <p>Vous pouvez nous envoyer un message via le formulaire ci-dessous :</p>
+<style>
+:root {
+  --primary-yellow: #ffc107;
+  --primary-blue: #0d1b2a;
+  --bg-white: #ffffff;
+  --bg-light-gray: #f8f9fa;
+  --text-dark: #1a1a2e;
+  --text-muted: #6c757d;
+  --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+}
 
-    {% if success %}
-      <div class="alert alert-success">Merci ! Votre message a été envoyé avec succès.</div>
-    {% endif %}
+/* BODY */
+body {
+  background-color: var(--bg-light-gray);
+  color: var(--text-dark);
+  font-family: "Poppins", sans-serif;
+}
 
-    <form method="post" class="mt-4">
+/* ================= CONTACT ================= */
+.contact-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+/* FORMULAIRE */
+.contact-form {
+  flex: 1 1 450px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 25px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.contact-form:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+.contact-form h2 {
+  color: var(--primary-blue);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.input-with-icon {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.input-with-icon input,
+.input-with-icon textarea {
+  padding-left: 45px;
+  border-radius: 50px !important;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  resize: none;
+}
+.input-with-icon input:focus,
+.input-with-icon textarea:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 8px rgba(13,110,253,0.25);
+}
+.contact-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+}
+.btn-custom {
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-custom:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(13,110,253,0.3);
+}
+
+/* INFORMATIONS CÔTÉ DROITE */
+.contact-info {
+  flex: 1 1 350px;
+  background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+  border-radius: 25px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.contact-info h5 {
+  color: var(--primary-blue);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.contact-info a {
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.contact-info a:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+.contact-info i {
+  margin-right: 0.5rem;
+  color: var(--primary-blue);
+}
+
+/* ALERT */
+.alert {
+  border-radius: 50px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .contact-container {
+    flex-direction: column;
+  }
+}
+</style>
+
+<section class="container">
+  <div class="contact-container">
+    <!-- FORMULAIRE -->
+    <div class="contact-form">
+      <h2>Contactez-nous</h2>
+      <p class="text-center">Vous pouvez nous envoyer un message via le formulaire ci-dessous :</p>
+
+      {% if success %}
+        <div class="alert alert-success text-center">Merci ! Votre message a été envoyé avec succès.</div>
+      {% endif %}
+
+      <form method="post" class="mt-4">
         {% csrf_token %}
-        <div class="mb-3">
-            {{ form.nom.label_tag }}
-            {{ form.nom }}
+
+        <div class="input-with-icon">
+          <i class="bi bi-person-fill contact-icon"></i>
+          {{ form.nom|add_class:"form-control form-control-lg" }}
+          {% if form.nom.errors %}
+            <div class="text-danger small mt-1">{{ form.nom.errors|striptags }}</div>
+          {% endif %}
         </div>
-        <div class="mb-3">
-            {{ form.email.label_tag }}
-            {{ form.email }}
+
+        <div class="input-with-icon">
+          <i class="bi bi-envelope-fill contact-icon"></i>
+          {{ form.email|add_class:"form-control form-control-lg" }}
+          {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>
+          {% endif %}
         </div>
-        <div class="mb-3">
-            {{ form.sujet.label_tag }}
-            {{ form.sujet }}
+
+        <div class="input-with-icon">
+          <i class="bi bi-pencil-fill contact-icon"></i>
+          {{ form.sujet|add_class:"form-control form-control-lg" }}
+          {% if form.sujet.errors %}
+            <div class="text-danger small mt-1">{{ form.sujet.errors|striptags }}</div>
+          {% endif %}
         </div>
-        <div class="mb-3">
-            {{ form.message.label_tag }}
-            {{ form.message }}
+
+        <div class="input-with-icon">
+          <i class="bi bi-chat-text-fill contact-icon"></i>
+          {{ form.message|add_class:"form-control form-control-lg" }}
+          {% if form.message.errors %}
+            <div class="text-danger small mt-1">{{ form.message.errors|striptags }}</div>
+          {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Envoyer</button>
-    </form>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100 btn-custom">
+          <i class="bi bi-send-fill me-2"></i> Envoyer
+        </button>
+      </form>
+    </div>
+
+    <!-- INFORMATIONS -->
+    <div class="contact-info">
+      <h5>Adresse & Contact</h5>
+      <p><i class="fas fa-map-marker-alt"></i> Siège : Lot Sat 94 Soamanandray, Ambohidratrimo 103</p>
+      <p><i class="fas fa-envelope"></i> <a href="mailto:tlmt.ervices@gmail.com">tlmt.ervices@gmail.com</a></p>
+      <p><i class="fas fa-phone"></i> <a href="tel:+261389041128">+261 336 036 171 - +261 340 772 612</a></p>
+
+      <h5>Relation Client</h5>
+      <p>
+        <a href="https://wa.me/+261336036171" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a><br>
+        <a href="https://www.facebook.com/share/p/19eMzfx7tn/" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      </p>
+
+      <h5>Suivez-nous</h5>
+      <p>
+        <a href="https://www.facebook.com/share/p/19eMzfx7tn/" target="_blank"><i class="fab fa-facebook fs-4"></i></a>
+        <a href="https://www.instagram.com/zoma" target="_blank"><i class="fab fa-instagram fs-4"></i></a>
+        <a href="https://twitter.com/zoma" target="_blank"><i class="fab fa-twitter fs-4"></i></a>
+        <a href="mailto:contact@zoma.mg"><i class="fas fa-envelope fs-4"></i></a>
+      </p>
+
+      <h5>Nos Offres</h5>
+      <ul class="list-unstyled">
+        <li><a href="#">Promotions</a></li>
+        <li><a href="#">Nouvel Arrivage</a></li>
+        <li><a href="#">Nos Marques</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+  </div>
 </section>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e){
+    e.preventDefault(); // empêcher le reload
+    const form = e.target;
+    const data = new FormData(form);
+
+    fetch("{% url 'contact' %}", {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: data
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if(data.success){
+            document.getElementById('contact-success').style.display='block';
+            form.reset();
+
+            // 🔔 Mettre à jour immédiatement le badge
+            updateNotificationsBadge();
+        } else {
+            alert("Erreur: " + (data.error || "Veuillez réessayer."));
+        }
+    })
+    .catch(err => console.error(err));
+});
+</script>
 {% endblock %}
