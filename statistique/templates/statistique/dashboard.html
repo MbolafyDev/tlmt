@@ -6,7 +6,7 @@
 <div class="dashboard-container">
   <h1 class="dashboard-title text-center mb-4">📊 Tableau de bord</h1>
 
-  <!-- ====== CARTES PRINCIPALES ====== -->
+  <!-- ====== CARTES ====== -->
   <div class="dashboard-cards">
     <div class="card dash-card">
       <div class="card-icon bg-warning"><i class="fas fa-shopping-cart"></i></div>
@@ -23,204 +23,133 @@
       <h3>Total Services</h3>
       <p>{{ total_services }}</p>
     </div>
+    <div class="card dash-card">
+      <div class="card-icon bg-dark"><i class="fas fa-users"></i></div>
+      <h3>Total Utilisateurs</h3>
+      <p>{{ total_users }}</p>
+    </div>
   </div>
 
   <hr class="divider">
 
   <!-- ====== GRAPHIQUES ====== -->
   <div class="charts-container">
-    <div class="chart-box">
-      <h2>Commandes par mode de paiement</h2>
-      <canvas id="chartCommandes"></canvas>
-    </div>
-    <div class="chart-box">
-      <h2>Services par statut</h2>
-      <canvas id="chartServices"></canvas>
-    </div>
+    <!-- Commandes -->
+    <div class="chart-box"><h2>Commandes par mode</h2><canvas id="chartCommandesMode"></canvas></div>
+    <div class="chart-box"><h2>Commandes par jour</h2><canvas id="chartCommandesJour"></canvas></div>
+    <div class="chart-box"><h2>Commandes par mois</h2><canvas id="chartCommandesMois"></canvas></div>
+    <div class="chart-box"><h2>Commandes par année</h2><canvas id="chartCommandesAnnee"></canvas></div>
+
+    <!-- Services -->
+    <div class="chart-box"><h2>Services par statut</h2><canvas id="chartServices"></canvas></div>
+    <div class="chart-box"><h2>Services par jour</h2><canvas id="chartServicesJour"></canvas></div>
+    <div class="chart-box"><h2>Services par mois</h2><canvas id="chartServicesMois"></canvas></div>
+    <div class="chart-box"><h2>Services par année</h2><canvas id="chartServicesAnnee"></canvas></div>
+
+    <!-- Utilisateurs -->
+    <div class="chart-box"><h2>Connexions utilisateurs par jour</h2><canvas id="chartUsersJour"></canvas></div>
+    <div class="chart-box"><h2>Connexions utilisateurs par mois</h2><canvas id="chartUsersMois"></canvas></div>
+    <div class="chart-box"><h2>Connexions utilisateurs par année</h2><canvas id="chartUsersAnnee"></canvas></div>
   </div>
 </div>
 
-<!-- ====== SCRIPTS CHART.JS ====== -->
+<!-- ====== CHART.JS ====== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const commandesData = {{ commandes_par_mode|safe }};
-  const labelsCommandes = commandesData.map(c => c.mode_paiement);
-  const dataCommandes = commandesData.map(c => c.total);
-
-  const ctxCommandes = document.getElementById('chartCommandes').getContext('2d');
-  new Chart(ctxCommandes, {
-    type: 'pie',
-    data: {
-      labels: labelsCommandes,
-      datasets: [{
-        data: dataCommandes,
-        backgroundColor: ['#ffc107','#0d1b2a','#36a2eb','#4bc0c0','#9b59b6'],
-        borderWidth: 1
+  // ===== Pie Commandes par mode =====
+  const commandesMode = {{ commandes_par_mode|safe }};
+  new Chart(document.getElementById('chartCommandesMode'), {
+    type:'pie',
+    data:{
+      labels:commandesMode.map(c=>c.mode_paiement),
+      datasets:[{
+        data:commandesMode.map(c=>c.total),
+        backgroundColor:['#ffc107','#0d1b2a','#36a2eb','#4bc0c0','#9b59b6']
       }]
     },
-    options: {
-      plugins: { legend: { position: 'bottom' } },
-      responsive: true,
-      maintainAspectRatio: false
-    }
+    options:{plugins:{legend:{position:'bottom'}}}
   });
 
-  const ctxServices = document.getElementById('chartServices').getContext('2d');
-  new Chart(ctxServices, {
-    type: 'bar',
-    data: {
-      labels: ['Planifié','En cours','Terminé'],
-      datasets: [{
-        label: 'Services',
-        data: [{{ services_planifie }}, {{ services_en_cours }}, {{ services_termine }}],
-        backgroundColor: ['#f39c12','#3498db','#2ecc71']
+  // ===== Fonction graphique ligne =====
+  function createLineChart(canvasId, data, label, color='#0d1b2a', type='day'){
+    const labels = data.map(d=>{
+      if(type==='day') return d.day;
+      if(type==='month') return d.month;
+      if(type==='year') return d.year;
+      return '';
+    });
+    const counts = data.map(d=>d.count);
+    new Chart(document.getElementById(canvasId), {
+      type:'line',
+      data:{
+        labels:labels,
+        datasets:[{
+          label:label,
+          data:counts,
+          borderColor:color,
+          backgroundColor:color+'33',
+          fill:true,
+          tension:0.3
+        }]
+      },
+      options:{
+        scales:{y:{beginAtZero:true}},
+        plugins:{legend:{position:'bottom'}}
+      }
+    });
+  }
+
+  // ===== Commandes =====
+  createLineChart('chartCommandesJour', {{ commandes_par_jour|safe }}, 'Commandes par jour','blue','day');
+  createLineChart('chartCommandesMois', {{ commandes_par_mois|safe }}, 'Commandes par mois','blue','month');
+  createLineChart('chartCommandesAnnee', {{ commandes_par_annee|safe }}, 'Commandes par année','blue','year');
+
+  // ===== Services =====
+  createLineChart('chartServicesJour', {{ services_par_jour|safe }}, 'Services par jour','#f39c12','day');
+  createLineChart('chartServicesMois', {{ services_par_mois|safe }}, 'Services par mois','#f39c12','month');
+  createLineChart('chartServicesAnnee', {{ services_par_annee|safe }}, 'Services par année','#f39c12','year');
+
+  // ===== Utilisateurs =====
+  createLineChart('chartUsersJour', {{ logins_par_jour|safe }}, 'Connexions par jour','#2ecc71','day');
+  createLineChart('chartUsersMois', {{ logins_par_mois|safe }}, 'Connexions par mois','#2ecc71','month');
+  createLineChart('chartUsersAnnee', {{ logins_par_annee|safe }}, 'Connexions par année','#2ecc71','year');
+
+  // ===== Services statut bar =====
+  new Chart(document.getElementById('chartServices'), {
+    type:'bar',
+    data:{
+      labels:['Planifié','En cours','Terminé'],
+      datasets:[{
+        label:'Services',
+        data:[{{ services_planifie }},{{ services_en_cours }},{{ services_termine }}],
+        backgroundColor:['#f39c12','#3498db','#2ecc71']
       }]
     },
-    options: {
-      scales: { y: { beginAtZero:true } },
-      plugins: { legend: { display: false } },
-      responsive: true,
-      maintainAspectRatio: false
+    options:{
+      scales:{y:{beginAtZero:true}},
+      plugins:{legend:{display:false}}
     }
   });
 </script>
 
 <!-- ====== STYLES ====== -->
 <style>
-:root {
-  --primary-yellow: #ffc107;
-  --primary-blue: #0d1b2a;
-  --bg-white: #ffffff;
-  --text-dark: #1a1a2e;
-  --shadow-light: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
-  --radius: 15px;
-}
-
-/* ====== CONTAINER ====== */
-.dashboard-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
-  background: #f9fafc;
-  border-radius: var(--radius);
-}
-
-/* TITRE */
-.dashboard-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary-blue);
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-/* CARDS SECTION */
-.dashboard-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-.dash-card {
-  flex: 1 1 300px;
-  max-width: 320px;
-  padding: 25px 20px;
-  background: var(--bg-white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
-  text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.dash-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-}
-.dash-card h3 {
-  color: var(--primary-blue);
-  font-weight: 600;
-  margin-top: 12px;
-  font-size: 1.1rem;
-}
-.dash-card p {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: var(--text-dark);
-  margin-top: 5px;
-}
-
-/* ICONES (plus petites et centrées) */
-.card-icon {
-  font-size: 1.1rem;
-  width: 34px;
-  height: 34px;
-  line-height: 34px;
-  border-radius: 50%;
-  color: #fff;
-  margin: 0 auto 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.bg-warning { background-color: var(--primary-yellow) !important; color: #0d1b2a; }
-.bg-primary { background-color: var(--primary-blue) !important; }
-.bg-success { background-color: #2ecc71 !important; }
-
-/* SEPARATEUR */
-.divider {
-  border: 0;
-  height: 1px;
-  background: #e0e0e0;
-  margin: 2rem 0;
-}
-
-/* GRAPHIQUES */
-.charts-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-.chart-box {
-  flex: 1 1 450px;
-  background: var(--bg-white);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
-  transition: box-shadow 0.3s;
-}
-.chart-box:hover {
-  box-shadow: var(--shadow-hover);
-}
-.chart-box h2 {
-  font-size: 1.2rem;
-  color: var(--primary-blue);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-canvas {
-  width: 100%;
-  height: 320px !important;
-  display: block;
-}
-
-/* ====== RESPONSIVE ====== */
-@media (max-width: 992px) {
-  .dashboard-title { font-size: 1.8rem; }
-  .dash-card { flex: 1 1 45%; }
-  .chart-box { flex: 1 1 100%; }
-}
-@media (max-width: 768px) {
-  .dashboard-container { margin: 20px; padding: 15px; }
-  .dash-card { flex: 1 1 100%; }
-  canvas { height: 280px !important; }
-}
-@media (max-width: 480px) {
-  .dashboard-title { font-size: 1.5rem; }
-  .dash-card p { font-size: 1.3rem; }
-  .card-icon { width: 30px; height: 30px; font-size: 0.9rem; }
-  .chart-box { padding: 1rem; }
-}
+.dashboard-container{ max-width:1300px;margin:40px auto;padding:20px;background:#f9fafc;border-radius:15px; }
+.dashboard-title{ font-size:2rem;font-weight:700;color:#0d1b2a;text-align:center;margin-bottom:1.5rem; }
+.dashboard-cards{ display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-bottom:30px; }
+.dash-card{ flex:1 1 280px;max-width:300px;padding:20px 15px;background:#fff;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.08);text-align:center;transition:0.3s; }
+.dash-card:hover{ transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.12); }
+.dash-card h3{ color:#0d1b2a;font-weight:600;margin-top:8px;font-size:1.1rem; }
+.dash-card p{ font-size:1.5rem;font-weight:bold;color:#1a1a2e;margin-top:5px; }
+.card-icon{ font-size:1rem;width:28px;height:28px;line-height:28px;border-radius:50%;color:#fff;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;}
+.bg-warning{background-color:#ffc107;color:#0d1b2a;}
+.bg-primary{background-color:#0d1b2a;}
+.bg-success{background-color:#2ecc71;}
+.bg-dark{background-color:#2d3436;}
+.divider{border:0;height:1px;background:#e0e0e0;margin:2rem 0;}
+.charts-container{ display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:20px;}
+.chart-box{ background:#fff;padding:1rem 1.5rem;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.chart-box h2{ font-size:1.2rem;color:#0d1b2a;margin-bottom:1rem;text-align:center;}
+canvas{ width:100%; height:300px !important; }
 </style>
 {% endblock %}
