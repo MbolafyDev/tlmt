@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "configuration",
     "common",
     "plomberie",
+    "statistique",
 ]
 
 # -----------------------------

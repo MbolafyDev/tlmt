@@ -112,9 +112,8 @@
             <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" class="desktop-logo">
         </a>
 
-        <!-- Mobile topbar: logo inline, recherche, panier, toggle -->
+        <!-- Mobile topbar -->
         <div class="d-flex d-lg-none align-items-center w-100 mobile-topbar">
-            <!-- Logo mobile inline -->
             <a class="me-2" href="{% url 'home' %}">
                 <img src="{% static 'images/logo.jpg' %}" alt="Logo TLMT" class="mobile-logo">
             </a>
@@ -123,6 +122,7 @@
                 <input class="form-control" type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher">
                 <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
             </form>
+
             {% if user.is_authenticated %}
             <a class="nav-link position-relative ms-2" href="{% url 'checkout' %}" title="Panier">
                 <i class="fas fa-shopping-cart"></i>
@@ -159,7 +159,7 @@
                         <li><a class="dropdown-item" href="#"><i class="fas fa-tools"></i> Installation</a></li>
                         <li><a class="dropdown-item" href="{% url 'ventes' %}"><i class="fas fa-hand-holding-usd"></i> Ventes</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice"></i> Devis</a></li>
-                        <li><a class="dropdown-item" href="{% url 'demande_dimensionnement' %}"><i class="fas fa-bolt"></i> Dimensionnement Panneau Solaire</a></li>
+                        <li><a class="dropdown-item" href="{% url 'demande_dimensionnement' %}"><i class="fas fa-bolt"></i> Dimensionnement</a></li>
                         <li><a class="dropdown-item" href="{% url 'calcul_tuyauterie' %}"><i class="fas fa-tint"></i> Calcul Tuyauterie</a></li>
                     </ul>
                 </li>
@@ -180,8 +180,17 @@
                     </ul>
                 </li>
 
-                <!-- Admin / Paramètres avec badge notifications -->
-                {% if user.is_superuser or user.role == "admin" %}
+                <!-- ✅ Dashboard (icône seul desktop, texte+icône mobile) -->
+                {% if user.is_authenticated and user.is_superuser or user.is_authenticated and user.role == "admin" %}
+                <li class="nav-item">
+                    <a class="nav-link d-none d-lg-inline" href="{% url 'dashboard' %}" title="Dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Admin / Paramètres -->
+                {% if user.is_authenticated and user.is_superuser or user.is_authenticated and user.role == "admin" %}
                 <li class="nav-item dropdown position-relative">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" title="Paramètres">
                         <i class="fas fa-cog"></i>
@@ -197,7 +206,8 @@
                         <li><a class="dropdown-item" href="{% url 'caracteristique_list' %}"><i class="fas fa-list"></i> Caractéristiques</a></li>
                         <li><a class="dropdown-item" href="{% url 'appareil_list' %}"><i class="fas fa-shower"></i> Appareils sanitaires</a></li>
                         <li><a class="dropdown-item" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
-                        <li><a class="dropdown-item" href="{% url 'contact_messages' %}"><i class="fas fa-envelope-open-text"></i> Messages de contact
+                        <li><a class="dropdown-item" href="{% url 'contact_messages' %}">
+                            <i class="fas fa-envelope-open-text"></i> Messages de contact
                             {% if new_notifications_count > 0 %}
                             <span class="badge bg-warning text-dark ms-1">{{ new_notifications_count }} Nouveau</span>
                             {% endif %}
@@ -221,10 +231,18 @@
     </div>
 </nav>
 
-<!-- Sidebar Mobile -->
+<!-- ✅ Sidebar Mobile (Dashboard visible ici aussi) -->
 <div id="mobileSidebar">
     <span class="close-btn" id="closeSidebarBtn">&times;</span>
     <ul>
+        {% if user.is_authenticated and user.is_superuser or user.is_authenticated and user.role == "admin" %}
+        <li>
+            <a href="{% url 'dashboard' %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard Admin
+            </a>
+        </li>
+        {% endif %}
+
         <!-- Services -->
         <li>
             <a href="#" class="submenu-toggle"><span><i class="fas fa-puzzle-piece"></i> Services</span> <i class="fas fa-caret-down"></i></a>
@@ -237,27 +255,25 @@
             </ul>
         </li>
 
-        {% if user.is_authenticated %}
-            {% if user.is_superuser or user.role == "admin" %}
-            <li>
-                <a href="#" class="submenu-toggle position-relative"><span><i class="fas fa-cog"></i> Paramètres</span>
-                    {% if new_notifications_count > 0 %}
-                    <span id="settings-badge-mobile">{{ new_notifications_count }}</span>
-                    {% endif %}
-                    <i class="fas fa-caret-down"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{% url 'journal_commandes' %}"><i class="fas fa-book"></i> Journal des commandes</a></li>
-                    <li><a href="{% url 'user_list' %}">Utilisateurs</a></li>
-                    <li><a href="{% url 'produit_list' %}">Produits</a></li>
-                    <li><a href="{% url 'categorie_list' %}">Catégories</a></li>
-                    <li><a href="{% url 'caracteristique_list' %}">Caractéristiques</a></li>
-                    <li><a href="{% url 'appareil_list' %}">Appareils sanitaires</a></li>
-                    <li><a href="{% url 'service_list' %}">Services</a></li>
-                    <li><a href="{% url 'contact_messages' %}"><i class="fas fa-envelope-open-text"></i> Messages de contact</a></li>
-                </ul>
-            </li>
-            {% endif %}
+        {% if user.is_authenticated and user.is_superuser or user.is_authenticated and user.role == "admin" %}
+        <li>
+            <a href="#" class="submenu-toggle position-relative"><span><i class="fas fa-cog"></i> Paramètres</span>
+                {% if new_notifications_count > 0 %}
+                <span id="settings-badge-mobile">{{ new_notifications_count }}</span>
+                {% endif %}
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="{% url 'journal_commandes' %}"><i class="fas fa-book"></i> Journal des commandes</a></li>
+                <li><a href="{% url 'user_list' %}">Utilisateurs</a></li>
+                <li><a href="{% url 'produit_list' %}">Produits</a></li>
+                <li><a href="{% url 'categorie_list' %}">Catégories</a></li>
+                <li><a href="{% url 'caracteristique_list' %}">Caractéristiques</a></li>
+                <li><a href="{% url 'appareil_list' %}">Appareils sanitaires</a></li>
+                <li><a href="{% url 'service_list' %}">Services</a></li>
+                <li><a href="{% url 'contact_messages' %}"><i class="fas fa-envelope-open-text"></i> Messages de contact</a></li>
+            </ul>
+        </li>
         {% endif %}
 
         <li><a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contact</a></li>
@@ -304,13 +320,10 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// fonctions pour mettre à jour le badge
 function updateNotificationsBadge() {
     fetch("{% url 'ajax_new_messages_count' %}")
         .then(response => response.json())
-        .then(data => {
-            setBadgeCount(data.new_messages_count);
-        })
+        .then(data => setBadgeCount(data.new_messages_count))
         .catch(err => console.error(err));
 }
 
@@ -320,19 +333,18 @@ function setBadgeCount(count){
 
     if(desktopBadge) {
         desktopBadge.style.display = (count > 0 ? 'inline-block' : 'none');
+        desktopBadge.textContent
         desktopBadge.textContent = count;
     }
-
     if(mobileBadge) {
         mobileBadge.style.display = (count > 0 ? 'inline-block' : 'none');
         mobileBadge.textContent = count;
     }
 }
 
-// Appel initial pour charger le badge
+// 🔁 Mise à jour automatique toutes les 10 secondes
+setInterval(updateNotificationsBadge, 10000);
+
+// Charger immédiatement au démarrage
 updateNotificationsBadge();
-
-// 🔔 Met à jour toutes les 5 secondes
-setInterval(updateNotificationsBadge, 5000);
 </script>
-
