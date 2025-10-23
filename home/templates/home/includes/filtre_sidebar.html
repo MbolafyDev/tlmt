@@ -1,0 +1,36 @@
+<div class="sidebar d-none d-md-block" id="sidebar-filters">
+        <!-- FILTRE SERVICES -->
+        <h5>Filtres Services</h5>
+        <form id="service-filter-form-sidebar" method="get">
+          <label for="filter-statut-sidebar">Statut :</label>
+          <select name="statut" id="filter-statut-sidebar" class="form-select">
+            <option value="">Tous</option>
+            <option value="planifie" {% if request.GET.statut == "planifie" %}selected{% endif %}>Planifié</option>
+            <option value="en_cours" {% if request.GET.statut == "en_cours" %}selected{% endif %}>En cours</option>
+            <option value="termine" {% if request.GET.statut == "termine" %}selected{% endif %}>Terminé</option>
+          </select>
+          <button type="submit" class="btn btn-primary w-100 mt-2">Filtrer</button>
+        </form>
+
+        <!-- FILTRE PRODUITS -->
+        <h5 class="mt-4">Filtres Produits</h5>
+        <form id="filter-form-sidebar" method="get">
+          <label>Catégorie</label>
+          <select name="categorie" id="filter-categorie-sidebar">
+            <option value="">Toutes</option>
+            {% for cat in categories_menu %}
+              <option value="{{ cat.slug }}" {% if cat.slug == categorie_selected %}selected{% endif %}>{{ cat.nom }}</option>
+            {% endfor %}
+          </select>
+          <label>Prix min : <span id="prix-min-val-sidebar">{{ prix_min|default:"0" }}</span> Ar</label>
+          <input type="range" name="prix_min" min="0" max="100000" value="{{ prix_min|default:"0" }}" id="prix-min-sidebar" class="form-range">
+          <label>Prix max : <span id="prix-max-val-sidebar">{{ prix_max|default:"100000" }}</span> Ar</label>
+          <input type="range" name="prix_max" min="0" max="100000" value="{{ prix_max|default:"100000" }}" id="prix-max-sidebar" class="form-range">
+          <label>Tri</label>
+          <select name="tri" id="filter-tri-sidebar">
+            <option value="">Derniers ajoutés</option>
+            <option value="alpha" {% if tri|default:'' == 'alpha' %}selected{% endif %}>A-Z</option>
+          </select>
+          <button type="submit" class="btn btn-primary w-100 mt-2">Filtrer</button>
+        </form>
+      </div>

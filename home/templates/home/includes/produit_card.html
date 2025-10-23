@@ -1,0 +1,30 @@
+{% load static %}
+
+<div class="col-md-9">
+      <h3>Produits en Vente</h3>
+      <div class="row g-3 d-flex align-items-stretch">
+        {% for produit in produits %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card text-center shadow-sm p-2">
+            {% if produit.images.exists %}
+              <img src="{{ produit.images.first.image.url }}" alt="{{ produit.nom }}">
+            {% else %}
+              <img src="{% static 'images/default.png' %}" alt="{{ produit.nom }}">
+            {% endif %}
+            <p class="mt-2 mb-1 fw-bold">{{ produit.nom }}</p>
+            <p class="mb-1 text-danger fw-bold">{{ produit.prix }} Ar</p>
+            <div class="d-flex justify-content-center align-items-center gap-1">
+              <input type="number" value="1" min="1" class="form-control form-control-sm qty-input" style="width:50px;">
+              <button class="btn btn-success btn-sm btn-add-cart" data-id="{{ produit.id }}">
+                <i class="fas fa-cart-arrow-down"></i>
+              </button>
+              <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm">
+                <i class="fas fa-eye"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% include 'includes/paginator.html' %}
+    </div>

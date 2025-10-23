@@ -1,0 +1,25 @@
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content-container"></div>
+  </div>
+</div>
+
+<div class="modal fade" id="commentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Commentaires</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="comments-container"></div>
+        {% if user.is_authenticated %}
+        <div class="mt-3 d-flex gap-2">
+          <input type="text" class="form-control" id="new-comment-input" placeholder="Écrire un commentaire...">
+          <button class="btn btn-primary" id="submit-comment">Envoyer</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
