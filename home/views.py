@@ -17,18 +17,44 @@ from .models import Service, ServiceLike, ServiceComment, Commande, CommandeItem
 # ------------------ VIEWS ------------------
 
 def home(request):
+    # ---------------- SERVICES ----------------
     services = Service.objects.prefetch_related("images").filter(is_active=True).order_by('-date_creation')
+    statut_filter = request.GET.get('statut')
+    if statut_filter:
+        services = services.filter(statut=statut_filter)
+
+    # ---------------- FILTRAGE PRODUITS ----------------
     produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
-    paginator = Paginator(produits_list, 12)
+    categorie_slug = request.GET.get('categorie')
+    prix_min = request.GET.get('prix_min')
+    prix_max = request.GET.get('prix_max')
+    tri = request.GET.get('tri')
+
+    if categorie_slug:
+        produits_list = produits_list.filter(categorie__slug=categorie_slug)
+    if prix_min:
+        try: produits_list = produits_list.filter(prix__gte=Decimal(prix_min))
+        except: pass
+    if prix_max:
+        try: produits_list = produits_list.filter(prix__lte=Decimal(prix_max))
+        except: pass
+    if tri == 'alpha':
+        produits_list = produits_list.order_by('nom')
+    else:
+        produits_list = produits_list.order_by('-id')
+
+    paginator = Paginator(produits_list, 24)
     produits = paginator.get_page(request.GET.get('page'))
-    panier = request.session.get('panier', {}) or {}
-    request.session['panier'] = panier
-    total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+    categories_menu = Categorie.objects.all()
+
     return render(request, 'home/home.html', {
         "services": services,
         "produits": produits,
-        "total_items": total_items,
-        "request": request,
+        "categories_menu": categories_menu,
+        "categorie_selected": categorie_slug,
+        "prix_min": prix_min or '',
+        "prix_max": prix_max or '',
+        "tri": tri or '',
     })
 
 def ventes(request, slug=None):
