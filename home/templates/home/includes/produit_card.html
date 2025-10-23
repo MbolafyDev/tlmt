@@ -1,30 +1,214 @@
 {% load static %}
 
 <div class="col-md-9">
-      <h3>Produits en Vente</h3>
-      <div class="row g-3 d-flex align-items-stretch">
+    <h3 class="mb-4">Produits en Vente</h3>
+    <div class="row g-3 d-flex align-items-stretch">
         {% for produit in produits %}
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="card text-center shadow-sm p-2">
-            {% if produit.images.exists %}
-              <img src="{{ produit.images.first.image.url }}" alt="{{ produit.nom }}">
-            {% else %}
-              <img src="{% static 'images/default.png' %}" alt="{{ produit.nom }}">
-            {% endif %}
-            <p class="mt-2 mb-1 fw-bold">{{ produit.nom }}</p>
-            <p class="mb-1 text-danger fw-bold">{{ produit.prix }} Ar</p>
-            <div class="d-flex justify-content-center align-items-center gap-1">
-              <input type="number" value="1" min="1" class="form-control form-control-sm qty-input" style="width:50px;">
-              <button class="btn btn-success btn-sm btn-add-cart" data-id="{{ produit.id }}">
-                <i class="fas fa-cart-arrow-down"></i>
-              </button>
-              <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm">
-                <i class="fas fa-eye"></i>
-              </a>
+            <div class="card product-card shadow-sm border-0">
+
+                <!-- Image produit -->
+                <div class="product-image-wrapper">
+                    {% if produit.images.exists %}
+                    <img src="{{ produit.images.first.image.url }}" alt="{{ produit.nom }}" class="product-img">
+                    {% else %}
+                    <img src="{% static 'images/default.png' %}" alt="{{ produit.nom }}" class="product-img">
+                    {% endif %}
+
+                    <!-- Overlay boutons desktop -->
+                    <div class="overlay d-flex justify-content-center align-items-center gap-2">
+                        <button class="btn btn-success btn-sm btn-add-cart" data-id="{{ produit.id }}" title="Ajouter au panier">
+                            <i class="fas fa-cart-arrow-down"></i>
+                        </button>
+                        <a href="{% url 'produit_detail_home' produit_id=produit.id %}" class="btn btn-info btn-sm" title="Voir le détail">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contenu produit -->
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold mb-1 text-truncate" title="{{ produit.nom }}">{{ produit.nom }}</h5>
+                    <p class="card-text text-danger fw-bold mb-2">{{ produit.prix }} Ar</p>
+
+                    <!-- Quantité avec boutons + et - stylés -->
+                    <div class="d-flex justify-content-center align-items-center gap-2 mt-2 quantity-wrapper">
+                        <button class="btn btn-qty btn-decrease" type="button">-</button>
+                        <input type="number" value="1" min="1" class="form-control form-control-sm qty-input">
+                        <button class="btn btn-qty btn-increase" type="button">+</button>
+                    </div>
+
+                </div>
+
             </div>
-          </div>
         </div>
         {% endfor %}
-      </div>
-      {% include 'includes/paginator.html' %}
     </div>
+    {% include 'includes/paginator.html' %}
+</div>
+
+<!-- ================= STYLES DES CARTES ================= -->
+<style>
+/* Carte produit moderne */
+.product-card {
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* Conteneur image carré */
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Image produit */
+.product-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+}
+.product-card:hover .product-img {
+    transform: scale(1.05);
+}
+
+/* Overlay desktop */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.product-card:hover .overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+.overlay .btn {
+    pointer-events: auto;
+    transition: transform 0.2s ease;
+}
+.overlay .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Texte produit */
+.card-title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-text {
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+/* Quantité stylée */
+.quantity-wrapper {
+    gap: 0.5rem;
+}
+.qty-input {
+    width: 50px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 0.25rem 0.3rem;
+}
+.btn-qty {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ced4da;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+}
+.btn-qty:hover {
+    background: #e9ecef;
+    transform: scale(1.1);
+}
+
+/* Responsive mobile */
+@media (max-width: 576px) {
+    .col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .overlay {
+        opacity: 1;
+        background: transparent;
+        pointer-events: none;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 5px 0;
+    }
+    .product-img {
+        height: auto;
+        padding: 5px;
+    }
+    .card-body {
+        padding: 0.5rem;
+    }
+    .card-title {
+        font-size: 0.85rem;
+    }
+    .card-text {
+        font-size: 0.9rem;
+    }
+    .qty-input {
+        width: 40px;
+        font-size: 0.85rem;
+    }
+    .btn-qty {
+        width: 28px;
+        height: 28px;
+    }
+}
+</style>
+
+<!-- ================= SCRIPT BOUTONS + et - ================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.quantity-wrapper').forEach(function(wrapper){
+        const input = wrapper.querySelector('.qty-input');
+        const btnIncrease = wrapper.querySelector('.btn-increase');
+        const btnDecrease = wrapper.querySelector('.btn-decrease');
+
+        btnIncrease.addEventListener('click', function() {
+            input.value = parseInt(input.value || 1) + 1;
+        });
+
+        btnDecrease.addEventListener('click', function() {
+            let val = parseInt(input.value || 1);
+            if(val > 1) input.value = val - 1;
+        });
+    });
+});
+</script>
