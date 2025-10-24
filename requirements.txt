@@ -8,6 +8,7 @@ charset-normalizer==3.4.4
 cryptography==46.0.2
 cssselect2==0.8.0
 Django==5.2.7
+django-tinymce==5.0.0
 django-widget-tweaks==1.5.0
 fonttools==4.60.1
 freetype-py==2.5.1

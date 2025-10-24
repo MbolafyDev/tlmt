@@ -60,7 +60,27 @@ INSTALLED_APPS = [
     "common",
     "plomberie",
     "statistique",
+    "tinymce",
 ]
+
+# (optionnel mais conseillé) : configuration par défaut
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 400,
+    "menubar": False,
+    "plugins": (
+        "advlist autolink lists link image charmap preview anchor "
+        "searchreplace visualblocks code fullscreen "
+        "insertdatetime media table code help wordcount"
+    ),
+    "toolbar": (
+        "undo redo | formatselect | "
+        "bold italic underline | alignleft aligncenter alignright alignjustify | "
+        "bullist numlist outdent indent | link image media | code preview"
+    ),
+    # Pour autoriser des balises HTML si tu utilises Django sanitize ailleurs
+    "valid_elements": "*[*]",
+    "content_style": "body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans','Liberation Sans',sans-serif; font-size:14px }",
+}
 
 # -----------------------------
 # Middleware

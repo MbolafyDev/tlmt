@@ -125,6 +125,7 @@
             <div class="row g-3">
               <!-- Catégorie -->
               <div class="col-12 col-md-6">
+                {{ form.media }}
                 <label class="form-label" for="{{ form.categorie.id_for_label }}">Catégorie</label>
                 {{ form.categorie }}
                 {% if form.categorie.errors %}<div class="text-danger">{{ form.categorie.errors }}</div>{% endif %}

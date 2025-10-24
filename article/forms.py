@@ -1,5 +1,6 @@
 from django import forms
 from article.models import Produit, Categorie, Caracteristique
+from tinymce.widgets import TinyMCE
 
 class ProduitForm(forms.ModelForm):
     class Meta:
@@ -27,8 +28,8 @@ class ProduitForm(forms.ModelForm):
         widgets = {
             "categorie": forms.Select(attrs={"class": "form-select"}),
             "nom": forms.TextInput(attrs={"class": "form-control"}),
-            "description_courte": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "description_detaillee": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "description_courte": TinyMCE(attrs={"rows": 20}),
+            "description_detaillee": TinyMCE(attrs={"rows": 20}),
             "prix_original": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "prix": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "caracteristiques": forms.SelectMultiple(attrs={"class": "form-select", "size": 6}),

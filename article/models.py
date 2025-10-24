@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from tinymce.models import HTMLField
 
 
 def _unique_slug_for(model_cls, base_text, *, pk_to_exclude=None, fallback="item"):
@@ -76,8 +77,8 @@ class Produit(models.Model):
     nom = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
 
-    description_courte = models.TextField(blank=True, null=True)
-    description_detaillee = models.TextField(blank=True, null=True)
+    description_courte = HTMLField(blank=True, null=True)
+    description_detaillee = HTMLField(blank=True, null=True)
 
     prix_original = models.DecimalField(max_digits=10, decimal_places=2)
     prix = models.DecimalField(max_digits=10, decimal_places=2)
