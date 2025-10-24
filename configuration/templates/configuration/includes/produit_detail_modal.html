@@ -39,7 +39,7 @@
         {% for label, value in details %}
           <div class="detail-item">
             <div class="detail-label">{{ label }}</div>
-            <div class="detail-value">{{ value }}</div>
+            <div class="detail-value">{{ value|safe }}</div>
           </div>
         {% endfor %}
       </div>

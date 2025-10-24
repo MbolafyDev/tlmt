@@ -18,6 +18,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from contact.models import ContactMessage
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.utils.safestring import mark_safe
 
 
 # ---------------- Users ----------------
@@ -162,6 +163,9 @@ def produit_detail(request, produit_id):
                 value = attr
         if value in (None, ""):
             value = "—"
+        # ✅ Marquer les champs HTML comme "safe"
+        if name in ["description_courte", "description_detaillee", "description_longue"]:
+            value = mark_safe(value)
         details.append((label, value))
 
     return render(
