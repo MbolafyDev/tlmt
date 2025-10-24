@@ -139,7 +139,7 @@
           <div class="d-flex flex-column flex-grow-1">
             <div class="card-body py-2">
               <h5 class="card-title">{{ produit.nom }}</h5>
-              <p class="card-text mb-1">{{ produit.description_courte|truncatechars:60 }}</p>
+              <p class="card-text mb-1">{{ produit.description_courte|safe|truncatechars:60 }}</p>
               <p class="mb-0"><strong>Prix :</strong> {{ produit.prix }} €</p>
               <p class="mb-0"><strong>Catégorie :</strong> {{ produit.categorie.nom|default:"—" }}</p>
             </div>

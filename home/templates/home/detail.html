@@ -175,7 +175,7 @@
     <!-- Détails -->
     <div class="col-md-6">
       <h2 class="fw-bold">{{ produit.nom }}</h2>
-      <p class="text-muted">{{ produit.description_courte }}</p>
+      <p class="text-muted">{{ produit.description_courte|safe }}</p>
 
       <h3 class="mt-2">
         {% if produit.prix_original %}
@@ -229,7 +229,7 @@
 
   <div class="mt-5">
     <h4>Description détaillée</h4>
-    <p>{{ produit.description_detaillee|default:"Pas de description détaillée disponible." }}</p>
+    <p>{{ produit.description_detaillee|safe|default:"Pas de description détaillée disponible." }}</p>
   </div>
 </div>
 {% endblock content %}

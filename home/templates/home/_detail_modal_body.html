@@ -39,7 +39,7 @@
     </div>
 
     <div class="col-md-6">
-      <p class="text-muted">{{ produit.description_courte }}</p>
+      <p class="text-muted">{{ produit.description_courte|safe }}</p>
       <h5 class="mb-3">
         {% if produit.prix_original %}
           <span class="text-decoration-line-through text-muted">{{ produit.prix_original|intcomma }} Ar</span>
