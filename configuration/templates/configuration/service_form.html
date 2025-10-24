@@ -127,6 +127,7 @@
     <div class="card shadow-sm">
       <div class="card-body">
         <div class="row g-3">
+          {{ form.media }}
           {% for field in form %}
             <div class="col-md-6">
               <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
