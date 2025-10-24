@@ -35,7 +35,7 @@
     <!-- Détails -->
     <div class="p-4 bg-white rounded-bottom shadow-sm">
       <h5 class="fw-semibold mb-3 text-secondary border-bottom pb-2">Détails du service</h5>
-      <p><strong>Description :</strong> {{ service.description|default:"—" }}</p>
+      <p><strong>Description :</strong> {{ service.description|safe|default:"—" }}</p>
       <p><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
       <p><strong>Durée :</strong> {{ service.duree|default:"—" }}</p>
       <p><strong>Date début :</strong> {{ service.date_debut|date:"d/m/Y"|default:"—" }}</p>

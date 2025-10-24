@@ -184,7 +184,7 @@
           <!-- Bloc détails -->
           <div class="d-flex flex-column flex-grow-1">
             <div class="card-body py-2">
-              <p class="card-text mb-2">{{ service.description|truncatechars:60 }}</p>
+              <p class="card-text mb-2">{{ service.description|safe|truncatechars:60 }}</p>
               <p class="mb-0"><strong>Lieu :</strong> {{ service.lieu|default:"—" }}</p>
             </div>
 
