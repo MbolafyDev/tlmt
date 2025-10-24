@@ -27,9 +27,9 @@
               <p class="card-text">
                 {% if service.description %}
                   {% if service.description|length > 50 %}
-                    {{ service.description|slice:":50" }}...
+                    {{ service.description|safe|slice:":50" }}...
                   {% else %}
-                    {{ service.description }}
+                    {{ service.description|safe }}
                   {% endif %}
                   <a href="#" class="voir-plus-service" data-service-id="{{ service.id }}">Voir plus</a>
                 {% else %}

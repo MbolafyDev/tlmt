@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from .models import Service, ServiceImage
+from tinymce.widgets import TinyMCE
 
 class ServiceForm(forms.ModelForm):
     class Meta:
@@ -15,7 +16,7 @@ class ServiceForm(forms.ModelForm):
         }
         widgets = {
             'titre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Titre du service'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description du service'}),
+            'description': TinyMCE(attrs={"rows": 20}),
             'lieu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu'}),
             'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

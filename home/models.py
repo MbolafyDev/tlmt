@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from article.models import Produit
 from django.utils import timezone
+from tinymce.models import HTMLField
 
 # ======= Commandes =======
 class Commande(models.Model):
@@ -57,7 +58,7 @@ class Service(models.Model):
     ]
 
     titre = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True)
+    description = HTMLField(blank=True, null=True)
     lieu = models.CharField(max_length=200, blank=True, null=True)
     date_debut = models.DateField(blank=True, null=True)
     date_fin = models.DateField(blank=True, null=True)
