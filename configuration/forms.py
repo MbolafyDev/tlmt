@@ -29,8 +29,8 @@ class ProduitForm(forms.ModelForm):
         ]
         widgets = {
             'nom': forms.TextInput(attrs={"class": "form-control"}),
-            'description_courte': forms.Textarea(attrs={"class": "form-control", "rows": 2}),
-            'description_detaillee': forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "description_courte": TinyMCE(attrs={"rows": 20}),
+            "description_detaillee": TinyMCE(attrs={"rows": 20}),
             'prix_original': forms.NumberInput(attrs={"class": "form-control"}),
             'prix': forms.NumberInput(attrs={"class": "form-control"}),
             'categorie': forms.Select(attrs={"class": "form-control"}),
