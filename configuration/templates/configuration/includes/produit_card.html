@@ -1,0 +1,52 @@
+<div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="card h-100 d-flex flex-column position-relative">
+
+          <!-- Badge actif/inactif -->
+          <span class="badge position-absolute top-0 end-0 m-2
+            {% if produit.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+            {% if produit.is_active %}Actif{% else %}Inactif{% endif %}
+          </span>
+
+          <!-- Image -->
+          <div class="p-3 text-center">
+            {% if produit.images.all %}
+              <img src="{{ produit.images.first.image.url }}" class="img-card mx-auto" alt="{{ produit.nom }}">
+            {% else %}
+              <img src="https://via.placeholder.com/150?text=Pas+d'image" class="img-card mx-auto" alt="No image">
+            {% endif %}
+          </div>
+
+          <!-- Détails -->
+          <div class="d-flex flex-column flex-grow-1">
+            <div class="card-body py-2">
+              <h5 class="card-title">{{ produit.nom }}</h5>
+              <p class="card-text mb-1">{{ produit.description_courte|safe|truncatechars:60 }}</p>
+              <p class="mb-0"><strong>Prix :</strong> {{ produit.prix }} €</p>
+              <p class="mb-0"><strong>Catégorie :</strong> {{ produit.categorie.nom|default:"—" }}</p>
+            </div>
+
+            <div class="card-footer mt-auto d-flex justify-content-center gap-2">
+              <button type="button"
+                      class="btn btn-outline-secondary btn-view"
+                      data-url="{% url 'produit_detail' produit.id %}"
+                      title="Voir les détails">
+                <i class="fa fa-eye"></i>
+              </button>
+
+              <a href="{% url 'produit_edit' produit.id %}"
+                 class="btn btn-outline-primary"
+                 title="Modifier">
+                <i class="fa fa-pen"></i>
+              </a>
+
+              <a href="{% url 'produit_delete' produit.id %}"
+                 class="btn btn-outline-danger"
+                 onclick="return confirm('Supprimer ce produit ?')"
+                 title="Supprimer">
+                <i class="fa fa-trash"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
