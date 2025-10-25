@@ -1,24 +1,149 @@
+{# ---- Carousel promo : images non rognées, texte lisible & design raffiné ---- #}
 <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        {% for slide in slides %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-            <img src="{{ slide.image.url }}" class="d-block w-100" alt="{{ slide.titre }}">
-            <div class="carousel-caption text-start">
-                {% if slide.titre %}<h2>{{ slide.titre }}</h2>{% endif %}
-                {% if slide.sous_titre %}<h3>{{ slide.sous_titre }}</h3>{% endif %}
-                {% if slide.description %}<p>{{ slide.description }}</p>{% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+  <div class="carousel-inner">
 
-    <!-- Navigation -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Précédent</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Suivant</span>
-    </button>
+    {% for slide in slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="slide-viewport">
+          <img
+            src="{{ slide.image.url }}"
+            alt="{{ slide.titre }}"
+            class="slide-img"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+
+        {% if slide.titre or slide.sous_titre or slide.description %}
+        <div class="carousel-caption text-start">
+          <div class="caption-backdrop">
+            {% if slide.titre %}<h2 class="slide-title">{{ slide.titre }}</h2>{% endif %}
+            {% if slide.sous_titre %}<h3 class="slide-subtitle">{{ slide.sous_titre }}</h3>{% endif %}
+            {% if slide.description %}<p class="slide-desc">{{ slide.description }}</p>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  </div>
+
+  <!-- Navigation -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Précédent</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Suivant</span>
+  </button>
 </div>
+
+<style>
+  /* ====== PARAMÈTRES DE HAUTEUR ====== */
+  #promoCarousel .slide-viewport {
+    position: relative;
+    width: 100%;
+    height: 360px;             /* Hauteur réduite et harmonieuse */
+    overflow: hidden;
+    background: #f8f9fa;
+  }
+  @media (max-width: 991.98px) {
+    #promoCarousel .slide-viewport { height: 300px; }
+  }
+  @media (max-width: 575.98px) {
+    #promoCarousel .slide-viewport { height: 240px; }
+  }
+
+  /* ====== IMAGE JAMAMAIS ROGNÉE ====== */
+  #promoCarousel .slide-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;       /* ✅ jamais rognée */
+    object-position: center;
+    display: block;
+  }
+
+  /* Écrase tout object-fit:cover hérité */
+  #promoCarousel .carousel-item img {
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  /* ====== ARRIÈRE-PLAN DÉGRADÉ pour lisibilité du texte ====== */
+  #promoCarousel .carousel-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ====== LÉGENDE LISIBLE ET ÉLÉGANTE ====== */
+  #promoCarousel .carousel-caption {
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: auto;
+    z-index: 2;
+    text-shadow: none;
+  }
+
+  #promoCarousel .caption-backdrop {
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    color: #fff;
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    max-width: min(92vw, 70ch);
+  }
+
+  #promoCarousel .slide-title {
+    margin: 0 0 .3rem 0;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    line-height: 1.2;
+  }
+  #promoCarousel .slide-subtitle {
+    margin: 0 0 .3rem 0;
+    font-weight: 600;
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+  }
+  #promoCarousel .slide-desc {
+    margin: 0;
+    font-size: clamp(.9rem, 1.5vw, 1.05rem);
+    opacity: 0.9;
+  }
+
+  /* Petits écrans */
+  @media (max-width: 575.98px) {
+    #promoCarousel .carousel-caption {
+      bottom: .8rem;
+      left: .8rem;
+    }
+    #promoCarousel .caption-backdrop {
+      padding: .6rem .8rem;
+    }
+  }
+
+  /* ====== CONTRÔLES ====== */
+  #promoCarousel .carousel-control-prev-icon,
+  #promoCarousel .carousel-control-next-icon {
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));
+  }
+
+  #promoCarousel .carousel-control-prev:hover,
+  #promoCarousel .carousel-control-next:hover {
+    transform: scale(1.1);
+    transition: 0.25s ease;
+  }
+</style>
