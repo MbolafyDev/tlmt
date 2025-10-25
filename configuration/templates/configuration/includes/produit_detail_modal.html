@@ -56,58 +56,66 @@
 
 <!-- ================= STYLES MODAL ================= -->
 <style>
-  .modal-img-carousel {
-    max-width: 340px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  }
+/* ====== Style modal ultra moderne ====== */
+.modal-img-carousel {
+  max-width: 340px;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  /* Grille propre pour les paires label/valeur */
+.modal-img-carousel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* Grille propre pour les paires label/valeur */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .5rem 1rem;
+}
+@media (min-width: 768px) {
   .details-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: .5rem .75rem;
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
   }
-  @media (min-width: 768px) {
-    .details-grid {
-      grid-template-columns: 1fr 2fr;
-      align-items: start;
-    }
-  }
-  .detail-item { display: contents; }
-  .detail-label {
-    font-weight: 600;
-    color: #0d1b2a;
-    padding: .25rem 0;
-  }
-  .detail-value {
-    padding: .25rem 0;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    color: #495057;
-  }
+}
+.detail-item { display: contents; }
+.detail-label {
+  font-weight: 600;
+  color: #0d1b2a;
+  padding: .25rem 0;
+}
+.detail-value {
+  padding: .25rem 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: #495057;
+}
 
-  /* Boutons du footer du modal */
-  .modal-footer .btn-primary {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #0d1b2a;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s;
-  }
-  .modal-footer .btn-primary:hover {
-    background-color: #e0a800;
-    border-color: #e0a800;
-  }
+/* Boutons du footer du modal */
+.modal-footer .btn-primary {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #0d1b2a;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.modal-footer .btn-primary:hover {
+  background-color: #e0a800;
+  border-color: #e0a800;
+}
 
-  .modal-footer .btn-secondary {
-    border-radius: 50px;
-    font-weight: 500;
-    transition: all 0.3s;
-  }
-  .modal-footer .btn-secondary:hover {
-    background-color: #6c757d;
-    color: #fff;
-  }
+.modal-footer .btn-secondary {
+  border-radius: 50px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+.modal-footer .btn-secondary:hover {
+  background-color: #6c757d;
+  color: #fff;
+}
 </style>

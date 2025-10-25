@@ -1,52 +1,97 @@
 <div class="col-lg-3 col-md-6 col-sm-12">
-        <div class="card h-100 d-flex flex-column position-relative">
+  <div class="card h-100 d-flex flex-column position-relative shadow-sm border-0 rounded-4 overflow-hidden transition-card">
 
-          <!-- Badge actif/inactif -->
-          <span class="badge position-absolute top-0 end-0 m-2
-            {% if produit.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-            {% if produit.is_active %}Actif{% else %}Inactif{% endif %}
-          </span>
+    <!-- Badge actif/inactif -->
+    <span class="badge position-absolute top-0 end-0 m-3 px-3 py-2 fs-6
+      {% if produit.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+      {% if produit.is_active %}Actif{% else %}Inactif{% endif %}
+    </span>
 
-          <!-- Image -->
-          <div class="p-3 text-center">
-            {% if produit.images.all %}
-              <img src="{{ produit.images.first.image.url }}" class="img-card mx-auto" alt="{{ produit.nom }}">
-            {% else %}
-              <img src="https://via.placeholder.com/150?text=Pas+d'image" class="img-card mx-auto" alt="No image">
-            {% endif %}
-          </div>
+    <!-- Image -->
+    <div class="p-3 text-center bg-light">
+      {% if produit.images.all %}
+        <img src="{{ produit.images.first.image.url }}" class="img-card mx-auto rounded-3 shadow-sm" alt="{{ produit.nom }}">
+      {% else %}
+        <img src="https://via.placeholder.com/150?text=Pas+d'image" class="img-card mx-auto rounded-3 shadow-sm" alt="No image">
+      {% endif %}
+    </div>
 
-          <!-- Détails -->
-          <div class="d-flex flex-column flex-grow-1">
-            <div class="card-body py-2">
-              <h5 class="card-title">{{ produit.nom }}</h5>
-              <p class="card-text mb-1">{{ produit.description_courte|safe|truncatechars:60 }}</p>
-              <p class="mb-0"><strong>Prix :</strong> {{ produit.prix }} €</p>
-              <p class="mb-0"><strong>Catégorie :</strong> {{ produit.categorie.nom|default:"—" }}</p>
-            </div>
-
-            <div class="card-footer mt-auto d-flex justify-content-center gap-2">
-              <button type="button"
-                      class="btn btn-outline-secondary btn-view"
-                      data-url="{% url 'produit_detail' produit.id %}"
-                      title="Voir les détails">
-                <i class="fa fa-eye"></i>
-              </button>
-
-              <a href="{% url 'produit_edit' produit.id %}"
-                 class="btn btn-outline-primary"
-                 title="Modifier">
-                <i class="fa fa-pen"></i>
-              </a>
-
-              <a href="{% url 'produit_delete' produit.id %}"
-                 class="btn btn-outline-danger"
-                 onclick="return confirm('Supprimer ce produit ?')"
-                 title="Supprimer">
-                <i class="fa fa-trash"></i>
-              </a>
-            </div>
-          </div>
-
-        </div>
+    <!-- Détails -->
+    <div class="d-flex flex-column flex-grow-1">
+      <div class="card-body py-3">
+        <h5 class="card-title fw-bold text-truncate">{{ produit.nom }}</h5>
+        <p class="card-text text-muted mb-2">{{ produit.description_courte|safe|truncatechars:60 }}</p>
+        <p class="mb-1"><strong>Prix :</strong> <span class="text-primary">{{ produit.prix }} €</span></p>
+        <p class="mb-0"><strong>Catégorie :</strong> {{ produit.categorie.nom|default:"—" }}</p>
       </div>
+
+      <div class="card-footer mt-auto d-flex justify-content-center gap-2 border-0 bg-white">
+        <button type="button"
+                class="btn btn-outline-secondary btn-view shadow-sm hover-scale"
+                data-url="{% url 'produit_detail' produit.id %}"
+                title="Voir les détails">
+          <i class="fa fa-eye"></i>
+        </button>
+
+        <a href="{% url 'produit_edit' produit.id %}"
+           class="btn btn-outline-primary shadow-sm hover-scale"
+           title="Modifier">
+          <i class="fa fa-pen"></i>
+        </a>
+
+        <a href="{% url 'produit_delete' produit.id %}"
+           class="btn btn-outline-danger shadow-sm hover-scale"
+           onclick="return confirm('Supprimer ce produit ?')"
+           title="Supprimer">
+          <i class="fa fa-trash"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* ====== Carte ultra belle ====== */
+.transition-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.transition-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.img-card {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain; /* Flexible et ne rogne plus l'image */
+  transition: transform 0.3s ease;
+}
+
+.img-card:hover {
+  transform: scale(1.05);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.1);
+}
+
+.card-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-body p {
+  font-size: 0.9rem;
+}
+
+.card-footer .btn {
+  border-width: 2px;
+}
+</style>
