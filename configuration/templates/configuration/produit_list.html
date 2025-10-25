@@ -3,6 +3,7 @@
 {% block title %}Gestion des produits - Zara Store{% endblock %}
 
 {% block content %}
+<!-- ================= STYLES LOCAUX ================= -->
 <style>
   :root {
     --primary-yellow: #ffcc00;
@@ -111,13 +112,15 @@
   }
 </style>
 
+<!-- ================= CONTENU PRINCIPAL ================= -->
 <div class="container mt-4 mb-5">
   <h2>Gestion des produits</h2>
   <a href="{% url 'produit_add' %}" class="btn btn-primary mb-3">Ajouter un produit</a>
 
-  <div class="row">
+  <!-- Vérifie que la grille Bootstrap s’applique -->
+  <div class="row g-3">
     {% for produit in produits %}
-      <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+      <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card h-100 d-flex flex-column position-relative">
 
           <!-- Badge actif/inactif -->
@@ -145,7 +148,6 @@
             </div>
 
             <div class="card-footer mt-auto d-flex justify-content-center gap-2">
-              <!-- Voir détails modal -->
               <button type="button"
                       class="btn btn-outline-secondary btn-view"
                       data-url="{% url 'produit_detail' produit.id %}"
@@ -153,14 +155,12 @@
                 <i class="fa fa-eye"></i>
               </button>
 
-              <!-- Modifier -->
               <a href="{% url 'produit_edit' produit.id %}"
                  class="btn btn-outline-primary"
                  title="Modifier">
                 <i class="fa fa-pen"></i>
               </a>
 
-              <!-- Supprimer -->
               <a href="{% url 'produit_delete' produit.id %}"
                  class="btn btn-outline-danger"
                  onclick="return confirm('Supprimer ce produit ?')"
@@ -182,7 +182,7 @@
   {% endif %}
 </div>
 
-<!-- Modal détails produit -->
+<!-- ================= MODAL ================= -->
 <div class="modal fade" id="produitDetailModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -197,6 +197,7 @@
   </div>
 </div>
 
+<!-- ================= SCRIPT MODAL ================= -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const modalEl = document.getElementById('produitDetailModal');
@@ -225,4 +226,5 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
+
 {% endblock %}
