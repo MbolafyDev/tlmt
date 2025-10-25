@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title|default:"Ajouter un slide" }}{% endblock %}
+
+{% block form_media %}
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6">
+      <div class="card shadow-lg rounded-4 border-0 p-4">
+        <h2 class="mb-4 text-center fw-bold">{{ title|default:"Ajouter un slide" }}</h2>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+
+          {% for field in form %}
+            <div class="mb-3">
+              {# ✅ Détection fiable du checkbox #}
+              {% if field.field.widget.input_type == "checkbox" %}
+                <div class="form-check form-switch">
+                  {# on applique la classe Bootstrap switch #}
+                  {% render_field field class+="form-check-input" id=field.id_for_label role="switch" %}
+                  <label class="form-check-label fw-semibold" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                  </label>
+                  {% if field.errors %}
+                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                  {% endif %}
+                </div>
+
+              {% else %}
+                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                {# Champ standard : input, textarea, file, etc. #}
+                {% if field.errors %}
+                  {% render_field field class+="form-control form-control-lg rounded-3 is-invalid" id=field.id_for_label placeholder=field.label %}
+                  <div class="invalid-feedback d-block">
+                    {{ field.errors|striptags }}
+                  </div>
+                {% else %}
+                  {% render_field field class+="form-control form-control-lg rounded-3" id=field.id_for_label placeholder=field.label %}
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'slide_list' %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+            <button type="submit" class="btn btn-success btn-lg fw-bold">Enregistrer</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Focus agréable sur inputs/textarea (la carte porte visuel) */
+  .card input.form-control:focus,
+  .card textarea.form-control:focus,
+  .card select.form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  }
+
+  /* Switch cochée en vert */
+  .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+
+  .form-check-label {
+    user-select: none;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
+</style>
+{% endblock %}

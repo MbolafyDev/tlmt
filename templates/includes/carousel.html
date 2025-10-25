@@ -1,126 +1,22 @@
-{% load static %}
-
-<style>
-/* --- Styles d’adaptation et de visibilité du texte --- */
-#promoCarousel {
-    position: relative;
-    overflow: hidden;
-}
-
-#promoCarousel .carousel-item {
-    position: relative;
-    height: 45vh; /* ✅ Hauteur fixe conservée */
-}
-
-/* Image : visible en entier, hauteur respectée, pas rognée, pas de bandes noires visibles */
-#promoCarousel .carousel-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;       /* ✅ L’image entière reste visible */
-    object-position: center;   /* ✅ Centrée parfaitement */
-    background-color: transparent; /* ✅ Supprime la sensation de bande noire */
-}
-
-/* Overlay sombre pour améliorer la lisibilité du texte */
-#promoCarousel .carousel-item::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
-    z-index: 1;
-}
-
-/* Texte */
-#promoCarousel .carousel-caption {
-    position: absolute;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 0.5rem;
-    padding: 1rem 1.5rem;
-    max-width: 550px;
-}
-
-#promoCarousel h2, #promoCarousel h3 {
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-    font-weight: 700;
-}
-
-#promoCarousel p {
-    color: #f8f9fa;
-    font-size: 1.05rem;
-    margin-top: .3rem;
-}
-
-/* Mode tablette */
-@media (max-width: 992px) {
-    #promoCarousel .carousel-item {
-        height: 40vh;
-    }
-}
-
-/* Mode mobile */
-@media (max-width: 768px) {
-    #promoCarousel .carousel-item {
-        height: 30vh;
-    }
-
-    #promoCarousel .carousel-caption {
-        font-size: 0.9rem;
-        max-width: 90%;
-        bottom: 0.8rem;
-        padding: .8rem 1rem;
-    }
-
-    #promoCarousel h2, #promoCarousel h3 {
-        font-size: 1.1rem;
-    }
-
-    #promoCarousel p {
-        font-size: 0.85rem;
-    }
-}
-</style>
-
 <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-        <!-- Slide 1 -->
-        <div class="carousel-item active">
-            <img src="{% static 'images/slide-1.png' %}" class="d-block w-100" alt="Électricité et plomberie TLMT">
+        {% for slide in slides %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ slide.image.url }}" class="d-block w-100" alt="{{ slide.titre }}">
             <div class="carousel-caption text-start">
-                <h2>TLMT Services — Votre partenaire de confiance</h2>
-                <p>Nous assurons des services complets d’électricité et de plomberie sanitaire pour particuliers et professionnels.</p>
+                {% if slide.titre %}<h2>{{ slide.titre }}</h2>{% endif %}
+                {% if slide.sous_titre %}<h3>{{ slide.sous_titre }}</h3>{% endif %}
+                {% if slide.description %}<p>{{ slide.description }}</p>{% endif %}
             </div>
         </div>
-
-        <!-- Slide 2 -->
-        <div class="carousel-item">
-            <img src="{% static 'images/slide-2.png' %}" class="d-block w-100" alt="Devis et dimensionnement">
-            <div class="carousel-caption">
-                <h3>Études, devis & dimensionnement précis</h3>
-                <p>Nos experts vous accompagnent pour concevoir et estimer vos installations avec transparence et efficacité.</p>
-            </div>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="carousel-item">
-            <img src="{% static 'images/slide-3.jpg' %}" class="d-block w-100" alt="Maintenance et support client">
-            <div class="carousel-caption">
-                <h3>Maintenance & support client réactif</h3>
-                <p>Un service rapide, fiable et à l’écoute, pour garantir la sécurité et la durabilité de vos installations.</p>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- Boutons de navigation -->
+    <!-- Navigation -->
     <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Précédent</span>
     </button>
-
     <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Suivant</span>

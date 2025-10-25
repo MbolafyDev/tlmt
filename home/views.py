@@ -2,28 +2,32 @@ from decimal import Decimal
 import random
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 
 from article.models import Produit, Categorie
+from carousel.models import Slide 
 from article.utils import render_to_pdf
-from .models import Service, ServiceLike, ServiceComment, Commande, CommandeItem, CommandeDetail
+from .models import (
+    Service, ServiceLike, ServiceComment,
+    Commande, CommandeItem, CommandeDetail
+)
 
-# ------------------ VIEWS ------------------
-
+# ------------------ HOME ------------------
 def home(request):
-    # ---------------- SERVICES ----------------
+    """ Page d'accueil avec services, produits filtrables et carousel dynamique """
+    
+    # --- Services ---
     services = Service.objects.prefetch_related("images").filter(is_active=True).order_by('-date_creation')
     statut_filter = request.GET.get('statut')
     if statut_filter:
         services = services.filter(statut=statut_filter)
 
-    # ---------------- FILTRAGE PRODUITS ----------------
+    # --- Produits ---
     produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
     categorie_slug = request.GET.get('categorie')
     prix_min = request.GET.get('prix_min')
@@ -33,11 +37,15 @@ def home(request):
     if categorie_slug:
         produits_list = produits_list.filter(categorie__slug=categorie_slug)
     if prix_min:
-        try: produits_list = produits_list.filter(prix__gte=Decimal(prix_min))
-        except: pass
+        try:
+            produits_list = produits_list.filter(prix__gte=Decimal(prix_min))
+        except:
+            pass
     if prix_max:
-        try: produits_list = produits_list.filter(prix__lte=Decimal(prix_max))
-        except: pass
+        try:
+            produits_list = produits_list.filter(prix__lte=Decimal(prix_max))
+        except:
+            pass
     if tri == 'alpha':
         produits_list = produits_list.order_by('nom')
     else:
@@ -47,6 +55,9 @@ def home(request):
     produits = paginator.get_page(request.GET.get('page'))
     categories_menu = Categorie.objects.all()
 
+    # --- Carousel ---
+    slides = Slide.objects.filter(actif=True)  # Récupère uniquement les slides actifs, triés par 'ordre'
+
     return render(request, 'home/home.html', {
         "services": services,
         "produits": produits,
@@ -55,9 +66,13 @@ def home(request):
         "prix_min": prix_min or '',
         "prix_max": prix_max or '',
         "tri": tri or '',
+        "slides": slides,  # <-- On passe les slides au template
     })
 
+
+# ------------------ VENTES ------------------
 def ventes(request, slug=None):
+    """ Page de vente avec filtrage par catégorie """
     categories_menu = Categorie.objects.all()
     if slug:
         categorie = get_object_or_404(Categorie, slug=slug)
@@ -65,11 +80,15 @@ def ventes(request, slug=None):
     else:
         categorie = None
         produits_list = Produit.objects.prefetch_related("images").filter(is_active=True)
+
     paginator = Paginator(produits_list, 12)
     produits = paginator.get_page(request.GET.get('page'))
+
+    # --- Gestion du panier ---
     panier = request.session.get('panier', {}) or {}
     request.session['panier'] = panier
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
     return render(request, 'home/vente.html', {
         "produits": produits,
         "total_items": total_items,
@@ -77,7 +96,10 @@ def ventes(request, slug=None):
         "slug": slug
     })
 
+
+# ------------------ DETAIL PRODUIT ------------------
 def produit_detail(request, produit_id):
+    """ Détail produit (modal HTMX ou page normale) """
     produit = get_object_or_404(
         Produit.objects.prefetch_related("images", "caracteristiques", "couleurs"),
         pk=produit_id
@@ -85,11 +107,15 @@ def produit_detail(request, produit_id):
     panier = request.session.get('panier', {}) or {}
     request.session['panier'] = panier
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
+
     is_htmx = request.headers.get("HX-Request") == "true" or request.headers.get("X-Requested-With") == "XMLHttpRequest"
     template_name = "home/_detail_modal_body.html" if is_htmx else "home/detail.html"
+
     return render(request, template_name, {'produit': produit, 'total_items': total_items})
 
+
 def produit_detail_resultat(request, produit_id):
+    """ Détail produit spécifique pour résultats modal """
     produit = get_object_or_404(
         Produit.objects.prefetch_related("images", "caracteristiques", "couleurs"),
         pk=produit_id
@@ -97,18 +123,23 @@ def produit_detail_resultat(request, produit_id):
     panier = request.session.get('panier', {}) or {}
     request.session['panier'] = panier
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
-    template_name = "home/resultat_detail_modal_body.html"
-    return render(request, template_name, {'produit': produit, 'total_items': total_items})
 
+    return render(request, "home/resultat_detail_modal_body.html", {'produit': produit, 'total_items': total_items})
+
+
+# ------------------ PANIER ------------------
 def ajouter_au_panier(request):
+    """ Ajouter un produit au panier via AJAX """
     if not request.user.is_authenticated:
         return JsonResponse({"success": False, "redirect": True, "login_url": "/users/login/"})
+
     if request.method == "POST":
         produit_id = request.POST.get("produit_id")
         quantite = int(request.POST.get("quantite", 1) or 1)
         produit = get_object_or_404(Produit, id=produit_id)
         panier = request.session.get("panier", {}) or {}
         key = str(produit_id)
+
         if key in panier:
             panier[key]["quantite"] += quantite
         else:
@@ -122,19 +153,23 @@ def ajouter_au_panier(request):
                 "quantite": quantite,
                 "image": image_url,
             }
+
         request.session["panier"] = panier
         request.session.modified = True
         total_items = sum(int(item.get("quantite", 0)) for item in panier.values())
+
         return JsonResponse({"success": True, "total_items": total_items})
+
     return JsonResponse({"success": False})
+
 
 @login_required
 def checkout(request):
+    """ Page checkout et gestion du paiement """
     panier = request.session.get('panier', {}) or {}
     total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values())
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
 
-    # POST : paiement ou suppression
     if request.method == "POST":
         remove_id = request.POST.get("remove_id")
         if remove_id:
@@ -148,7 +183,6 @@ def checkout(request):
             messages.error(request, "Votre panier est vide.")
             return redirect('checkout')
 
-        # Paiement espèces / Mobile Money
         if mode in ["espece", "mvola", "airtel", "orange"]:
             request.session['payment_mode'] = mode
             return redirect('info_commande')
@@ -159,8 +193,10 @@ def checkout(request):
         'total_items': total_items
     })
 
+
 @login_required
 def info_commande(request):
+    """ Informations du client et création de commande """
     panier = request.session.get('panier', {}) or {}
     total = sum(Decimal(str(item.get('prix', 0))) * int(item.get('quantite', 0)) for item in panier.values())
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
@@ -182,6 +218,7 @@ def info_commande(request):
             email=email,
             mode_paiement=mode
         )
+
         for produit_id, item in panier.items():
             produit_obj = get_object_or_404(Produit, id=produit_id)
             CommandeItem.objects.create(
@@ -190,6 +227,7 @@ def info_commande(request):
                 quantite=int(item.get('quantite', 0)),
                 prix_unitaire=Decimal(str(item.get('prix', 0)))
             )
+
         CommandeDetail.objects.create(
             commande=commande,
             nom_complet=nom_complet,
@@ -200,6 +238,7 @@ def info_commande(request):
             commentaire=commentaire
         )
 
+        # Reset session
         request.session['panier'] = {}
         request.session['payment_mode'] = None
         messages.success(request, f"Commande {numero_facture} enregistrée avec succès ! Mode de paiement : {mode}")
@@ -212,7 +251,10 @@ def info_commande(request):
         'mode': mode
     })
 
+
+# ------------------ CATEGORIE ------------------
 def categorie_detail(request, slug):
+    """ Détail catégorie avec pagination """
     categorie = get_object_or_404(Categorie, slug=slug)
     produits_list = categorie.produits.all()
     paginator = Paginator(produits_list, 10)
@@ -221,24 +263,32 @@ def categorie_detail(request, slug):
     total_items = sum(int(item.get('quantite', 0)) for item in panier.values())
     return render(request, 'home/home.html', {'produits': produits, 'categorie': categorie, 'total_items': total_items})
 
+
+# ------------------ SERVICE ------------------
 @require_GET
 def voir_plus_service(request, service_id):
+    """ Voir plus de détails d'un service (modal) """
     service = get_object_or_404(Service.objects.prefetch_related("images"), pk=service_id)
     html_modal = render_to_string('home/_modal_service.html', {'service': service}, request=request)
     return JsonResponse({'html': html_modal})
 
+
 @login_required
 @require_POST
 def like_service(request):
+    """ Liker/déliker un service """
     service = get_object_or_404(Service, id=request.POST.get('service_id'))
     like, created = ServiceLike.objects.get_or_create(user=request.user, service=service)
-    if not created: like.delete(); liked=False
-    else: liked=True
+    liked = created
+    if not created:
+        like.delete()
+        liked = False
     return JsonResponse({'liked': liked, 'likes_count': service.likes_count})
 
 
 @login_required
 def get_comments_service(request, service_id):
+    """ Récupérer les commentaires d'un service avec leurs réponses """
     service = get_object_or_404(Service, id=service_id)
     comments_data = []
 
@@ -266,14 +316,15 @@ def get_comments_service(request, service_id):
 @login_required
 @require_POST
 def comment_service(request):
+    """ Ajouter un commentaire sur un service """
     service = get_object_or_404(Service, id=request.POST.get('service_id'))
     content = request.POST.get('content')
     if not content.strip():
         return JsonResponse({'success': False, 'error': 'Le commentaire ne peut pas être vide.'})
-    
+
     comment = ServiceComment.objects.create(user=request.user, service=service, content=content)
     avatar_url = request.user.image.url if request.user.image else '/static/images/default.png'
-    
+
     return JsonResponse({
         'success': True,
         'comment_id': comment.id,
@@ -283,21 +334,27 @@ def comment_service(request):
         'comments_count': service.comments_count
     })
 
+
 @login_required
 @require_POST
 def reply_comment_service(request):
+    """ Répondre à un commentaire existant """
     parent_comment = get_object_or_404(ServiceComment, id=request.POST.get('comment_id'))
     content = request.POST.get('content')
     if not content.strip():
         return JsonResponse({'success': False, 'error': 'Le message ne peut pas être vide.'})
-    
-    reply = ServiceComment.objects.create(user=request.user, service=parent_comment.service, content=content, parent=parent_comment)
+
+    reply = ServiceComment.objects.create(
+        user=request.user,
+        service=parent_comment.service,
+        content=content,
+        parent=parent_comment
+    )
     avatar_url = reply.user.image.url if reply.user.image else '/static/images/default.png'
-    
+
     return JsonResponse({
         'success': True,
         'username': reply.user.username,
         'content': reply.content,
         'avatar_url': avatar_url
     })
-

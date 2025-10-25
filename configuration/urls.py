@@ -47,4 +47,9 @@ urlpatterns = [
     path('contact-messages/mark-read/', views.contact_message_mark_read, name='contact_message_mark_read'),
     # AJAX pour badge notifications
     path('ajax/new-messages-count/', views.get_new_messages_count, name='ajax_new_messages_count'),
+
+    path('slides/', views.slide_list, name='slide_list'),
+    path('slides/add/', views.slide_add, name='slide_add'),
+    path('slides/edit/<int:slide_id>/', views.slide_edit, name='slide_edit'),
+    path('slides/delete/<int:slide_id>/', views.slide_delete, name='slide_delete'),
 ]

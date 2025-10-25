@@ -19,6 +19,8 @@ from contact.models import ContactMessage
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils.safestring import mark_safe
+from carousel.models import Slide
+from carousel.forms import SlideForm
 
 
 # ---------------- Users ----------------
@@ -526,3 +528,45 @@ def get_new_messages_count(request):
     """Retourne le nombre de nouveaux messages non lus pour le badge."""
     count = ContactMessage.objects.filter(is_read=False).count()
     return JsonResponse({"new_messages_count": count})
+
+# ---------------- Slides Carousel ----------------
+@admin_required
+def slide_list(request):
+    slides = Slide.objects.all()
+    return render(request, "configuration/slide_list.html", {"slides": slides})
+
+@admin_required
+def slide_add(request):
+    if request.method == "POST":
+        form = SlideForm(request.POST, request.FILES)
+        if form.is_valid():
+            slide = form.save()
+            messages.success(request, f"Slide '{slide.titre or slide.id}' ajouté avec succès.")
+            return redirect("slide_list")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+    else:
+        form = SlideForm()
+    return render(request, "configuration/slide_form.html", {"form": form, "title": "Ajouter un slide"})
+
+@admin_required
+def slide_edit(request, slide_id):
+    slide = get_object_or_404(Slide, id=slide_id)
+    if request.method == "POST":
+        form = SlideForm(request.POST, request.FILES, instance=slide)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Slide '{slide.titre or slide.id}' modifié avec succès.")
+            return redirect("slide_list")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+    else:
+        form = SlideForm(instance=slide)
+    return render(request, "configuration/slide_form.html", {"form": form, "title": f"Modifier le slide : {slide.titre or slide.id}"})
+
+@admin_required
+def slide_delete(request, slide_id):
+    slide = get_object_or_404(Slide, id=slide_id)
+    slide.delete()
+    messages.success(request, f"Slide '{slide.titre or slide.id}' supprimé avec succès.")
+    return redirect("slide_list")

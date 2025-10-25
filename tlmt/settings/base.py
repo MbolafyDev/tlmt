@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "plomberie",
     "statistique",
     "tinymce",
+    "carousel",
 ]
 
 # (optionnel mais conseillé) : configuration par défaut

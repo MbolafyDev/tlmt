@@ -1,3 +1,5 @@
+{# tmlt/configuration/categorie_form.html #}
+
 {% extends "base.html" %}
 {% load widget_tweaks %}
 
@@ -19,7 +21,6 @@
           --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
       }
 
-      /* TITRE */
       h2 {
           color: var(--primary-blue);
           font-weight: 700;
@@ -28,7 +29,6 @@
           margin-bottom: 2rem;
       }
 
-      /* CARD FORMULAIRE */
       .form-card {
           background-color: var(--bg-white);
           padding: 2rem;
@@ -41,13 +41,11 @@
           box-shadow: var(--shadow-hover);
       }
 
-      /* LABELS */
       label.form-label {
           font-weight: 600;
           color: var(--primary-blue);
       }
 
-      /* INPUT */
       input.form-control {
           border-radius: 12px;
           border: 1px solid #ced4da;
@@ -59,7 +57,6 @@
           box-shadow: 0 0 0 0.2rem rgba(255,193,7,0.25);
       }
 
-      /* BOUTONS */
       .btn-success {
           background-color: var(--primary-yellow);
           border-color: var(--primary-yellow);
@@ -89,24 +86,43 @@
           border-color: var(--text-muted);
           color: var(--bg-white);
       }
+
+      .text-danger {
+          font-size: 0.875rem;
+      }
       </style>
 
       <!-- ================= FORMULAIRE ================= -->
       <div class="form-card">
+        <h2>{{ title|default:"Ajouter une catégorie" }}</h2>
         <form method="post" novalidate>
           {% csrf_token %}
 
-          <div class="mb-3">
-            <label for="nom" class="form-label">Nom</label>
-            <input
-              type="text"
-              name="nom"
-              id="nom"
-              class="form-control"
-              value="{{ categorie.nom|default:'' }}"
-              required
-            >
-          </div>
+          {# Si vous utilisez un ModelForm Django, on peut gérer le champ dynamique #}
+          {% if form %}
+            {% for field in form %}
+              <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% render_field field class="form-control" %}
+                {% if field.errors %}
+                  <div class="text-danger small">{{ field.errors }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            {# Champ 'nom' statique si pas de form Django #}
+            <div class="mb-3">
+              <label for="nom" class="form-label">Nom</label>
+              <input
+                type="text"
+                name="nom"
+                id="nom"
+                class="form-control"
+                value="{{ categorie.nom|default:'' }}"
+                required
+              >
+            </div>
+          {% endif %}
 
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-success">Enregistrer</button>
